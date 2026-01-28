@@ -1,0 +1,2 @@
+[alias]
+helloworld = "echo 'Hello, World!'"
