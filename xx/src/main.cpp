@@ -48,8 +48,6 @@ int main(int argc, char** argv) {
     CLI::App app{ "xx – Per‑project alias & preset tool" };
     GlobalArgs globalArgs{};
 
-    // Global flags
-
     app.add_option("-c,--config", globalArgs.configFile, "Path to project configuration file")->default_val(".xx.toml");
     app.add_flag("--up", globalArgs.upFlag, "Instead of using the current directory to locate the project configuration file, search parent directories");
     app.add_flag("-v,--verbose", globalArgs.verboseFlag, "Enable verbose output");
@@ -83,7 +81,11 @@ int main(int argc, char** argv) {
 
             const auto& commands = *parseResult;
             for (const auto& cmd : commands) {
-                std::cout << cmd.name << std::endl;
+                const auto joinedCmd = std::accumulate(std::next(cmd.cmd.begin()), cmd.cmd.end(), cmd.cmd[0],
+                                               [](const std::string& a, const std::string& b) {
+                                                   return a + " " + b;
+                                               });
+                std::cout << cmd.name << ": " << joinedCmd << std::endl;
             }
         });
 

@@ -1,2 +1,2 @@
-[alias]
-helloworld = "echo 'Hello, World!'"
+[alias.helloworld]
+cmd = "echo 'Hello, World!'"
