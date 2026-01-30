@@ -10,6 +10,7 @@ set(SOURCES
     src/detail/parser.cpp
     src/detail/planner.cpp
     src/detail/executor.cpp
+    src/detail/platform.cpp
     src/main.cpp
 )
 

@@ -1,43 +1,19 @@
 #include "detail/planner.hpp"
+#include "detail/platform.hpp"
 
 namespace xxlib::planner {
 	bool matches_constraints(const Command& command) {
 		for (const auto& [key, value] : command.constraints) {
 			if (key == "os") {
-#ifdef _WIN32
-				const std::string currentOS = "windows";
-#elif __APPLE__
-				const std::string currentOS = "macos";
-#elif __linux__
-				const std::string currentOS = "linux";
-#else
-				const std::string currentOS = "unknown";
-#endif
-				if (currentOS != value) {
+				if (xxlib::platform::string_to_os(value) != xxlib::platform::get_current_os()) {
 					return false;
 				}
 			} else if (key == "arch") {
-#ifdef __x86_64__
-				const std::string currentArch = "x86_64";
-#elif __aarch64__
-				const std::string currentArch = "arm64";
-#else
-				const std::string currentArch = "unknown";
-#endif
-				if (currentArch != value) {
+				if (xxlib::platform::string_to_architecture(value) != xxlib::platform::get_current_architecture()) {
 					return false;
 				}
 			} else if (key == "osfamily") {
-#ifdef _WIN32
-				const std::string currentOSFamily = "windows";
-#elif __APPLE__
-				const std::string currentOSFamily = "unix";
-#elif __linux__
-				const std::string currentOSFamily = "unix";
-#else
-				const std::string currentOSFamily = "unknown";
-#endif
-				if (currentOSFamily != value) {
+				if (xxlib::platform::string_to_os_family(value) != xxlib::platform::get_current_os_family()) {
 					return false;
 				}
 			} else {
