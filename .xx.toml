@@ -3,6 +3,8 @@ cmd = "echo 'Hello, World!'"
 
 [alias.build]
 cmd = "cmake . -G 'Ninja' --fresh && ninja"
+env = { CC = "/opt/homebrew/opt/llvm/bin/clang", CXX = "/opt/homebrew/opt/llvm/bin/clang++" }
+constraints = [ [ "os", "macos" ] ]
 
 [alias.install]
 cmd = "sudo mv ./xx/xx-cli /usr/local/bin/xx"
