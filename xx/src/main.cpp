@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
 	app.add_option("-c,--config", globalArgs.configFile, "Path to project configuration file")->default_val(".xx.toml");
 	app.add_flag("--up", globalArgs.upFlag, "Instead of using the current directory to locate the project configuration file, search parent directories");
 	app.add_flag("-v,--verbose", globalArgs.verboseFlag, "Enable verbose output");
-	app.add_flag("-d,--dry", globalArgs.dryRunFlag, "Perform a dry run without executing commands");
+	app.add_flag("-n,--dry", globalArgs.dryRunFlag, "Perform a dry run without executing commands, act like they succeeded");
 
 	const auto workdir = std::filesystem::current_path().string();
 
@@ -88,6 +88,7 @@ int main(int argc, char** argv) {
 	auto* run = app.add_subcommand("run", "Run a specified command");
 	std::string commandName;
 	run->add_option("command", commandName, "Name of the command to run")->required();
+	run->allow_extras();
 	run->callback([&]() {
 		auto configPathOpt = find_config(workdir, globalArgs);
 		if (!configPathOpt) {
@@ -114,14 +115,22 @@ int main(int argc, char** argv) {
 			return;
 		}
 
-		const auto& commandToRun = *plannedCommandOpt;
+		auto& commandToRun = *plannedCommandOpt;
+
+		const auto& extras = run->remaining();
+		if (!extras.empty()) {
+			commandToRun.cmd.insert(commandToRun.cmd.end(), extras.begin(), extras.end());
+		}
 
 		if (globalArgs.dryRunFlag) {
+			exitCode = 0;
+
 			std::cout << "Dry run: Command to be executed: ";
 			for (const auto& arg : commandToRun.cmd) {
 				std::cout << arg << " ";
 			}
 			std::cout << std::endl;
+
 			return;
 		}
 

@@ -27,6 +27,19 @@ namespace xxlib::planner {
 				if (currentArch != value) {
 					return false;
 				}
+			} else if (key == "osfamily") {
+#ifdef _WIN32
+				const std::string currentOSFamily = "windows";
+#elif __APPLE__
+				const std::string currentOSFamily = "unix";
+#elif __linux__
+				const std::string currentOSFamily = "unix";
+#else
+				const std::string currentOSFamily = "unknown";
+#endif
+				if (currentOSFamily != value) {
+					return false;
+				}
 			} else {
 				return false;
 			}

@@ -3,3 +3,7 @@ cmd = "echo 'Hello, World!'"
 
 [alias.build]
 cmd = "cmake . -G 'Ninja' --fresh && ninja"
+
+[alias.install]
+cmd = "sudo mv ./xx/xx-cli /usr/local/bin/xx"
+constraints = [ [ "osfamily", "unix" ] ]
