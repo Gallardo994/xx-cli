@@ -5,27 +5,27 @@
 
 namespace xxlib {
 	namespace platform {
-		enum class OSFamily { windows, unix, unknown };
+		enum class OSFamily { Windows, Unix, Unknown };
 		inline OSFamily string_to_os_family(const std::string& osFamily) {
 			if (osFamily == "windows") {
-				return OSFamily::windows;
+				return OSFamily::Windows;
 			} else if (osFamily == "unix") {
-				return OSFamily::unix;
+				return OSFamily::Unix;
 			} else {
-				return OSFamily::unknown;
+				return OSFamily::Unknown;
 			}
 		}
 
-		enum class OS { windows, macos, linux, unknown };
+		enum class OS { Windows, MacOS, Linux, Unknown };
 		inline OS string_to_os(const std::string& os) {
 			if (os == "windows") {
-				return OS::windows;
+				return OS::Windows;
 			} else if (os == "macos") {
-				return OS::macos;
+				return OS::MacOS;
 			} else if (os == "linux") {
-				return OS::linux;
+				return OS::Linux;
 			} else {
-				return OS::unknown;
+				return OS::Unknown;
 			}
 		}
 

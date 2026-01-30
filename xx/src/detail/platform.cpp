@@ -4,25 +4,25 @@ namespace xxlib {
 	namespace platform {
 		OSFamily get_current_os_family() {
 #ifdef _WIN32
-			return OSFamily::windows;
+			return OSFamily::Windows;
 #elif __APPLE__
-			return OSFamily::unix;
+			return OSFamily::Unix;
 #elif __linux__
-			return OSFamily::unix;
+			return OSFamily::Unix;
 #else
-			return OSFamily::unknown;
+			return OSFamily::Unknown;
 #endif
 		}
 
 		OS get_current_os() {
 #ifdef _WIN32
-			return OS::windows;
+			return OS::Windows;
 #elif __APPLE__
-			return OS::macos;
+			return OS::MacOS;
 #elif __linux__
-			return OS::linux;
+			return OS::Linux;
 #else
-			return OS::unknown;
+			return OS::Unknown;
 #endif
 		}
 
