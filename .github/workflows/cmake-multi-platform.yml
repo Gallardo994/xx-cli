@@ -47,4 +47,11 @@ jobs:
           vcvarsall: true
           cmake: true
           ninja: true
-          vcpkg: true
+
+      - name: Configure CMake
+        run: |
+          cmake -G "Ninja" -B build/ -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+
+      - name: "Build"
+        run: |
+          cmake --build ./build
