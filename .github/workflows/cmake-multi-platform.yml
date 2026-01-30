@@ -1,56 +1,50 @@
-name: CMake on multiple platforms
+name: ci
 on:
-  push:
-    branches: [ "main", "experimental" ]
   pull_request:
-    branches: [ "main", "experimental" ]
+  push:
+    branches:
+      - main
+      - experimental
 jobs:
-  build:
+  Test:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        build_type: [Release]
-        c_compiler: [gcc, clang, cl]
+        os:
+          - windows-2025
+          - ubuntu-24.04
+          - macos-15
+          - macos-13
+        compiler:
+          - llvm-21
+          - gcc
         include:
-          - os: windows-latest
-            c_compiler: cl
-            cpp_compiler: cl
-          - os: ubuntu-latest
-            c_compiler: gcc
-            cpp_compiler: g++
-          - os: ubuntu-latest
-            c_compiler: clang
-            cpp_compiler: clang++
-        exclude:
-          - os: windows-latest
-            c_compiler: gcc
-          - os: windows-latest
-            c_compiler: clang
-          - os: ubuntu-latest
-            c_compiler: cl
-
+          - os: "windows-2025"
+            compiler: "msvc"
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-    - name: Set reusable strings
-      id: strings
-      shell: bash
-      run: |
-        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+      - name: Cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ./build/
+            ~/.cache/ccache
+            ~/.ccache
+            ~/.config/ccache
+            ~/Library/Caches/ccache
+            ${{ env.LOCALAPPDATA }}/ccache
+            ${{ env.XDG_CACHE_HOME }}/ccache
+          key: ${{ runner.os }}-${{ matrix.compiler }}-${{ env.BUILD_TYPE }}-${{ hashFiles('**/CMakeLists.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.BUILD_TYPE }}-
 
-    - name: Configure CMake
-      run: >
-        cmake -B ${{ steps.strings.outputs.build-output-dir }}
-        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
-        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
-        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-        -S ${{ github.workspace }}
-
-    - name: Build
-      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
-
-    - name: Test
-      working-directory: ${{ steps.strings.outputs.build-output-dir }}
-      run: ctest --build-config ${{ matrix.build_type }}
+      - name: Setup Cpp
+        uses: aminya/setup-cpp@v1
+        with:
+          compiler: ${{ matrix.compiler }}
+          vcvarsall: true
+          cmake: true
+          ninja: true
+          vcpkg: true
