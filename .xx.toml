@@ -5,5 +5,5 @@ cmd = "echo 'Hello, World!'"
 cmd = "cmake . -G 'Ninja' --fresh && ninja"
 
 [alias.install]
-cmd = "sudo mv ./xx/xx-cli /usr/local/bin/xx"
+cmd = "sudo rm -f /usr/local/bin/xx && sudo cp ./xx/xx-cli /usr/local/bin/xx"
 constraints = [ [ "osfamily", "unix" ] ]
