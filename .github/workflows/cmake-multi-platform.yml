@@ -16,7 +16,7 @@ jobs:
           - ubuntu-24.04
           - macos-15
         compiler:
-          - llvm-21
+          - llvm-20
           - gcc-14
         include:
           - os: "windows-2025"
