@@ -5,6 +5,8 @@ on:
     branches:
       - main
       - experimental
+env:
+  BUILD_TYPE: Release
 jobs:
   Test:
     runs-on: ${{ matrix.os }}
