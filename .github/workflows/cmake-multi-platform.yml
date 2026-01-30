@@ -17,7 +17,7 @@ jobs:
           - macos-15
         compiler:
           - llvm-21
-          - gcc-15
+          - gcc-15.2
         include:
           - os: "windows-2025"
             compiler: "msvc"
