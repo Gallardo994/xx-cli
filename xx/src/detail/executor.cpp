@@ -34,6 +34,8 @@ namespace xxlib::executor {
 		}
 
 		auto returnCode = pclose(pipe.get());
+		
+		// TODO: Unsupported on Windows
 		result.exitCode = WEXITSTATUS(returnCode);
 		result.output = output;
 		result.errorOutput = errorOutput;
