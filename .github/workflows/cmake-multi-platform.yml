@@ -15,10 +15,9 @@ jobs:
           - windows-2025
           - ubuntu-24.04
           - macos-15
-          - macos-13
         compiler:
           - llvm-21
-          - gcc
+          - gcc-15
         include:
           - os: "windows-2025"
             compiler: "msvc"
