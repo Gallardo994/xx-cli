@@ -1,2 +1,5 @@
 [alias.helloworld]
 cmd = "echo 'Hello, World!'"
+
+[alias.build]
+cmd = "cmake . -G 'Ninja' --fresh && ninja"

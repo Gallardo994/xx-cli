@@ -4,5 +4,7 @@
 constexpr const char* XXLIB_VERSION = "0.1.0";
 
 #include "detail/parser.hpp"
+#include "detail/planner.hpp"
+#include "detail/executor.hpp"
 
 #endif // XXLIB_HPP

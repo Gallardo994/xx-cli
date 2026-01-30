@@ -8,6 +8,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(SOURCES
     src/detail/parser.cpp
+    src/detail/planner.cpp
+    src/detail/executor.cpp
     src/main.cpp
 )
 

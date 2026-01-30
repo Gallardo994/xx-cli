@@ -93,11 +93,9 @@ namespace xxlib::parser {
 			std::vector<Command> commands;
 
 			if (auto aliasTable = tomlData["alias"].as_table()) {
-				std::cout << "Found alias table with " << aliasTable->size() << " entries." << std::endl;
-				std::cout << "Alias table contents:" << std::endl;
-				for (const auto& [key, value] : *aliasTable) {
-					std::cout << "Key: " << key << ", Value: " << value.as_string() << std::endl;
+				commands.reserve(aliasTable->size());
 
+				for (const auto& [key, value] : *aliasTable) {
 					if (value.is_table()) {
 						auto commandOpt = parse_command(*value.as_table());
 						if (commandOpt) {
