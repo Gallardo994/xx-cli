@@ -56,6 +56,9 @@ build.ninja
 # Compile commands database
 compile_commands.json
 
+# Build directories
+build/
+
 # Final binaries
 xx/xx-cli
 xx-cli

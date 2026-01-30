@@ -18,12 +18,6 @@ cmd = "echo 'Hello, World!'"
 cmd = "cmake . -G 'Ninja' --fresh && ninja"
 constraints = [ [ "osfamily", "unix" ] ]
 
-# xx run build (Windows family version, sets env variables for clang installed via msys2)
-[alias.build]
-cmd = "cmake . -G 'Ninja' --fresh && ninja"
-constraints = [ [ "osfamily", "windows" ] ]
-env = { 'CC' = 'C:/tools/msys64/clang64/bin/clang.exe', 'CXX' = 'C:/tools/msys64/clang64/bin/clang++.exe' }
-
 # xx run install (Unix family version)
 [alias.install]
 cmd = "sudo rm -f /usr/local/bin/xx && sudo cp ./xx/xx-cli /usr/local/bin/xx"

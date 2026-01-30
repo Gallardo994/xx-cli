@@ -2,14 +2,9 @@
 cmd = "echo 'Hello, World!'"
 
 [alias.build]
-cmd = "cmake . -G 'Ninja' --fresh && ninja"
+cmd = "cmake . --preset default --fresh && ninja -C build/"
 constraints = [ [ "osfamily", "unix" ] ]
 
-[alias.build]
-cmd = "cmake . -G 'Ninja' --fresh && ninja"
-constraints = [ [ "osfamily", "windows" ] ]
-env = { 'CC' = 'C:/tools/msys64/clang64/bin/clang.exe', 'CXX' = 'C:/tools/msys64/clang64/bin/clang++.exe' }
-
 [alias.install]
-cmd = "sudo rm -f /usr/local/bin/xx && sudo cp ./xx/xx-cli /usr/local/bin/xx"
+cmd = "sudo rm -f /usr/local/bin/xx && sudo cp build/xx/xx-cli /usr/local/bin/xx"
 constraints = [ [ "osfamily", "unix" ] ]
