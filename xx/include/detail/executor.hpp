@@ -1,15 +1,14 @@
 #ifndef XX_EXECUTOR_HPP
 #define XX_EXECUTOR_HPP
 
-#include "detail/parser.hpp"
-
+#include "detail/command.hpp"
 #include <string>
 
 namespace xxlib {
 	struct ExecutionResult {
-		int exitCode;
-		std::string output;
-		std::string errorOutput;
+		int32_t exitCode = -1;
+		std::string output{};
+		std::string errorOutput{};
 	};
 
 	namespace executor {

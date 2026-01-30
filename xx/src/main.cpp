@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <filesystem>
+#include <string>
+#include <optional>
 
 struct GlobalArgs {
 	std::string configFile;
@@ -83,7 +85,7 @@ int main(int argc, char** argv) {
 		}
 	});
 
-	int exitCode = 0;
+	int32_t exitCode = 0;
 
 	auto* run = app.add_subcommand("run", "Run a specified command");
 	std::string commandName;

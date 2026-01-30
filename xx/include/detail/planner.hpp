@@ -1,7 +1,10 @@
 #ifndef XX_PLANNER_HPP
 #define XX_PLANNER_HPP
 
-#include "detail/parser.hpp"
+#include "detail/command.hpp"
+#include <optional>
+#include <vector>
+#include <string>
 
 namespace xxlib {
 	namespace planner {

@@ -25,11 +25,6 @@ namespace xxlib::parser {
 		}
 	}
 
-	// [alias.helloworld]
-	// cmd = "echo Hello, World!" # or cmd = ["echo", "Hello, World!"]
-	// env = { GREETING = "Hello", TARGET = "World" } # optional
-	// constraints = [ ["os", "linux"], ["arch", "x86_64"] ] # optional
-
 	std::expected<Command, std::string> parse_command(const toml::table& table) {
 		Command command;
 
