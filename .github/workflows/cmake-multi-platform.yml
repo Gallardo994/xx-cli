@@ -59,14 +59,14 @@ jobs:
 
       - name: "Upload Build Artifacts [Windows]"
         if: matrix.os == 'windows-latest'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v6
         with:
           name: build-${{ matrix.os }}-${{ matrix.compiler }}-${{ env.BUILD_TYPE }}
           path: ./build/xx/xx-cli.exe
 
       - name: "Upload Build Artifacts [Linux/MacOS]"
         if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v6
         with:
           name: build-${{ matrix.os }}-${{ matrix.compiler }}-${{ env.BUILD_TYPE }}
           path: ./build/xx/xx-cli
