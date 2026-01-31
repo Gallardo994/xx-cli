@@ -2,7 +2,6 @@
 
 #include <cstdlib>
 #include <array>
-#include <memory>
 #include <string>
 #include <sstream>
 #include <iostream>
@@ -26,7 +25,7 @@ namespace xxlib::executor {
 			std::cout << "Executing system command: " << fullCommand << std::endl;
 		}
 
-		std::shared_ptr<FILE> pipe(popen(fullCommand.c_str(), "r"), pclose);
+		auto pipe = popen(fullCommand.c_str(), "r");
 		if (!pipe) {
 			return std::unexpected("popen() failed");
 		}
@@ -34,12 +33,12 @@ namespace xxlib::executor {
 		std::array<char, 4096> buffer;
 		size_t bytesRead = 0;
 
-		while ((bytesRead = fread(buffer.data(), 1, buffer.size(), pipe.get())) > 0) {
-			std::cout.write(buffer.data(), bytesRead);
+		while ((fgets(buffer.data(), buffer.size(), pipe))) {
+			std::cout << buffer.data();
 			std::cout.flush();
 		}
 
-		auto returnCode = pclose(pipe.get());
+		auto returnCode = pclose(pipe);
 		return WEXITSTATUS(returnCode);
 	}
 } // namespace xxlib::executor
