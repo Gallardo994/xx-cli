@@ -33,7 +33,3 @@ endif()
 add_executable(xx-cli ${SOURCES})
 target_compile_features(xx-cli PRIVATE cxx_std_23)
 target_include_directories(xx-cli PRIVATE include)
-
-if (WIN32)
-    target_link_libraries(xx-cli PRIVATE Crypt32)
-endif()
