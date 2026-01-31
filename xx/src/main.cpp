@@ -8,6 +8,7 @@
 #include <string>
 #include <optional>
 #include <spdlog/spdlog.h>
+#include <lua.hpp>
 
 struct GlobalArgs {
 	std::string configFile;
@@ -135,6 +136,7 @@ int main(int argc, char** argv) {
 
 	app.add_subcommand("version", "Show version information")->callback([&]() {
 		spdlog::info("xxlib version {}", XXLIB_VERSION);
+		spdlog::info("lua version {}", LUA_VERSION);
 	});
 
 	auto* list = app.add_subcommand("list", "List all available commands");

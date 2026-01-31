@@ -39,7 +39,14 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(spdlog)
 
+FetchContent_Declare(
+    lua
+    GIT_REPOSITORY https://github.com/walterschell/Lua.git
+    GIT_TAG v5.4.7
+)
+FetchContent_MakeAvailable(lua)
+
 add_executable(xx ${SOURCES})
 target_compile_features(xx PRIVATE cxx_std_23)
 target_include_directories(xx PRIVATE include)
-target_link_libraries(xx PRIVATE spdlog::spdlog)
+target_link_libraries(xx PRIVATE spdlog::spdlog lua_static)
