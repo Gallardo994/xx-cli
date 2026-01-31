@@ -9,10 +9,17 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(SOURCES
     src/detail/parser.cpp
     src/detail/planner.cpp
-    src/detail/executor.cpp
     src/detail/platform.cpp
     src/main.cpp
 )
+
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    list(APPEND SOURCES src/detail/executor_windows.cpp)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    list(APPEND SOURCES src/detail/executor_unix.cpp)
+else()
+    message(FATAL_ERROR "Unsupported platform: ${CMAKE_SYSTEM_NAME}")
+endif()
 
 add_executable(xx-cli ${SOURCES})
 target_compile_features(xx-cli PRIVATE cxx_std_23)
