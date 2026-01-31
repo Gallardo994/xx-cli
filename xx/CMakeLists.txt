@@ -1,10 +1,18 @@
 cmake_minimum_required(VERSION 3.22)
 
 project(xx VERSION 0.1.0 LANGUAGES CXX)
+include(FetchContent)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+FetchContent_Declare(
+    spdlog
+    GIT_REPOSITORY https://github.com/gabime/spdlog.git
+    GIT_TAG v1.17.0
+)
+FetchContent_MakeAvailable(spdlog)
 
 set(SOURCES
     src/detail/command.cpp
@@ -34,3 +42,4 @@ endif()
 add_executable(xx ${SOURCES})
 target_compile_features(xx PRIVATE cxx_std_23)
 target_include_directories(xx PRIVATE include)
+target_link_libraries(xx PRIVATE spdlog::spdlog)

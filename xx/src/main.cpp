@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <string>
 #include <optional>
+#include <spdlog/spdlog.h>
 
 struct GlobalArgs {
 	std::string configFile;
@@ -38,7 +39,7 @@ namespace {
 					}
 				}
 			} catch (const std::filesystem::filesystem_error& e) {
-				std::cerr << "Filesystem error: " << e.what() << std::endl;
+				spdlog::error("Filesystem error while searching for config: {}", e.what());
 				return std::nullopt;
 			}
 		} else {
@@ -52,49 +53,36 @@ namespace {
 	}
 
 	std::vector<Command> load_commands(const GlobalArgs& globalArgs, const std::string& workdir) {
-		if (globalArgs.verboseFlag) {
-			std::cout << "Loading configuration from workdir: " << workdir << std::endl;
-		}
+		spdlog::debug("Loading configuration from workdir: {}", workdir);
 
 		std::vector<Command> commands;
 
 		auto configPathOpt = find_config(workdir, globalArgs.configFile, globalArgs.upFlag);
 		if (configPathOpt) {
-			if (globalArgs.verboseFlag) {
-				std::cout << "Configuration file found: " << *configPathOpt << std::endl;
-			}
+			spdlog::debug("Configuration file found at: {}", *configPathOpt);
 
 			const auto buffer = xxlib::parser::read_file(*configPathOpt);
 			if (buffer) {
-				auto parseResult = xxlib::parser::parse_buffer(*buffer, globalArgs.verboseFlag);
+				auto parseResult = xxlib::parser::parse_buffer(*buffer);
 				if (!parseResult) {
 					throw std::runtime_error("Error parsing configuration: " + parseResult.error());
 				}
 
 				commands.insert(commands.end(), parseResult->begin(), parseResult->end());
-
-				if (globalArgs.verboseFlag) {
-					std::cout << "Loaded " << parseResult->size() << " project commands." << std::endl;
-				}
+				spdlog::debug("Loaded {} project commands.", parseResult->size());
 			} else {
-				if (globalArgs.verboseFlag) {
-					std::cout << "Error reading configuration file: " << buffer.error() << std::endl;
-				}
+				spdlog::debug("Error reading configuration file: {}", buffer.error());
 			}
 		} else {
-			if (globalArgs.verboseFlag) {
-				std::cout << "No configuration file found." << std::endl;
-			}
+			spdlog::debug("No configuration file found.");
 		}
 
 		const auto userConfigFilePath = std::filesystem::path(globalArgs.userConfigFile);
 		const auto userBuffer = xxlib::parser::read_file(userConfigFilePath.string());
 		if (userBuffer) {
-			if (globalArgs.verboseFlag) {
-				std::cout << "User configuration found: " << userConfigFilePath.string() << std::endl;
-			}
+			spdlog::debug("User configuration found: {}", userConfigFilePath.string());
 
-			auto userParseResult = xxlib::parser::parse_buffer(*userBuffer, globalArgs.verboseFlag);
+			auto userParseResult = xxlib::parser::parse_buffer(*userBuffer);
 			if (userParseResult) {
 				auto& userCommands = *userParseResult;
 				for (auto& cmd : userCommands) {
@@ -102,19 +90,12 @@ namespace {
 				}
 
 				commands.insert(commands.end(), userCommands.begin(), userCommands.end());
-
-				if (globalArgs.verboseFlag) {
-					std::cout << "Loaded " << userCommands.size() << " user commands." << std::endl;
-				}
+				spdlog::debug("Loaded {} user commands.", userCommands.size());
 			} else {
-				if (globalArgs.verboseFlag) {
-					std::cout << "Error parsing user configuration: " << userParseResult.error() << std::endl;
-				}
+				spdlog::debug("Error parsing user configuration: {}", userParseResult.error());
 			}
 		} else {
-			if (globalArgs.verboseFlag) {
-				std::cout << "User configuration file not found or could not be read: " << userBuffer.error() << std::endl;
-			}
+			spdlog::debug("No user configuration file found at: {}", userConfigFilePath.string());
 		}
 
 		return commands;
@@ -138,10 +119,16 @@ int main(int argc, char** argv) {
 	app.add_flag("-v,--verbose", globalArgs.verboseFlag, "Enable verbose output");
 	app.add_flag("-n,--dry", globalArgs.dryRunFlag, "Perform a dry run without executing commands, act like they succeeded");
 
+	if (globalArgs.verboseFlag) {
+		spdlog::set_level(spdlog::level::debug);
+	} else {
+		spdlog::set_level(spdlog::level::info);
+	}
+
 	const auto workdir = std::filesystem::current_path().string();
 
 	app.add_subcommand("version", "Show version information")->callback([&]() {
-		std::cout << "xx version " << XXLIB_VERSION << std::endl;
+		spdlog::info("xxlib version {}", XXLIB_VERSION);
 	});
 
 	app.add_subcommand("list", "List all available commands")->callback([&]() {
@@ -161,21 +148,21 @@ int main(int argc, char** argv) {
 			return cmd.userScope ? "[User] " : "";
 		};
 
-		std::cout << "Commands available for the current environment:" << std::endl;
+		spdlog::debug("Commands available for the current environment:");
 		for (const auto& cmd : constraintSatisfiedCommands) {
-			std::cout << userTag(cmd) << cmd.name << ": " << xxlib::command::join_cmd(cmd) << std::endl;
+			spdlog::debug("{} {}", cmd.name, xxlib::command::join_cmd(cmd));
 		}
 
 		if (!constraintUnsatisfiedCommands.empty()) {
-			std::cout << "\nCommands not available for the current environment (due to constraints):" << std::endl;
+			spdlog::debug("Commands not available for the current environment: (due to constraints)");
 			for (const auto& cmd : constraintUnsatisfiedCommands) {
-				std::cout << userTag(cmd) << cmd.name << ": " << xxlib::command::join_cmd(cmd) << " [Constraints: " << xxlib::command::join_constraints(cmd) << "]" << std::endl;
+				spdlog::debug("{} {} [Constraints: {}]", cmd.name, xxlib::command::join_cmd(cmd), xxlib::command::join_constraints(cmd));
 			}
 		}
 	});
 
 	app.add_subcommand("user-config-path", "Show the path to the user configuration file")->callback([&]() {
-		std::cout << globalArgs.userConfigFile << std::endl;
+		spdlog::info("{}", globalArgs.userConfigFile);
 	});
 
 	int32_t exitCode = -1;
@@ -189,7 +176,7 @@ int main(int argc, char** argv) {
 
 		auto plannedCommand = xxlib::planner::plan_single(commands, commandName);
 		if (!plannedCommand.has_value()) {
-			std::cerr << "Error planning command: " << plannedCommand.error() << std::endl;
+			spdlog::error("Error planning command '{}': {}", commandName, plannedCommand.error());
 			return;
 		}
 
@@ -202,23 +189,14 @@ int main(int argc, char** argv) {
 
 		if (globalArgs.dryRunFlag) {
 			exitCode = 0;
-
-			std::cout << "Dry run: Command to be executed: ";
-			for (const auto& arg : commandToRun.cmd) {
-				std::cout << arg << " ";
-			}
-			std::cout << std::endl;
-
+			spdlog::info("Dry run: Command to be executed: {}", xxlib::command::join_cmd(commandToRun));
 			return;
 		}
 
-		auto execResult = xxlib::executor::execute_command(commandToRun, globalArgs.verboseFlag);
+		auto execResult = xxlib::executor::execute_command(commandToRun);
 
 		if (!execResult) {
-			if (globalArgs.verboseFlag) {
-				std::cerr << "Error executing command: " << execResult.error() << std::endl;
-			}
-
+			spdlog::error("Error executing command '{}': {}", commandName, execResult.error());
 			return;
 		}
 

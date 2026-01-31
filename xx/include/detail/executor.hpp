@@ -8,7 +8,7 @@
 
 namespace xxlib {
 	namespace executor {
-		std::expected<int32_t, std::string> execute_command(const Command& command, bool verbose);
+		std::expected<int32_t, std::string> execute_command(const Command& command);
 	} // namespace executor
 } // namespace xxlib
 

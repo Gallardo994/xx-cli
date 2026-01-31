@@ -2,6 +2,7 @@
 #include "third_party/toml.hpp"
 
 #include <iostream>
+#include <spdlog/spdlog.h>
 
 namespace xxlib::parser {
 	std::expected<std::string, std::string> read_file(const std::string& path) {
@@ -82,15 +83,13 @@ namespace xxlib::parser {
 		return command;
 	}
 
-	std::expected<std::vector<Command>, std::string> parse_buffer(const std::string& buffer, bool verbose) {
+	std::expected<std::vector<Command>, std::string> parse_buffer(const std::string& buffer) {
 		try {
 			auto tomlData = toml::parse(buffer);
 			std::vector<Command> commands;
 
 			const auto add_command_from_table = [&](const std::string_view key, const toml::table& table) -> std::optional<std::string> {
-				if (verbose) {
-					std::cout << "Parsing command: " << key << std::endl;
-				}
+				spdlog::debug("Parsing command: {}", key);
 
 				auto commandOpt = parse_command(table);
 				if (commandOpt) {
@@ -104,16 +103,13 @@ namespace xxlib::parser {
 			};
 
 			if (auto aliasTable = tomlData["alias"].as_table()) {
-				if (verbose) {
-					std::cout << "Found " << aliasTable->size() << " command aliases in configuration." << std::endl;
-				}
+				spdlog::debug("Found {} command aliases in configuration.", aliasTable->size());
 
 				commands.reserve(aliasTable->size());
 
 				for (const auto& [key, value] : *aliasTable) {
-					if (verbose) {
-						std::cout << "Parsing command alias: " << key << " with type " << value.type() << std::endl;
-					}
+					// TODO: Implement type formatter as it's an enum.
+					spdlog::debug("Parsing command alias: {}", key.str());
 
 					if (value.is_table()) {
 						auto errorOpt = add_command_from_table(key, *value.as_table());

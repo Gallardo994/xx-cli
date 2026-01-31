@@ -5,6 +5,7 @@
 #include <sstream>
 #include <iostream>
 #include <cstdlib>
+#include <spdlog/spdlog.h>
 
 namespace xxlib::executor {
 	std::string build_shell(const Command& command) {
@@ -18,17 +19,15 @@ namespace xxlib::executor {
 		return oss.str();
 	}
 
-	std::expected<int32_t, std::string> execute_command(const Command& command, bool verbose) {
+	std::expected<int32_t, std::string> execute_command(const Command& command) {
 		auto fullCommand = build_shell(command);
-
-		if (verbose) {
-			std::cout << "Executing system command: " << fullCommand << std::endl;
-		}
+		spdlog::debug("Executing system command: {}", fullCommand);
 
 		// Recommended by https://en.cppreference.com/w/cpp/utility/program/system.html
 		std::cout << std::flush;
 
 		auto returnCode = std::system(fullCommand.c_str());
+		spdlog::debug("Command exited with return code: {}", returnCode);
 		if (returnCode == -1) {
 			return std::unexpected("Failed to execute command");
 		}
