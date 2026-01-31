@@ -1,9 +1,9 @@
 # helloworld
 
 [[alias.helloworld]]
-cmd = "echo \"Hello {{ name }}!\""
+cmd = "echo \"{{ greeting }}, {{ target }}!\""
 render_engine = "inja"
-template_vars = { name = "World" }
+template_vars = { greeting = "Hello", target = "World" }
 
 # build
 

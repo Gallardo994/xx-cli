@@ -218,13 +218,17 @@ int main(int argc, char** argv) {
 					auto pos = extra.find('=');
 					if (pos != std::string::npos) {
 						auto key = extra.substr(0, pos);
-						auto value = extra.substr(pos + 1);
-						spdlog::debug("Adding template variable: {}={}", key, value);
-						commandToRun.templateVars[key] = value;
-					} else {
-						spdlog::debug("Adding simple append variable (not k=v): {}", extra);
-						commandToRun.cmd.push_back(extra);
+						if (commandToRun.templateVars.find(key) != commandToRun.templateVars.end()) {
+							auto value = extra.substr(pos + 1);
+							commandToRun.templateVars[key] = value;
+
+							spdlog::debug("Adding template variable: {}={}", key, value);
+							continue;
+						}
 					}
+
+					spdlog::debug("Adding simple append variable (not part of template_vars / k=v format): {}", extra);
+					commandToRun.cmd.push_back(extra);
 				}
 			}
 		}

@@ -14,7 +14,9 @@ This project is a work in progress. The features and syntax are subject to chang
 ```toml
 # `xx run helloworld` will print "Hello World!" to the console.
 [[alias.helloworld]]
-cmd = "echo \"Hello World!\""
+cmd = "echo \"{{ greeting }}, {{ target }}!\""
+render_engine = "inja"
+template_vars = { greeting = "Hello", target = "World" }
 
 # `xx run build` will configure and build the project using CMake and Ninja. Linux+MacOS and Windows versions are separate.
 [[alias.build]]
