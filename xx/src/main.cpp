@@ -1,5 +1,3 @@
-#include "detail/command.hpp"
-#include "detail/luavm.hpp"
 #include "xxlib.hpp"
 #include "third_party/CLI11.hpp"
 
@@ -9,7 +7,6 @@
 #include <string>
 #include <optional>
 #include <spdlog/spdlog.h>
-#include <lua.hpp>
 
 struct GlobalArgs {
 	std::string configFile;
