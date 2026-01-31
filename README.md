@@ -2,9 +2,9 @@
 
 [![CI](https://github.com/Gallardo994/xx-cli/actions/workflows/cmake-multi-platform.yml/badge.svg)](https://github.com/Gallardo994/xx-cli/actions/workflows/cmake-multi-platform.yml)
 
-xx-cli is a CLI tool for executing pre-made command aliases on per-project basis, meaning the commands can be shared across team members working on the same project.
+xx-cli is a CLI tool for executing pre-made command aliases on per-project basis, meaning the commands can be shared across team members working on the same project. Alongside aliases, xx-cli includes self-contained Lua VM that can make abstracting OS differences easier.
 
-It is both suitable for running locally, as well as in CI/CD pipelines by wget'ing or curl'ing a pre-compiled binary from the releases page.
+It is both suitable for running locally, as well as in CI/CD pipelines by wget'ing or curl'ing a pre-compiled binary from the releases page. No extra dependencies are required to run the binaries.
 
 ## Work in Progress
 
