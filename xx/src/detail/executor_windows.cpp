@@ -1,10 +1,8 @@
 #include "detail/executor.hpp"
 
 #include <windows.h>
-#include <string>
 #include <sstream>
 #include <iostream>
-#include <array>
 
 namespace xxlib::executor {
 	std::string build_powershell(const Command& command) {
@@ -40,60 +38,14 @@ namespace xxlib::executor {
 			std::cout << "Executing system command: " << fullCommand << std::endl;
 		}
 
-		SECURITY_ATTRIBUTES sa{};
-		sa.nLength = sizeof(SECURITY_ATTRIBUTES);
-		sa.bInheritHandle = TRUE;
+		// Recommended by https://en.cppreference.com/w/cpp/utility/program/system.html
+		std::cout << std::flush;
 
-		HANDLE stdoutRead = nullptr;
-		HANDLE stdoutWrite = nullptr;
-
-		if (!CreatePipe(&stdoutRead, &stdoutWrite, &sa, 0)) {
-			return std::unexpected("CreatePipe() failed");
+		auto returnCode = std::system(fullCommand.c_str());
+		if (returnCode == -1) {
+			return std::unexpected("Failed to execute command");
 		}
 
-		SetHandleInformation(stdoutRead, HANDLE_FLAG_INHERIT, 0);
-
-		STARTUPINFOA si{};
-		si.cb = sizeof(STARTUPINFOA);
-		si.hStdOutput = stdoutWrite;
-		// TODO: We should probably capture stderr separately so we don't modify original behavior of a command.
-		si.hStdError = stdoutWrite;
-		si.dwFlags |= STARTF_USESTDHANDLES;
-
-		PROCESS_INFORMATION pi{};
-
-		// TODO: Test TUI apps. Unix's pipes were okay with Yazi but failed to render fast enough for htop.
-		auto success = CreateProcessA(nullptr, fullCommand.data(), nullptr, nullptr, TRUE, CREATE_NO_WINDOW, nullptr, nullptr, &si, &pi);
-
-		CloseHandle(stdoutWrite);
-
-		if (!success) {
-			CloseHandle(stdoutRead);
-			return std::unexpected("CreateProcessA() failed");
-		}
-
-		std::array<char, 4096> buffer;
-		DWORD bytesRead = 0;
-
-		while (true) {
-			auto success = ReadFile(stdoutRead, buffer.data(), buffer.size(), &bytesRead, nullptr);
-			if (!success || bytesRead == 0) {
-				break;
-			}
-
-			std::cout.write(buffer.data(), bytesRead);
-			std::cout.flush();
-		}
-
-		WaitForSingleObject(pi.hProcess, INFINITE);
-
-		DWORD exitCode = 0;
-		GetExitCodeProcess(pi.hProcess, &exitCode);
-
-		CloseHandle(pi.hProcess);
-		CloseHandle(pi.hThread);
-		CloseHandle(stdoutRead);
-
-		return static_cast<int32_t>(exitCode);
+		return static_cast<int32_t>(returnCode);
 	}
 } // namespace xxlib::executor
