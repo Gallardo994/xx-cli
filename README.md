@@ -11,19 +11,28 @@ This project is a work in progress. The features and syntax are subject to chang
 ## Example TOML Configuration
 
 ```toml
-# xx run helloworld (Can be run on any OS, as there are no constraints)
-[alias.helloworld]
-cmd = "echo 'Hello, World!'"
+# `xx run helloworld` will print "Hello World!" to the console.
+[[alias.helloworld]]
+cmd = "echo \"Hello World!\""
 
-# xx run build (Unix family version, meaning it will be skipped on Windows)
-[alias.build]
-cmd = "cmake . -G 'Ninja' --fresh && ninja"
+# `xx run build` will configure and build the project using CMake and Ninja. Linux+MacOS and Windows versions are separate.
+[[alias.build]]
+cmd = "cmake . --preset default --fresh && ninja -C build/"
 constraints = [ [ "osfamily", "unix" ] ]
 
-# xx run install (Unix family version)
-[alias.install]
-cmd = "sudo rm -f /usr/local/bin/xx && sudo cp ./xx/xx /usr/local/bin/xx"
+[[alias.build]]
+cmd = "cmake . --preset default --fresh; if ($?) { ninja -C build/ }"
+constraints = [ [ "osfamily", "windows" ] ]
+env = { 'CC' = 'C:/tools/msys64/clang64/bin/clang.exe', 'CXX' = 'C:/tools/msys64/clang64/bin/clang++.exe' }
+
+# `xx run path` will print the PATH environment variable on both Unix-like systems and Windows.
+[[alias.path]]
+cmd = "echo $PATH"
 constraints = [ [ "osfamily", "unix" ] ]
+
+[[alias.path]]
+cmd = "echo $Env:Path"
+constraints = [ [ "osfamily", "windows" ] ]
 ```
 
 ## Commands
