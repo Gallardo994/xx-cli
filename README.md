@@ -45,7 +45,6 @@ print(tostring(sum))
 return 0
 """
 execution_engine = "lua"
-render_engine = "inja"
 template_vars = { values = "0" }
 
 # `xx run build` will configure and build the project using CMake and Ninja. Linux+MacOS and Windows versions are separate.
