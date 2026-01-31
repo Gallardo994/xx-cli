@@ -12,6 +12,7 @@ set(SOURCES
     src/detail/parser.cpp
     src/detail/planner.cpp
     src/detail/platform.cpp
+    src/detail/luavm.cpp
     src/main.cpp
 )
 

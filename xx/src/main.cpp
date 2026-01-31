@@ -1,4 +1,5 @@
 #include "detail/command.hpp"
+#include "detail/luavm.hpp"
 #include "xxlib.hpp"
 #include "third_party/CLI11.hpp"
 
@@ -261,32 +262,63 @@ int main(int argc, char** argv) {
 		if (commandToRun.executionEngine == CommandExecutionEngine::System) {
 			execResult = xxlib::executor::execute_command(commandToRun);
 		} else if (commandToRun.executionEngine == CommandExecutionEngine::Lua) {
-			// TODO: Move to a separate class that manages Lua state and owns it. Any exception here will leak the state.
-			auto* state = luaL_newstate();
-			luaL_openlibs(state);
+			auto state = xxlib::luavm::create();
 			std::string luaCommand;
+
 			for (const auto& part : commandToRun.cmd) {
 				luaCommand += xxlib::command::render(part, commandToRun.templateVars, commandToRun.renderEngine) + " ";
 			}
 			spdlog::debug("Executing Lua script: {}", luaCommand);
 
-			// TODO: Pass Command stuff to Lua environment (envs, templateVars, etc.)
-			if (luaL_loadstring(state, luaCommand.c_str()) || lua_pcall(state, 0, 1, 0)) {
-				execResult = std::unexpected(std::string("Error executing Lua command: ") + lua_tostring(state, -1));
+			const auto push_as_table = [&](const std::unordered_map<std::string, std::string>& map, const char* tableName) {
+				xxlib::luavm::new_table(state);
+				for (const auto& [key, value] : map) {
+					xxlib::luavm::push_string(state, key);
+					xxlib::luavm::push_string(state, value);
+					xxlib::luavm::set_table(state, -3);
+				}
+				xxlib::luavm::set_global(state, tableName);
+			};
+
+			push_as_table(commandToRun.templateVars, "TEMPLATE_VARS");
+			push_as_table(commandToRun.envs, "ENVS");
+
+			xxlib::luavm::new_table(state);
+			{
+				xxlib::luavm::push_string(state, "command_name");
+				xxlib::luavm::push_string(state, commandToRun.name);
+				xxlib::luavm::set_table(state, -3);
+
+				xxlib::luavm::push_string(state, "is_dry_run");
+				xxlib::luavm::push_boolean(state, globalArgs.dryRunFlag);
+				xxlib::luavm::set_table(state, -3);
+			}
+			xxlib::luavm::set_global(state, "CTX");
+
+			if (xxlib::luavm::loadstring(state, luaCommand) || xxlib::luavm::pcall(state, 0, 1, 0)) {
+				execResult = std::unexpected(std::string("Error executing Lua command: ") + xxlib::luavm::tostring(state));
 			}
 
-			const auto* shellCommand = lua_tostring(state, -1);
-			if (!shellCommand) {
-				execResult = std::unexpected("Lua script did not return a string");
-			} else {
+			if (xxlib::luavm::is_nil(state)) {
+				exitCode = 0;
+				spdlog::info("Lua script returned nil, treating as successful no-op.");
+			} else if (xxlib::luavm::is_integer(state)) {
+				exitCode = static_cast<int32_t>(xxlib::luavm::tointeger(state));
+				spdlog::debug("Lua script returned exit code: {}", exitCode);
+			} else if (xxlib::luavm::is_boolean(state)) {
+				bool boolResult = xxlib::luavm::toboolean(state);
+				exitCode = boolResult ? 0 : 1;
+				spdlog::debug("Lua script returned boolean: {}, treating as exit code: {}", boolResult, exitCode);
+			} else if (xxlib::luavm::is_string(state)) {
+				const auto* shellCommand = xxlib::luavm::tostring(state);
 				spdlog::debug("Lua script returned shell command: {}", shellCommand);
 				Command shellExecCommand = commandToRun;
 				shellExecCommand.cmd = {shellCommand};
 				shellExecCommand.executionEngine = CommandExecutionEngine::System;
 				execResult = xxlib::executor::execute_command(shellExecCommand);
+			} else {
+				execResult = std::unexpected("Lua script returned unsupported type");
 			}
-
-			lua_close(state);
 		} else {
 			execResult = std::unexpected("Unknown execution engine");
 		}

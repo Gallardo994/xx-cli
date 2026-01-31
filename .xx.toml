@@ -9,14 +9,19 @@ template_vars = { greeting = "Hello", target = "World" }
 
 [[alias.luacode]]
 cmd = """
-local t = { {{ values }} }
+local t = {}
+for str in string.gmatch(TEMPLATE_VARS.values, '([^,]+)') do
+    table.insert(t, tonumber(str))
+end
 
 local sum = 0
 for k,v in pairs(t) do
     sum = sum + v
 end
 
-return "echo " .. tostring(sum)
+print(tostring(sum))
+
+return 0
 """
 execution_engine = "lua"
 render_engine = "inja"
