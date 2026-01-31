@@ -4,41 +4,44 @@
 #include <array>
 #include <memory>
 #include <string>
+#include <sstream>
+#include <iostream>
 
 namespace xxlib::executor {
-	ExecutionResult execute_command(const Command& command) {
-		ExecutionResult result{};
-		std::string fullCommand;
-
+	std::string build_shell(const Command& command) {
+		std::ostringstream oss;
 		for (const auto& [key, value] : command.envs) {
-			fullCommand += key + "=" + value + " ";
+			oss << key << "=" << value << " ";
 		}
 		for (const auto& arg : command.cmd) {
-			fullCommand += arg + " ";
+			oss << arg << " ";
 		}
+		return oss.str();
+	}
 
-		std::string output;
-		std::string errorOutput;
+	std::expected<int32_t, std::string> execute_command(const Command& command, bool verbose) {
+		auto fullCommand = build_shell(command);
+
+		if (verbose) {
+			std::cout << "Executing system command: " << fullCommand << std::endl;
+		}
 
 		std::shared_ptr<FILE> pipe(popen(fullCommand.c_str(), "r"), pclose);
 		if (!pipe) {
-			result.exitCode = -1;
-			errorOutput = "popen() failed!";
-			result.errorOutput = errorOutput;
-			return result;
+			return std::unexpected("popen() failed");
 		}
 
-		std::array<char, 128> buffer;
-		while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
-			output += buffer.data();
+		std::array<char, 4096> buffer;
+		size_t bytesRead = 0;
+
+		while ((bytesRead = fread(buffer.data(), 1, buffer.size(), pipe.get())) > 0) {
+			std::cout.write(buffer.data(), bytesRead);
+			std::cout.flush();
 		}
 
-		auto returnCode = pclose(pipe.get());
-		
-		result.exitCode = WEXITSTATUS(returnCode);
-		result.output = output;
-		result.errorOutput = errorOutput;
+		int ret = pclose(pipe.get());
+		pipe.release();
 
-		return result;
+		return WEXITSTATUS(ret);
 	}
 } // namespace xxlib::executor
