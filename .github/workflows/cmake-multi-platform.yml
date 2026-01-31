@@ -128,7 +128,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Tag the release
-        if: github.event.inputs.tag != '' && github.event.inputs.prerelease == 'false' && github.ref != 'refs/tags/' + github.event.inputs.tag
+        if: github.event.inputs.tag != '' && github.event.inputs.prerelease == 'false' && github.ref_type != 'tag'
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
