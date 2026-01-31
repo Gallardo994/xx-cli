@@ -55,6 +55,7 @@ Special thanks to the following open-source projects:
 - [CLI11](https://github.com/CLIUtils/CLI11)
 - [tomlplusplus](https://github.com/marzer/tomlplusplus)
 - [spdlog](https://github.com/gabime/spdlog)
+- [inja](https://github.com/pantor/inja)
 
 ## License
 

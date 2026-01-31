@@ -8,6 +8,7 @@
 
 namespace xxlib {
 	namespace executor {
+		std::string build_shell_command(const Command& command);
 		std::expected<int32_t, std::string> execute_command(const Command& command);
 	} // namespace executor
 } // namespace xxlib

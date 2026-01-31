@@ -1,16 +1,46 @@
 #include "detail/command.hpp"
+#include "third_party/inja.hpp"
 
 #include <numeric>
 #include <string>
+#include <spdlog/spdlog.h>
 
 namespace xxlib {
 	namespace command {
+		CommandRenderEngine string_to_command_render_engine(const std::string& rendererStr) {
+			if (rendererStr == "inja") {
+				return CommandRenderEngine::Inja;
+			} else if (rendererStr == "none") {
+				return CommandRenderEngine::None;
+			} else {
+				throw std::invalid_argument("Unknown renderer type: " + rendererStr);
+			}
+		}
+
 		template <typename T> std::string join_vector(const std::vector<T>& vec, const std::string& separator) {
 			if (vec.empty()) {
 				return "";
 			}
 
-			return std::accumulate(std::next(vec.begin()), vec.end(), vec[0], [&separator](const std::string& a, const T& b) { return a + separator + b; });
+			return std::accumulate(std::next(vec.begin()), vec.end(), vec[0], [&separator](const std::string& a, const T& b) {
+				return a + separator + b;
+			});
+		}
+
+		std::string render_inja_template(const std::string& templateStr, const std::unordered_map<std::string, std::string>& templateVars) {
+			inja::json data;
+			for (const auto& [key, value] : templateVars) {
+				data[key] = value;
+			}
+			return inja::render(templateStr, data);
+		}
+
+		std::string render(const std::string& templateStr, const std::unordered_map<std::string, std::string>& templateVars, CommandRenderEngine renderEngine) {
+			if (renderEngine == CommandRenderEngine::Inja) {
+				return render_inja_template(templateStr, templateVars);
+			} else {
+				return templateStr;
+			}
 		}
 
 		std::string join_cmd(const Command& command) {

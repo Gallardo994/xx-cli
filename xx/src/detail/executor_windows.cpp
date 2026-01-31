@@ -6,7 +6,7 @@
 #include <spdlog/spdlog.h>
 
 namespace xxlib::executor {
-	std::string build_powershell(const Command& command) {
+	std::string build_shell_command(const Command& command) {
 		// TODO: Very much unsafe. Needs better escaping.
 		const auto escape_arg = [](const std::string& arg) -> std::string {
 			std::string escaped;
@@ -26,14 +26,14 @@ namespace xxlib::executor {
 			oss << "$env:" << key << "=\\\"" << escape_arg(value) << "\\\"; ";
 		}
 		for (const auto& arg : command.cmd) {
-			oss << escape_arg(arg) << " ";
+			oss << escape_arg(command::render(arg, command.templateVars, command.renderEngine)) << " ";
 		}
 		oss << " }\"";
 		return oss.str();
 	}
 
 	std::expected<int32_t, std::string> execute_command(const Command& command) {
-		auto fullCommand = build_powershell(command);
+		auto fullCommand = build_shell_command(command);
 		spdlog::debug("Executing system command: {}", fullCommand);
 
 		// Recommended by https://en.cppreference.com/w/cpp/utility/program/system.html

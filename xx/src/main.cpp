@@ -1,3 +1,4 @@
+#include "detail/command.hpp"
 #include "xxlib.hpp"
 #include "third_party/CLI11.hpp"
 
@@ -119,13 +120,15 @@ int main(int argc, char** argv) {
 	app.add_flag("-v,--verbose", globalArgs.verboseFlag, "Enable verbose output");
 	app.add_flag("-n,--dry", globalArgs.dryRunFlag, "Perform a dry run without executing commands, act like they succeeded");
 
-	if (globalArgs.verboseFlag) {
-		spdlog::set_level(spdlog::level::debug);
-		spdlog::set_pattern("[%^%l%$] %v");
-	} else {
-		spdlog::set_level(spdlog::level::info);
-		spdlog::set_pattern("%v");
-	}
+	app.parse_complete_callback([&]() {
+		if (globalArgs.verboseFlag) {
+			spdlog::set_level(spdlog::level::debug);
+			spdlog::set_pattern("[%^%l%$] %v");
+		} else {
+			spdlog::set_level(spdlog::level::info);
+			spdlog::set_pattern("%v");
+		}
+	});
 
 	const auto workdir = std::filesystem::current_path().string();
 
@@ -199,12 +202,36 @@ int main(int argc, char** argv) {
 
 		const auto& extras = run->remaining();
 		if (!extras.empty()) {
-			commandToRun.cmd.insert(commandToRun.cmd.end(), extras.begin(), extras.end());
+			spdlog::debug("Appending {} extra arguments to command.", extras.size());
+			for (const auto& extra : extras) {
+				spdlog::debug("  Extra argument: {}", extra);
+			}
+
+			if (commandToRun.renderEngine == CommandRenderEngine::None) {
+				spdlog::debug("Using simple append for extra arguments (no rendering).");
+
+				commandToRun.cmd.insert(commandToRun.cmd.end(), extras.begin(), extras.end());
+			} else {
+				spdlog::debug("Using template variable rendering for extra arguments.");
+
+				for (const auto& extra : extras) {
+					auto pos = extra.find('=');
+					if (pos != std::string::npos) {
+						auto key = extra.substr(0, pos);
+						auto value = extra.substr(pos + 1);
+						spdlog::debug("Adding template variable: {}={}", key, value);
+						commandToRun.templateVars[key] = value;
+					} else {
+						spdlog::debug("Adding simple append variable (not k=v): {}", extra);
+						commandToRun.cmd.push_back(extra);
+					}
+				}
+			}
 		}
 
 		if (globalArgs.dryRunFlag) {
 			exitCode = 0;
-			spdlog::info("Dry run: Command to be executed: {}", xxlib::command::join_cmd(commandToRun));
+			spdlog::info("Dry run: Command to be executed: {}", xxlib::executor::build_shell_command(commandToRun));
 			return;
 		}
 

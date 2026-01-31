@@ -8,19 +8,19 @@
 #include <spdlog/spdlog.h>
 
 namespace xxlib::executor {
-	std::string build_shell(const Command& command) {
+	std::string build_shell_command(const Command& command) {
 		std::ostringstream oss;
 		for (const auto& [key, value] : command.envs) {
 			oss << key << "=" << value << " ";
 		}
 		for (const auto& arg : command.cmd) {
-			oss << arg << " ";
+			oss << command::render(arg, command.templateVars, command.renderEngine) << " ";
 		}
 		return oss.str();
 	}
 
 	std::expected<int32_t, std::string> execute_command(const Command& command) {
-		auto fullCommand = build_shell(command);
+		auto fullCommand = build_shell_command(command);
 		spdlog::debug("Executing system command: {}", fullCommand);
 
 		// Recommended by https://en.cppreference.com/w/cpp/utility/program/system.html

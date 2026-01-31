@@ -48,6 +48,25 @@ namespace xxlib::parser {
 				return std::unexpected("Missing cmd field");
 			}
 
+			command.renderEngine = CommandRenderEngine::None;
+			if (auto cmdRendererValue = table["render_engine"]) {
+				if (cmdRendererValue.is_string()) {
+					command.renderEngine = command::string_to_command_render_engine(cmdRendererValue.as_string()->get());
+				} else {
+					return std::unexpected("Invalid renderer type");
+				}
+			}
+
+			if (auto templateVarsTable = table["template_vars"].as_table()) {
+				for (const auto& [key, value] : *templateVarsTable) {
+					if (value.is_string()) {
+						command.templateVars.emplace(key, value.as_string()->get());
+					} else {
+						return std::unexpected("Invalid template_var value type for key");
+					}
+				}
+			}
+
 			if (auto envsTable = table["env"].as_table()) {
 				for (const auto& [key, value] : *envsTable) {
 					if (value.is_string()) {
