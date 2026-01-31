@@ -22,7 +22,7 @@ constraints = [ [ "osfamily", "unix" ] ]
 
 # xx run install (Unix family version)
 [alias.install]
-cmd = "sudo rm -f /usr/local/bin/xx && sudo cp ./xx/xx-cli /usr/local/bin/xx"
+cmd = "sudo rm -f /usr/local/bin/xx && sudo cp ./xx/xx /usr/local/bin/xx"
 constraints = [ [ "osfamily", "unix" ] ]
 ```
 

@@ -77,14 +77,14 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           name: build-${{ matrix.os }}-${{ matrix.compiler }}-${{ env.BUILD_TYPE }}
-          path: ./build/xx/xx-cli.exe
+          path: ./build/xx/xx.exe
 
       - name: "Upload Build Artifacts [Linux/MacOS]"
         if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
         uses: actions/upload-artifact@v6
         with:
           name: build-${{ matrix.os }}-${{ matrix.compiler }}-${{ env.BUILD_TYPE }}
-          path: ./build/xx/xx-cli
+          path: ./build/xx/xx
   release:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
@@ -101,15 +101,16 @@ jobs:
       - name: Rename artifacts
         run: |
           mkdir -p ./artifacts
-          for file in ./downloaded-artifacts/*; do
+          for artifact in ./downloaded-artifacts/*; do
+            file=$(find "$artifact" -maxdepth 1 -type f)
             filename=$(basename -- "$file")
             extension="${filename##*.}"
-            os_compiler_buildtype="${filename#build-}"
+            os_compiler_buildtype=$(basename "$artifact")
             os_compiler_buildtype="${os_compiler_buildtype//-/_}"
             if [[ "$extension" == "exe" ]]; then
-              mv "$file" "./artifacts/xx-cli-${os_compiler_buildtype}.exe"
+              mv "$file" "./artifacts/xx-${os_compiler_buildtype}.exe"
             else
-              mv "$file" "./artifacts/xx-cli-${os_compiler_buildtype}"
+              mv "$file" "./artifacts/xx-${os_compiler_buildtype}"
             fi
           done
       - name: Upload Release Assets

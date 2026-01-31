@@ -60,5 +60,5 @@ compile_commands.json
 build/
 
 # Final binaries
-xx/xx-cli
-xx-cli
+xx/xx
+xx
