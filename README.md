@@ -24,6 +24,22 @@ render_engine = "inja"
 template_vars = { greeting = "Hello", target = "World" }
 requires_confirmation = true
 
+# `xx run luacode values="1,2,3,4,5"` will print sum of those values to the console using embedded Lua VM. No dependency on external Lua installation.
+[[alias.luacode]]
+cmd = """
+local t = { {{ values }} }
+
+local sum = 0
+for k,v in pairs(t) do
+    sum = sum + v
+end
+
+return "echo " .. tostring(sum)
+"""
+execution_engine = "lua"
+render_engine = "inja"
+template_vars = { values = "0" }
+
 # `xx run build` will configure and build the project using CMake and Ninja. Linux+MacOS and Windows versions are separate.
 [[alias.build]]
 cmd = "cmake . --preset default --fresh && ninja -C build/"

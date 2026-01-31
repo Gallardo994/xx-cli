@@ -5,11 +5,22 @@ cmd = "echo \"{{ greeting }}, {{ target }}!\""
 render_engine = "inja"
 template_vars = { greeting = "Hello", target = "World" }
 
+# luacode
+
 [[alias.luacode]]
 cmd = """
-return "echo hello from lua: " .. (os.date())
+local t = { {{ values }} }
+
+local sum = 0
+for k,v in pairs(t) do
+    sum = sum + v
+end
+
+return "echo " .. tostring(sum)
 """
 execution_engine = "lua"
+render_engine = "inja"
+template_vars = { values = "0" }
 
 # build
 
