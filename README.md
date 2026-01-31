@@ -13,6 +13,7 @@ This project is a work in progress. The features and syntax are subject to chang
 `.xx.toml` file in current working directory:
 ```toml
 # `xx run helloworld` will print "Hello World!" to the console.
+# `xx run helloworld greeting=Hi target=Everyone` will print "Hi Everyone!" to the console.
 [[alias.helloworld]]
 cmd = "echo \"{{ greeting }}, {{ target }}!\""
 render_engine = "inja"
