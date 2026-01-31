@@ -6,11 +6,11 @@ cmd = "echo \"Hello World!\""
 # build
 
 [[alias.build]]
-cmd = "cmake . --preset default --fresh && ninja -C build/"
+cmd = "cmake . --preset default --fresh -DCMAKE_BUILD_TYPE=\"Release\" && ninja -C build/"
 constraints = [ [ "osfamily", "unix" ] ]
 
 [[alias.build]]
-cmd = "cmake . --preset default --fresh; if ($?) { ninja -C build/ }"
+cmd = "cmake . --preset default --fresh -DCMAKE_BUILD_TYPE=\"Release\"; if ($?) { ninja -C build/ }"
 constraints = [ [ "osfamily", "windows" ] ]
 env = { 'CC' = 'C:/tools/msys64/clang64/bin/clang.exe', 'CXX' = 'C:/tools/msys64/clang64/bin/clang++.exe' }
 
