@@ -33,6 +33,7 @@ jobs:
         os:
           - windows-latest
           - ubuntu-latest
+          - ubuntu-24.04-arm
           - macos-latest
         compiler:
           - llvm-20 # llvm-21 is currently broken on macos: https://github.com/llvm/llvm-project/issues/155531
@@ -84,7 +85,7 @@ jobs:
           path: ./build/xx/xx.exe
 
       - name: "Upload Build Artifacts [Linux/MacOS]"
-        if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
+        if: matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-24.04-arm' || matrix.os == 'macos-latest'
         uses: actions/upload-artifact@v6
         with:
           name: build-${{ matrix.os }}-${{ matrix.compiler }}-${{ env.BUILD_TYPE }}
