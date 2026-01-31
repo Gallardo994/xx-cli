@@ -25,6 +25,9 @@ namespace xxlib::executor {
 			std::cout << "Executing system command: " << fullCommand << std::endl;
 		}
 
+		// Recommended by https://en.cppreference.com/w/cpp/utility/program/system.html
+		std::cout << std::flush;
+
 		auto returnCode = std::system(fullCommand.c_str());
 		if (returnCode == -1) {
 			return std::unexpected("Failed to execute command");
