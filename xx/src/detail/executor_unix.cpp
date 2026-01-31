@@ -39,9 +39,7 @@ namespace xxlib::executor {
 			std::cout.flush();
 		}
 
-		int ret = pclose(pipe.get());
-		pipe.release();
-
-		return WEXITSTATUS(ret);
+		auto returnCode = pclose(pipe.get());
+		return WEXITSTATUS(returnCode);
 	}
 } // namespace xxlib::executor
