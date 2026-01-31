@@ -33,7 +33,7 @@ namespace xxlib::executor {
 		std::array<char, 4096> buffer;
 		size_t bytesRead = 0;
 
-		while ((fgets(buffer.data(), buffer.size(), pipe))) {
+		while (fgets(buffer.data(), buffer.size(), pipe)) {
 			std::cout << buffer.data();
 			std::cout.flush();
 		}
