@@ -170,6 +170,8 @@ int main(int argc, char** argv) {
 		}
 	});
 
+	app.add_subcommand("user-config-path", "Show the path to the user configuration file")->callback([&]() { std::cout << globalArgs.userConfigFile << std::endl; });
+
 	int32_t exitCode = -1;
 
 	auto* run = app.add_subcommand("run", "Run a specified command");
