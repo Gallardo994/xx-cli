@@ -133,8 +133,8 @@ int main(int argc, char** argv) {
 		spdlog::info("xxlib version {}", XXLIB_VERSION);
 	});
 
-	std::string listGrep;
 	auto* list = app.add_subcommand("list", "List all available commands");
+	std::string listGrep;
 	list->add_option("--grep", listGrep, "Filter commands by name containing the specified substring");
 	list->callback([&]() {
 		const auto user_tag = [](const Command& cmd) -> std::string {
