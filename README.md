@@ -27,14 +27,22 @@ requires_confirmation = true
 # `xx run luacode values="1,2,3,4,5"` will print sum of those values to the console using embedded Lua VM. No dependency on external Lua installation.
 [[alias.luacode]]
 cmd = """
-local t = { {{ values }} }
+local t = {}
+-- Use TEMPLATE_VARS, ENVS and CTX tables to read context information.
+for str in string.gmatch(TEMPLATE_VARS.values, '([^,]+)') do
+    table.insert(t, tonumber(str))
+end
 
 local sum = 0
 for k,v in pairs(t) do
     sum = sum + v
 end
 
-return "echo " .. tostring(sum)
+print(tostring(sum))
+
+-- Returning 0 indicates success, just as not returning anything at all.
+-- Returning a string will treat it as a command to execute in system shell.
+return 0
 """
 execution_engine = "lua"
 render_engine = "inja"
