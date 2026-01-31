@@ -4,6 +4,8 @@
 
 xx-cli is a CLI tool for executing pre-made command aliases on per-project basis, meaning the commands can be shared across team members working on the same project.
 
+It is both suitable for running locally, as well as in CI/CD pipelines by wget'ing or curl'ing a pre-compiled binary from the releases page.
+
 ## Work in Progress
 
 This project is a work in progress. The features and syntax are subject to change.
@@ -50,7 +52,7 @@ Be sure to name your aliases uniquely as they may conflict between project-level
 
 ## Commands
 
-Generally you're going to use `xx run <alias>` (use `--dry` to simulate command execution without actually running it) and `xx list` to see all the available aliases.
+Generally you're going to use `xx run <alias>` (use `--dry` to simulate command execution without actually running it) and `xx list` to see all the available aliases (with `--grep abc` to quickly find what you're looking for).
 
 Use `xx --help` to see the list of available commands.
 
