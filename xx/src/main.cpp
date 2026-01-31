@@ -256,7 +256,40 @@ int main(int argc, char** argv) {
 			}
 		}
 
-		auto execResult = xxlib::executor::execute_command(commandToRun);
+		std::expected<int32_t, std::string> execResult;
+
+		if (commandToRun.executionEngine == CommandExecutionEngine::System) {
+			execResult = xxlib::executor::execute_command(commandToRun);
+		} else if (commandToRun.executionEngine == CommandExecutionEngine::Lua) {
+			// TODO: Move to a separate class that manages Lua state and owns it. Any exception here will leak the state.
+			auto* state = luaL_newstate();
+			luaL_openlibs(state);
+			std::string luaCommand;
+			for (const auto& part : commandToRun.cmd) {
+				luaCommand += xxlib::command::render(part, commandToRun.templateVars, commandToRun.renderEngine) + " ";
+			}
+			spdlog::debug("Executing Lua script: {}", luaCommand);
+
+			// TODO: Pass Command stuff to Lua environment (envs, templateVars, etc.)
+			if (luaL_loadstring(state, luaCommand.c_str()) || lua_pcall(state, 0, 1, 0)) {
+				execResult = std::unexpected(std::string("Error executing Lua command: ") + lua_tostring(state, -1));
+			}
+
+			const auto* shellCommand = lua_tostring(state, -1);
+			if (!shellCommand) {
+				execResult = std::unexpected("Lua script did not return a string");
+			} else {
+				spdlog::debug("Lua script returned shell command: {}", shellCommand);
+				Command shellExecCommand = commandToRun;
+				shellExecCommand.cmd = {shellCommand};
+				shellExecCommand.executionEngine = CommandExecutionEngine::System;
+				execResult = xxlib::executor::execute_command(shellExecCommand);
+			}
+
+			lua_close(state);
+		} else {
+			execResult = std::unexpected("Unknown execution engine");
+		}
 
 		if (!execResult) {
 			spdlog::error("Error executing command '{}': {}", commandName, execResult.error());

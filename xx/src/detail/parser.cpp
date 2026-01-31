@@ -57,6 +57,15 @@ namespace xxlib::parser {
 				}
 			}
 
+			command.executionEngine = CommandExecutionEngine::System;
+			if (auto cmdExecutorValue = table["execution_engine"]) {
+				if (cmdExecutorValue.is_string()) {
+					command.executionEngine = command::string_to_command_execution_engine(cmdExecutorValue.as_string()->get());
+				} else {
+					return std::unexpected("Invalid execution_engine type");
+				}
+			}
+
 			if (auto templateVarsTable = table["template_vars"].as_table()) {
 				for (const auto& [key, value] : *templateVarsTable) {
 					if (value.is_string()) {

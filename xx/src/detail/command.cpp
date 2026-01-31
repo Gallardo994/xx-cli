@@ -17,6 +17,16 @@ namespace xxlib {
 			}
 		}
 
+		CommandExecutionEngine string_to_command_execution_engine(const std::string& executorStr) {
+			if (executorStr == "system") {
+				return CommandExecutionEngine::System;
+			} else if (executorStr == "lua") {
+				return CommandExecutionEngine::Lua;
+			} else {
+				throw std::invalid_argument("Unknown executor type: " + executorStr);
+			}
+		}
+
 		template <typename T> std::string join_vector(const std::vector<T>& vec, const std::string& separator) {
 			if (vec.empty()) {
 				return "";

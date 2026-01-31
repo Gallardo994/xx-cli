@@ -5,6 +5,12 @@ cmd = "echo \"{{ greeting }}, {{ target }}!\""
 render_engine = "inja"
 template_vars = { greeting = "Hello", target = "World" }
 
+[[alias.luacode]]
+cmd = """
+return "echo hello from lua: " .. (os.date())
+"""
+execution_engine = "lua"
+
 # build
 
 [[alias.build]]
