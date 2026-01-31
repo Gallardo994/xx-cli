@@ -6,7 +6,7 @@ on:
       - main
       - experimental
     tags:
-      - 'v*'
+      - "v*"
   workflow_dispatch:
     inputs:
       tag:
@@ -77,7 +77,7 @@ jobs:
           cmake --build ./build
 
       - name: "Upload Build Artifacts [Windows]"
-        if: matrix.os == 'windows-latest'
+        if: matrix.os == 'windows-latest' || matrix.os == 'windows-11-arm'
         uses: actions/upload-artifact@v6
         with:
           name: build-${{ matrix.os }}-${{ matrix.compiler }}-${{ env.BUILD_TYPE }}
