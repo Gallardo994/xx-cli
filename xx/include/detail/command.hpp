@@ -10,6 +10,7 @@ struct Command {
 	std::vector<std::string> cmd{};
 	std::unordered_map<std::string, std::string> envs{};
 	std::vector<std::pair<std::string, std::string>> constraints{};
+	bool userScope = false;
 };
 
 namespace xxlib {

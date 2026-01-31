@@ -10,6 +10,7 @@ This project is a work in progress. The features and syntax are subject to chang
 
 ## Example TOML Configuration
 
+`.xx.toml` file in current working directory:
 ```toml
 # `xx run helloworld` will print "Hello World!" to the console.
 [[alias.helloworld]]
@@ -34,6 +35,12 @@ constraints = [ [ "osfamily", "unix" ] ]
 cmd = "echo $Env:Path"
 constraints = [ [ "osfamily", "windows" ] ]
 ```
+
+User-defined configuration is stored in these locations:
+- `~/.config/xx/xx.toml` on Linux and MacOS
+- `%APPDATA%\xx\xx.toml` on Windows
+
+Be sure to name your aliases uniquely as they may conflict between project-level and user-level configurations.
 
 ## Commands
 
