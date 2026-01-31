@@ -1,8 +1,8 @@
 #include "xxlib.hpp"
 #include "third_party/CLI11.hpp"
 
-#include <iostream>
 #include <filesystem>
+#include <sstream>
 #include <string>
 #include <optional>
 #include <spdlog/spdlog.h>
@@ -152,12 +152,14 @@ int main(int argc, char** argv) {
 				continue;
 			}
 
-			auto fullText = user_tag(cmd) + cmd.name + ": " + cmdText;
+			std::ostringstream fullText;
+			fullText << user_tag(cmd) << cmd.name << ": " << cmdText;
 
 			if (xxlib::planner::matches_constraints(cmd)) {
-				constraintSatisfiedCommands.push_back(fullText);
+				constraintSatisfiedCommands.push_back(fullText.str());
 			} else {
-				constraintUnsatisfiedCommands.push_back(fullText + " [Constraints: " + xxlib::command::join_constraints(cmd) + "]");
+				fullText << " [Constraints: " << xxlib::command::join_constraints(cmd) << "]";
+				constraintUnsatisfiedCommands.push_back(fullText.str());
 			}
 		}
 
