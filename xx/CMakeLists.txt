@@ -7,13 +7,6 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-FetchContent_Declare(
-    spdlog
-    GIT_REPOSITORY https://github.com/gabime/spdlog.git
-    GIT_TAG v1.17.0
-)
-FetchContent_MakeAvailable(spdlog)
-
 set(SOURCES
     src/detail/command.cpp
     src/detail/parser.cpp
@@ -38,6 +31,13 @@ elseif(UNIX)
 else()
     message(FATAL_ERROR "Unsupported platform: ${CMAKE_SYSTEM_NAME}")
 endif()
+
+FetchContent_Declare(
+    spdlog
+    GIT_REPOSITORY https://github.com/gabime/spdlog.git
+    GIT_TAG v1.17.0
+)
+FetchContent_MakeAvailable(spdlog)
 
 add_executable(xx ${SOURCES})
 target_compile_features(xx PRIVATE cxx_std_23)
