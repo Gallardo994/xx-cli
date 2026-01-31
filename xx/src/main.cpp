@@ -140,7 +140,9 @@ int main(int argc, char** argv) {
 
 	const auto workdir = std::filesystem::current_path().string();
 
-	app.add_subcommand("version", "Show version information")->callback([&]() { std::cout << "xx version " << XXLIB_VERSION << std::endl; });
+	app.add_subcommand("version", "Show version information")->callback([&]() {
+		std::cout << "xx version " << XXLIB_VERSION << std::endl;
+	});
 
 	app.add_subcommand("list", "List all available commands")->callback([&]() {
 		const auto commands = load_commands(globalArgs, workdir);
@@ -155,7 +157,9 @@ int main(int argc, char** argv) {
 			}
 		}
 
-		const auto userTag = [](const Command& cmd) { return cmd.userScope ? "[User] " : ""; };
+		const auto userTag = [](const Command& cmd) {
+			return cmd.userScope ? "[User] " : "";
+		};
 
 		std::cout << "Commands available for the current environment:" << std::endl;
 		for (const auto& cmd : constraintSatisfiedCommands) {
@@ -170,7 +174,9 @@ int main(int argc, char** argv) {
 		}
 	});
 
-	app.add_subcommand("user-config-path", "Show the path to the user configuration file")->callback([&]() { std::cout << globalArgs.userConfigFile << std::endl; });
+	app.add_subcommand("user-config-path", "Show the path to the user configuration file")->callback([&]() {
+		std::cout << globalArgs.userConfigFile << std::endl;
+	});
 
 	int32_t exitCode = -1;
 

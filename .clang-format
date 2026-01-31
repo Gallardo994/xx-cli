@@ -21,4 +21,7 @@ FixNamespaceComments: true
 SortIncludes: Never
 
 BinPackArguments: false
+
+AllowShortLambdasOnASingleLine: false
 ---
+
