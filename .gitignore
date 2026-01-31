@@ -60,5 +60,4 @@ compile_commands.json
 build/
 
 # Final binaries
-xx/xx
-xx
+build/xx/xx
