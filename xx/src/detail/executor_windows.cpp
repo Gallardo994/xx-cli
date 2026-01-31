@@ -2,9 +2,9 @@
 
 #include <windows.h>
 #include <string>
-#include <vector>
 #include <sstream>
 #include <iostream>
+#include <array>
 
 namespace xxlib::executor {
 	std::string build_powershell(const Command& command) {
