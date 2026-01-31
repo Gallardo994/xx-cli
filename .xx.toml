@@ -39,3 +39,7 @@ constraints = [ [ "osfamily", "windows" ] ]
 [[alias.htop]]
 cmd = "htop"
 constraints = [ [ "osfamily", "unix" ] ]
+
+[[alias.downloads]]
+cmd = "yazi ~/Downloads"
+constraints = [ [ "osfamily", "unix" ] ]
