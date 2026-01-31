@@ -121,8 +121,10 @@ int main(int argc, char** argv) {
 
 	if (globalArgs.verboseFlag) {
 		spdlog::set_level(spdlog::level::debug);
+		spdlog::set_pattern("[%^%l%$] %v");
 	} else {
 		spdlog::set_level(spdlog::level::info);
+		spdlog::set_pattern("%v");
 	}
 
 	const auto workdir = std::filesystem::current_path().string();
@@ -131,32 +133,43 @@ int main(int argc, char** argv) {
 		spdlog::info("xxlib version {}", XXLIB_VERSION);
 	});
 
-	app.add_subcommand("list", "List all available commands")->callback([&]() {
-		const auto commands = load_commands(globalArgs, workdir);
-
-		std::vector<Command> constraintSatisfiedCommands;
-		std::vector<Command> constraintUnsatisfiedCommands;
-		for (const auto& cmd : commands) {
-			if (xxlib::planner::matches_constraints(cmd)) {
-				constraintSatisfiedCommands.push_back(cmd);
-			} else {
-				constraintUnsatisfiedCommands.push_back(cmd);
-			}
-		}
-
-		const auto userTag = [](const Command& cmd) {
+	std::string listGrep;
+	auto* list = app.add_subcommand("list", "List all available commands");
+	list->add_option("--grep", listGrep, "Filter commands by name containing the specified substring");
+	list->callback([&]() {
+		const auto user_tag = [](const Command& cmd) -> std::string {
 			return cmd.userScope ? "[User] " : "";
 		};
 
-		spdlog::debug("Commands available for the current environment:");
-		for (const auto& cmd : constraintSatisfiedCommands) {
-			spdlog::debug("{} {}", cmd.name, xxlib::command::join_cmd(cmd));
+		const auto commands = load_commands(globalArgs, workdir);
+
+		std::vector<std::string> constraintSatisfiedCommands;
+		std::vector<std::string> constraintUnsatisfiedCommands;
+		for (const auto& cmd : commands) {
+			auto cmdText = xxlib::command::join_cmd(cmd);
+
+			if (!listGrep.empty() && (cmd.name.find(listGrep) == std::string::npos && cmdText.find(listGrep) == std::string::npos)) {
+				continue;
+			}
+
+			auto fullText = user_tag(cmd) + cmd.name + ": " + cmdText;
+
+			if (xxlib::planner::matches_constraints(cmd)) {
+				constraintSatisfiedCommands.push_back(fullText);
+			} else {
+				constraintUnsatisfiedCommands.push_back(fullText + " [Constraints: " + xxlib::command::join_constraints(cmd) + "]");
+			}
+		}
+
+		spdlog::info("Commands available for the current environment:");
+		for (const auto& str : constraintSatisfiedCommands) {
+			spdlog::info("-- {}", str);
 		}
 
 		if (!constraintUnsatisfiedCommands.empty()) {
-			spdlog::debug("Commands not available for the current environment: (due to constraints)");
-			for (const auto& cmd : constraintUnsatisfiedCommands) {
-				spdlog::debug("{} {} [Constraints: {}]", cmd.name, xxlib::command::join_cmd(cmd), xxlib::command::join_constraints(cmd));
+			spdlog::info("Commands not available for the current environment: (due to constraints)");
+			for (const auto& str : constraintUnsatisfiedCommands) {
+				spdlog::info("-- {}", str);
 			}
 		}
 	});
