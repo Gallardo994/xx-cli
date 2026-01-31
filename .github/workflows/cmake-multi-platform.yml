@@ -40,6 +40,8 @@ jobs:
         include:
           - os: "windows-latest"
             compiler: "msvc"
+          - os: "windows-11-arm"
+            compiler: "msvc"
     steps:
       - uses: actions/checkout@v3
 
