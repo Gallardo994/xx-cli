@@ -91,6 +91,14 @@ namespace xxlib::parser {
 					}
 				}
 			}
+
+			if (auto confirmValue = table["requires_confirmation"]) {
+				if (confirmValue.is_boolean()) {
+					command.requiresConfirmation = confirmValue.as_boolean()->get();
+				} else {
+					return std::unexpected("Invalid requires_confirmation type");
+				}
+			}
 		} catch (const std::exception& e) {
 			return std::unexpected(std::string("Error parsing command: ") + e.what());
 		}

@@ -2,6 +2,7 @@
 #include "xxlib.hpp"
 #include "third_party/CLI11.hpp"
 
+#include <cstdio>
 #include <filesystem>
 #include <sstream>
 #include <string>
@@ -187,7 +188,9 @@ int main(int argc, char** argv) {
 
 	auto* run = app.add_subcommand("run", "Run a specified command");
 	std::string commandName;
+	bool yoloFlag = false;
 	run->add_option("command", commandName, "Name of the command to run")->required();
+	run->add_flag("--yolo", yoloFlag, "Run the command without confirmation, even if it requires confirmation");
 	run->allow_extras();
 	run->callback([&]() {
 		const auto commands = load_commands(globalArgs, workdir);
@@ -237,6 +240,18 @@ int main(int argc, char** argv) {
 			exitCode = 0;
 			spdlog::info("Dry run: Command to be executed: {}", xxlib::executor::build_shell_command(commandToRun));
 			return;
+		}
+
+		if (commandToRun.requiresConfirmation && !yoloFlag) {
+			spdlog::info("Command to be executed: {}", xxlib::executor::build_shell_command(commandToRun));
+			spdlog::info("Type 'y' to confirm execution:");
+
+			auto symbol = std::getc(stdin);
+			if (std::tolower(symbol) != 'y') {
+				spdlog::info("Command execution cancelled by user.");
+				exitCode = 0;
+				return;
+			}
 		}
 
 		auto execResult = xxlib::executor::execute_command(commandToRun);

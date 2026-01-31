@@ -18,6 +18,7 @@ struct Command {
 	std::vector<std::pair<std::string, std::string>> constraints{};
 	bool userScope = false;
 	CommandRenderEngine renderEngine = CommandRenderEngine::None;
+	bool requiresConfirmation = false;
 };
 
 namespace xxlib {
