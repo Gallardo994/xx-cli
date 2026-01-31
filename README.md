@@ -15,10 +15,12 @@ This project is a work in progress. The features and syntax are subject to chang
 # `xx run helloworld` will print "Hello World!" to the console.
 # `xx run helloworld greeting=Hi target=Everyone` will print "Hi Everyone!" to the console.
 # `xx run helloworld greeting=It\'s target=$(date)` will print "It's, <current date>!" to the console, if your shell supports command substitution.
+# User will be prompted for confirmation before executing the command unless --yolo flag is provided.
 [[alias.helloworld]]
 cmd = "echo \"{{ greeting }} {{ target }}!\""
 render_engine = "inja"
 template_vars = { greeting = "Hello", target = "World" }
+requires_confirmation = true
 
 # `xx run build` will configure and build the project using CMake and Ninja. Linux+MacOS and Windows versions are separate.
 [[alias.build]]
