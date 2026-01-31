@@ -13,8 +13,8 @@ on:
         description: "Tag. Use existing tag or create new one"
         required: true
         default: ""
-      prerelease:
-        description: "Is pre-release"
+      stable:
+        description: "Stable release"
         required: false
         default: "false"
       changelog:
@@ -115,18 +115,6 @@ jobs:
               mv "$file" "./artifacts/xx-${os_compiler_buildtype}"
             fi
           done
-      - name: Upload Release Assets
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ github.event.inputs.tag }}
-          name: Release ${{ github.event.inputs.tag }}
-          body: ${{ github.event.inputs.changelog }}
-          draft: false
-          prerelease: ${{ github.event.inputs.prerelease }}
-          files: |
-            ./artifacts/**
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Tag the release
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.tag != ''
         run: |
@@ -140,5 +128,17 @@ jobs:
           fi
           git tag ${{ github.event.inputs.tag }}
           git push origin ${{ github.event.inputs.tag }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload Release Assets
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag != '' && github.event.inputs.tag || github.ref_name }}
+          name: Release ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag != '' && github.event.inputs.tag || github.ref_name }}
+          body: ${{ github.event.inputs.changelog }}
+          draft: false
+          prerelease: ${{ github.event.inputs.stable == 'false' && 'true' || 'false' }}
+          files: |
+            ./artifacts/**
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
