@@ -5,6 +5,21 @@ on:
     branches:
       - main
       - experimental
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag. Use existing tag or create new one"
+        required: true
+        default: ""
+      prerelease:
+        description: "Is pre-release"
+        required: false
+        default: "false"
+      changelog:
+        description: "Change log for this release"
+        required: false
+        default: ""
+
 env:
   BUILD_TYPE: Release
 jobs:
@@ -70,3 +85,35 @@ jobs:
         with:
           name: build-${{ matrix.os }}-${{ matrix.compiler }}-${{ env.BUILD_TYPE }}
           path: ./build/xx/xx-cli
+  release:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v5
+        with:
+          path: ./artifacts
+          pattern: build-*
+          merge-multiple: true
+      - name: Upload Release Assets
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.event.inputs.tag }}
+          name: Release ${{ github.event.inputs.tag }}
+          body: ${{ github.event.inputs.changelog }}
+          draft: false
+          prerelease: ${{ github.event.inputs.prerelease }}
+          files: |
+            ./artifacts/**
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Tag the release
+        if: github.event.inputs.tag != '' && github.event.inputs.prerelease == 'false'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git tag ${{ github.event.inputs.tag }}
+          git push origin ${{ github.event.inputs.tag }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
