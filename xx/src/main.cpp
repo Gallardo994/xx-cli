@@ -19,6 +19,11 @@ namespace {
 		if (upFlag) {
 			std::filesystem::path currentPath = startPath;
 
+			std::string configFileName{configFile};
+			if (const auto path = std::filesystem::path(configFile); path.has_parent_path()) {
+				configFileName = path.filename().string();
+			}
+
 			try {
 				while (true) {
 					std::filesystem::path configPath = currentPath / configFile;
@@ -26,7 +31,7 @@ namespace {
 						return configPath.string();
 					}
 
-					if (currentPath.has_parent_path()) {
+					if (currentPath.has_parent_path() && currentPath != currentPath.parent_path()) {
 						currentPath = currentPath.parent_path();
 					} else {
 						break;
