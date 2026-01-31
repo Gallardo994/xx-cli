@@ -1,9 +1,7 @@
 #include "detail/executor.hpp"
 
 #include <cstdlib>
-#include <array>
-#include <memory>
-#include <string>
+#include <stdexcept>
 
 namespace xxlib::executor {
 	ExecutionResult execute_command(const Command& command) {
