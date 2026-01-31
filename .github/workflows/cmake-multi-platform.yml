@@ -137,7 +137,7 @@ jobs:
           name: Release ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag != '' && github.event.inputs.tag || github.ref_name }}
           body: ${{ github.event.inputs.changelog }}
           draft: false
-          prerelease: ${{ github.event.inputs.stable == 'false' && 'true' || 'false' }}
+          prerelease: ${{ github.event.inputs.stable != 'true' }}
           files: |
             ./artifacts/**
         env:
