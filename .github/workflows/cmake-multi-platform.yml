@@ -8,7 +8,7 @@ on:
 env:
   BUILD_TYPE: Release
 jobs:
-  Test:
+  build:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
