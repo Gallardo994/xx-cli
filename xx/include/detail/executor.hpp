@@ -3,6 +3,7 @@
 
 #include "detail/command.hpp"
 #include <string>
+#include <cstdint>
 
 namespace xxlib {
 	struct ExecutionResult {
