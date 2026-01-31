@@ -95,9 +95,23 @@ jobs:
       - name: Download all artifacts
         uses: actions/download-artifact@v5
         with:
-          path: ./artifacts
+          path: ./downloaded-artifacts
           pattern: build-*
-          merge-multiple: true
+          merge-multiple: false
+      - name: Rename artifacts
+        run: |
+          mkdir -p ./artifacts
+          for file in ./downloaded-artifacts/*; do
+            filename=$(basename -- "$file")
+            extension="${filename##*.}"
+            os_compiler_buildtype="${filename#build-}"
+            os_compiler_buildtype="${os_compiler_buildtype//-/_}"
+            if [[ "$extension" == "exe" ]]; then
+              mv "$file" "./artifacts/xx-cli-${os_compiler_buildtype}.exe"
+            else
+              mv "$file" "./artifacts/xx-cli-${os_compiler_buildtype}"
+            fi
+          done
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v1
         with:
