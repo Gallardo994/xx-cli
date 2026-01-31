@@ -76,6 +76,10 @@ namespace {
 				if (globalArgs.verboseFlag) {
 					std::cout << "Loaded " << parseResult->size() << " project commands." << std::endl;
 				}
+			} else {
+				if (globalArgs.verboseFlag) {
+					std::cout << "Error reading configuration file: " << buffer.error() << std::endl;
+				}
 			}
 		} else {
 			if (globalArgs.verboseFlag) {
