@@ -36,6 +36,6 @@ constraints = [ [ "osfamily", "windows" ] ]
 
 # TUI apps
 
-[[alias.yazi]]
-cmd = "yazi"
+[[alias.htop]]
+cmd = "htop"
 constraints = [ [ "osfamily", "unix" ] ]

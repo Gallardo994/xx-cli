@@ -1,10 +1,10 @@
 #include "detail/executor.hpp"
 
 #include <cstdlib>
-#include <array>
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <cstdlib>
 
 namespace xxlib::executor {
 	std::string build_shell(const Command& command) {
@@ -25,20 +25,11 @@ namespace xxlib::executor {
 			std::cout << "Executing system command: " << fullCommand << std::endl;
 		}
 
-		auto pipe = popen(fullCommand.c_str(), "r");
-		if (!pipe) {
-			return std::unexpected("popen() failed");
+		auto returnCode = std::system(fullCommand.c_str());
+		if (returnCode == -1) {
+			return std::unexpected("Failed to execute command");
 		}
 
-		std::array<char, 4096> buffer;
-		size_t bytesRead = 0;
-
-		while (fgets(buffer.data(), buffer.size(), pipe)) {
-			std::cout << buffer.data();
-			std::cout.flush();
-		}
-
-		auto returnCode = pclose(pipe);
 		return WEXITSTATUS(returnCode);
 	}
 } // namespace xxlib::executor

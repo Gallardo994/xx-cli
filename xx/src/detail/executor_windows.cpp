@@ -62,6 +62,7 @@ namespace xxlib::executor {
 
 		PROCESS_INFORMATION pi{};
 
+		// TODO: Test TUI apps. Unix's pipes were okay with Yazi but failed to render fast enough for htop.
 		auto success = CreateProcessA(nullptr, fullCommand.data(), nullptr, nullptr, TRUE, CREATE_NO_WINDOW, nullptr, nullptr, &si, &pi);
 
 		CloseHandle(stdoutWrite);
