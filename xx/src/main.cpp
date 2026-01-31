@@ -210,28 +210,43 @@ int main(int argc, char** argv) {
 				spdlog::debug("  Extra argument: {}", extra);
 			}
 
-			if (commandToRun.renderEngine == CommandRenderEngine::None) {
-				spdlog::debug("Using simple append for extra arguments (no rendering).");
+			if (commandToRun.executionEngine == CommandExecutionEngine::System) {
+				if (commandToRun.renderEngine == CommandRenderEngine::None) {
+					spdlog::debug("Using simple append for extra arguments (no rendering).");
 
-				commandToRun.cmd.insert(commandToRun.cmd.end(), extras.begin(), extras.end());
-			} else {
-				spdlog::debug("Using template variable rendering for extra arguments.");
+					commandToRun.cmd.insert(commandToRun.cmd.end(), extras.begin(), extras.end());
+				} else {
+					spdlog::debug("Using template variable rendering for extra arguments.");
 
+					for (const auto& extra : extras) {
+						auto pos = extra.find('=');
+						if (pos != std::string::npos) {
+							auto key = extra.substr(0, pos);
+							if (commandToRun.templateVars.find(key) != commandToRun.templateVars.end()) {
+								auto value = extra.substr(pos + 1);
+								commandToRun.templateVars[key] = value;
+
+								spdlog::debug("Adding template variable: {}={}", key, value);
+								continue;
+							}
+						}
+
+						spdlog::debug("Adding simple append variable (not part of template_vars / k=v format): {}", extra);
+						commandToRun.cmd.push_back(extra);
+					}
+				}
+			} else if (commandToRun.executionEngine == CommandExecutionEngine::Lua) {
 				for (const auto& extra : extras) {
 					auto pos = extra.find('=');
 					if (pos != std::string::npos) {
 						auto key = extra.substr(0, pos);
-						if (commandToRun.templateVars.find(key) != commandToRun.templateVars.end()) {
-							auto value = extra.substr(pos + 1);
-							commandToRun.templateVars[key] = value;
+						auto value = extra.substr(pos + 1);
+						commandToRun.templateVars[key] = value;
 
-							spdlog::debug("Adding template variable: {}={}", key, value);
-							continue;
-						}
+						spdlog::debug("Adding template variable: {}={}", key, value);
+					} else {
+						spdlog::debug("Skipping non-kv variable: {}", extra);
 					}
-
-					spdlog::debug("Adding simple append variable (not part of template_vars / k=v format): {}", extra);
-					commandToRun.cmd.push_back(extra);
 				}
 			}
 		}
