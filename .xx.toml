@@ -32,4 +32,4 @@ constraints = [ [ "osfamily", "unix" ] ]
 
 [[alias.install]]
 cmd = "Copy-Item -Path build/xx/xx.exe -Destination C:/tools/xx-cli/xx.exe -Force"
-constraints = [ [ "osfamily", "windows" ]
+constraints = [ [ "osfamily", "windows" ] ]
