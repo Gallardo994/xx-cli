@@ -6,7 +6,7 @@ on:
       - main
       - experimental
     tags:
-      - "v*"
+      - 'v*'
   workflow_dispatch:
     inputs:
       tag:
@@ -34,14 +34,11 @@ jobs:
           - windows-latest
           - ubuntu-latest
           - macos-latest
-          - windows-11-arm
         compiler:
           - llvm-20 # llvm-21 is currently broken on macos: https://github.com/llvm/llvm-project/issues/155531
           - gcc
         include:
           - os: "windows-latest"
-            compiler: "msvc"
-          - os: "windows-11-arm"
             compiler: "msvc"
     steps:
       - uses: actions/checkout@v3
