@@ -1,0 +1,10 @@
+[alias.helloworld]
+cmd = "echo 'Hello, World!'"
+
+[alias.build]
+cmd = "cmake . --preset default --fresh && ninja -C build/"
+constraints = [ [ "osfamily", "unix" ] ]
+
+[alias.install]
+cmd = "sudo rm -f /usr/local/bin/xx && sudo cp build/xx/xx-cli /usr/local/bin/xx"
+constraints = [ [ "osfamily", "unix" ] ]

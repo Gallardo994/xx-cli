@@ -39,3 +39,26 @@
 
 # debug information files
 *.dwo
+
+# CMake generated files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+
+# Ninja build files
+build.ninja
+.ninja_deps
+.ninja_log
+
+# Clangd files
+.cache/
+
+# Compile commands database
+compile_commands.json
+
+# Build directories
+build/
+
+# Final binaries
+xx/xx-cli
+xx-cli
