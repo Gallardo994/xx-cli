@@ -41,6 +41,13 @@ Generally you're going to use `xx run <alias>` (use `--dry` to simulate command 
 
 Use `xx --help` to see the list of available commands.
 
+## Third-Party Libraries
+
+Special thanks to the following open-source projects:
+
+- [CLI11](https://github.com/CLIUtils/CLI11)
+- [tomlplusplus](https://github.com/marzer/tomlplusplus)
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
