@@ -51,22 +51,32 @@ namespace {
 			std::cout << "Loading configuration from workdir: " << workdir << std::endl;
 		}
 
+		std::vector<Command> commands;
+
 		auto configPathOpt = find_config(workdir, globalArgs.configFile, globalArgs.upFlag);
-		if (!configPathOpt) {
-			throw std::runtime_error("Configuration file not found.");
-		}
+		if (configPathOpt) {
+			if (globalArgs.verboseFlag) {
+				std::cout << "Configuration file found: " << *configPathOpt << std::endl;
+			}
 
-		const auto buffer = xxlib::parser::read_file(*configPathOpt);
-		if (!buffer) {
-			throw std::runtime_error("Error reading configuration file: " + buffer.error());
-		}
+			const auto buffer = xxlib::parser::read_file(*configPathOpt);
+			if (buffer) {
+				auto parseResult = xxlib::parser::parse_buffer(*buffer, globalArgs.verboseFlag);
+				if (!parseResult) {
+					throw std::runtime_error("Error parsing configuration: " + parseResult.error());
+				}
 
-		auto parseResult = xxlib::parser::parse_buffer(*buffer, globalArgs.verboseFlag);
-		if (!parseResult) {
-			throw std::runtime_error("Error parsing configuration: " + parseResult.error());
-		}
+				commands.insert(commands.end(), parseResult->begin(), parseResult->end());
 
-		auto& commands = *parseResult;
+				if (globalArgs.verboseFlag) {
+					std::cout << "Loaded " << parseResult->size() << " project commands." << std::endl;
+				}
+			}
+		} else {
+			if (globalArgs.verboseFlag) {
+				std::cout << "No configuration file found." << std::endl;
+			}
+		}
 
 		const auto userConfigFilePath = std::filesystem::path(globalArgs.userConfigFile);
 		const auto userBuffer = xxlib::parser::read_file(userConfigFilePath.string());
@@ -124,12 +134,6 @@ int main(int argc, char** argv) {
 	app.add_subcommand("version", "Show version information")->callback([&]() { std::cout << "xx version " << XXLIB_VERSION << std::endl; });
 
 	app.add_subcommand("list", "List all available commands")->callback([&]() {
-		auto configPathOpt = find_config(workdir, globalArgs.configFile, globalArgs.upFlag);
-		if (!configPathOpt) {
-			std::cerr << "Configuration file not found." << std::endl;
-			return;
-		}
-
 		const auto commands = load_commands(globalArgs, workdir);
 
 		std::vector<Command> constraintSatisfiedCommands;
@@ -164,12 +168,6 @@ int main(int argc, char** argv) {
 	run->add_option("command", commandName, "Name of the command to run")->required();
 	run->allow_extras();
 	run->callback([&]() {
-		auto configPathOpt = find_config(workdir, globalArgs.configFile, globalArgs.upFlag);
-		if (!configPathOpt) {
-			std::cerr << "Configuration file not found." << std::endl;
-			return;
-		}
-
 		const auto commands = load_commands(globalArgs, workdir);
 
 		auto plannedCommand = xxlib::planner::plan_single(commands, commandName);

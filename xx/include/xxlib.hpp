@@ -1,7 +1,7 @@
 #ifndef XXLIB_HPP
 #define XXLIB_HPP
 
-constexpr const char* XXLIB_VERSION = "0.1.4";
+constexpr const char* XXLIB_VERSION = "0.2.0";
 
 #include "detail/parser.hpp"
 #include "detail/planner.hpp"
