@@ -3,16 +3,12 @@
 
 #include "detail/command.hpp"
 #include <string>
+#include <cstdint>
+#include <expected>
 
 namespace xxlib {
-	struct ExecutionResult {
-		int32_t exitCode = -1;
-		std::string output{};
-		std::string errorOutput{};
-	};
-
 	namespace executor {
-		ExecutionResult execute_command(const Command& command);
+		std::expected<int32_t, std::string> execute_command(const Command& command, bool verbose);
 	} // namespace executor
 } // namespace xxlib
 

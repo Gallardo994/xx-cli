@@ -1,5 +1,7 @@
 # xx-cli [WIP]
 
+[![CI](https://github.com/Gallardo994/xx-cli/actions/workflows/cmake-multi-platform.yml/badge.svg)](https://github.com/Gallardo994/xx-cli/actions/workflows/cmake-multi-platform.yml)
+
 xx-cli is a CLI tool for executing pre-made command aliases on per-project basis, meaning the commands can be shared across team members working on the same project.
 
 ## Work in Progress

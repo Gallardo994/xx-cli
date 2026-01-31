@@ -136,19 +136,18 @@ int main(int argc, char** argv) {
 			return;
 		}
 
-		auto execResult = xxlib::executor::execute_command(commandToRun);
+		auto execResult = xxlib::executor::execute_command(commandToRun, globalArgs.verboseFlag);
 
-		if (globalArgs.verboseFlag) {
-			std::cout << "Command executed with exit code: " << execResult.exitCode << std::endl;
-			std::cout << "Output: " << execResult.output << std::endl;
-			if (!execResult.errorOutput.empty()) {
-				std::cerr << "Error Output: " << execResult.errorOutput << std::endl;
+		if (!execResult) {
+			if (globalArgs.verboseFlag) {
+				std::cerr << "Error executing command: " << execResult.error() << std::endl;
 			}
-		} else {
-			std::cout << execResult.output;
+
+			exitCode = -1;
+			return;
 		}
 
-		exitCode = execResult.exitCode;
+		exitCode = execResult.value();
 	});
 
 	CLI11_PARSE(app, argc, argv);
