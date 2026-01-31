@@ -2,13 +2,14 @@
 #define XX_PLANNER_HPP
 
 #include "detail/command.hpp"
-#include <optional>
 #include <vector>
 #include <string>
+#include <expected>
 
 namespace xxlib {
 	namespace planner {
-		std::optional<Command> plan_single(const std::vector<Command>& commands, const std::string& commandName);
+		bool matches_constraints(const Command& command);
+		std::expected<Command, std::string> plan_single(const std::vector<Command>& commands, const std::string& commandName);
 	} // namespace planner
 } // namespace xxlib
 

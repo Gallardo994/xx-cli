@@ -12,4 +12,11 @@ struct Command {
 	std::vector<std::pair<std::string, std::string>> constraints{};
 };
 
+namespace xxlib {
+	namespace command {
+		std::string join_cmd(const Command& command);
+		std::string join_constraints(const Command& command);
+	} // namespace command
+} // namespace xxlib
+
 #endif // XX_COMMAND_HPP

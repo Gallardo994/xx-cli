@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(SOURCES
+    src/detail/command.cpp
     src/detail/parser.cpp
     src/detail/planner.cpp
     src/detail/platform.cpp

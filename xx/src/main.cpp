@@ -72,20 +72,36 @@ int main(int argc, char** argv) {
 			return;
 		}
 
-		auto parseResult = xxlib::parser::parse_buffer(*buffer);
+		auto parseResult = xxlib::parser::parse_buffer(*buffer, globalArgs.verboseFlag);
 		if (!parseResult) {
 			std::cerr << "Error parsing configuration: " << parseResult.error() << std::endl;
 			return;
 		}
 
-		const auto& commands = *parseResult;
-		for (const auto& cmd : commands) {
-			const auto joinedCmd = std::accumulate(std::next(cmd.cmd.begin()), cmd.cmd.end(), cmd.cmd[0], [](const std::string& a, const std::string& b) { return a + " " + b; });
-			std::cout << cmd.name << ": " << joinedCmd << std::endl;
+		std::vector<Command> constraintSatisfiedCommands;
+		std::vector<Command> constraintUnsatisfiedCommands;
+        for (const auto& cmd : *parseResult) {
+            if (xxlib::planner::matches_constraints(cmd)) {
+                constraintSatisfiedCommands.push_back(cmd);
+            } else {
+                constraintUnsatisfiedCommands.push_back(cmd);
+            }
+        }
+
+        std::cout << "Commands available for the current environment:" << std::endl;
+		for (const auto& cmd : constraintSatisfiedCommands) {
+			std::cout << cmd.name << ": " << xxlib::command::join_cmd(cmd) << std::endl;
 		}
+
+		if (!constraintUnsatisfiedCommands.empty()) {
+            std::cout << "\nCommands not available for the current environment (due to constraints):" << std::endl;
+            for (const auto& cmd : constraintUnsatisfiedCommands) {
+                std::cout << cmd.name << ": " << xxlib::command::join_cmd(cmd) << " [Constraints: " << xxlib::command::join_constraints(cmd) << "]" << std::endl;
+            }
+        }
 	});
 
-	int32_t exitCode = 0;
+	int32_t exitCode = -1;
 
 	auto* run = app.add_subcommand("run", "Run a specified command");
 	std::string commandName;
@@ -104,20 +120,20 @@ int main(int argc, char** argv) {
 			return;
 		}
 
-		auto parseResult = xxlib::parser::parse_buffer(*buffer);
+		auto parseResult = xxlib::parser::parse_buffer(*buffer, globalArgs.verboseFlag);
 		if (!parseResult) {
 			std::cerr << "Error parsing configuration: " << parseResult.error() << std::endl;
 			return;
 		}
 
 		const auto& commands = *parseResult;
-		auto plannedCommandOpt = xxlib::planner::plan_single(commands, commandName);
-		if (!plannedCommandOpt) {
-			std::cerr << "No suitable command found for the current environment." << std::endl;
+		auto plannedCommand = xxlib::planner::plan_single(commands, commandName);
+		if (!plannedCommand.has_value()) {
+			std::cerr << "Error planning command: " << plannedCommand.error() << std::endl;
 			return;
 		}
 
-		auto& commandToRun = *plannedCommandOpt;
+		auto& commandToRun = plannedCommand.value();
 
 		const auto& extras = run->remaining();
 		if (!extras.empty()) {
@@ -143,7 +159,6 @@ int main(int argc, char** argv) {
 				std::cerr << "Error executing command: " << execResult.error() << std::endl;
 			}
 
-			exitCode = -1;
 			return;
 		}
 

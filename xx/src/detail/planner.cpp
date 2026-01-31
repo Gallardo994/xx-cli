@@ -1,6 +1,8 @@
 #include "detail/planner.hpp"
 #include "detail/platform.hpp"
 
+#include <functional>
+
 namespace xxlib::planner {
 	bool matches_constraints(const Command& command) {
 		for (const auto& [key, value] : command.constraints) {
@@ -24,17 +26,25 @@ namespace xxlib::planner {
 		return true;
 	}
 
-	std::optional<Command> plan_single(const std::vector<Command>& commands, const std::string& commandName) {
+	std::expected<Command, std::string> plan_single(const std::vector<Command>& commands, const std::string& commandName) {
+		std::vector<std::reference_wrapper<const Command>> matchedCommands;
+
 		for (const auto& command : commands) {
 			if (command.name != commandName) {
 				continue;
 			}
 
 			if (matches_constraints(command)) {
-				return command;
+				matchedCommands.push_back(std::cref(command));
 			}
 		}
 
-		return std::nullopt;
+		if (matchedCommands.size() == 1) {
+			return matchedCommands.front().get();
+		} else if (matchedCommands.size() > 1) {
+			return std::unexpected("Multiple matching commands found for name: " + commandName);
+		}
+
+		return std::unexpected("No matching command found for name: " + commandName);
 	}
 } // namespace xxlib::planner

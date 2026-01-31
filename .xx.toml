@@ -1,25 +1,31 @@
-# Common testing stuff
+# helloworld
 
-[alias.helloworld]
+[[alias.helloworld]]
 cmd = "echo \"Hello World!\""
 
-# MacOS / Linux testing stuff
+# build
 
-[alias.build]
+[[alias.build]]
 cmd = "cmake . --preset default --fresh && ninja -C build/"
 constraints = [ [ "osfamily", "unix" ] ]
 
-[alias.install]
-cmd = "sudo rm -f /usr/local/bin/xx && sudo cp build/xx/xx /usr/local/bin/xx"
-constraints = [ [ "osfamily", "unix" ] ]
-
-# Windows testing stuff
-
-[alias.echopath]
-cmd = "echo $Env:Path"
-constraints = [ [ "osfamily", "windows" ] ]
-
-[alias.build_windows]
+[[alias.build]]
 cmd = "cmake . --preset default --fresh; if ($?) { ninja -C build/ }"
 constraints = [ [ "osfamily", "windows" ] ]
 env = { 'CC' = 'C:/tools/msys64/clang64/bin/clang.exe', 'CXX' = 'C:/tools/msys64/clang64/bin/clang++.exe' }
+
+# path
+
+[[alias.path]]
+cmd = "echo $PATH"
+constraints = [ [ "osfamily", "unix" ] ]
+
+[[alias.path]]
+cmd = "echo $Env:Path"
+constraints = [ [ "osfamily", "windows" ] ]
+
+# install
+
+[[alias.install]]
+cmd = "sudo rm -f /usr/local/bin/xx && sudo cp build/xx/xx /usr/local/bin/xx"
+constraints = [ [ "osfamily", "unix" ] ]

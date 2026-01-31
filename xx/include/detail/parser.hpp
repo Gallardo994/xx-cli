@@ -8,7 +8,7 @@
 namespace xxlib {
 	namespace parser {
 		std::expected<std::string, std::string> read_file(const std::string& path);
-		std::expected<std::vector<Command>, std::string> parse_buffer(const std::string& buffer);
+		std::expected<std::vector<Command>, std::string> parse_buffer(const std::string& buffer, bool verbose = false);
 	} // namespace parser
 } // namespace xxlib
 

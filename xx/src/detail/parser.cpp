@@ -82,25 +82,58 @@ namespace xxlib::parser {
 		return command;
 	}
 
-	std::expected<std::vector<Command>, std::string> parse_buffer(const std::string& buffer) {
+	std::expected<std::vector<Command>, std::string> parse_buffer(const std::string& buffer, bool verbose) {
 		try {
 			auto tomlData = toml::parse(buffer);
 			std::vector<Command> commands;
 
+			const auto add_command_from_table = [&](const std::string_view key, const toml::table& table) -> std::optional<std::string> {
+				if (verbose) {
+					std::cout << "Parsing command: " << key << std::endl;
+				}
+
+				auto commandOpt = parse_command(table);
+				if (commandOpt) {
+					Command command = *commandOpt;
+					command.name = key;
+					commands.push_back(command);
+					return std::nullopt;
+				} else {
+					return commandOpt.error();
+				}
+			};
+
 			if (auto aliasTable = tomlData["alias"].as_table()) {
+				if (verbose) {
+					std::cout << "Found " << aliasTable->size() << " command aliases in configuration." << std::endl;
+				}
+
 				commands.reserve(aliasTable->size());
 
 				for (const auto& [key, value] : *aliasTable) {
+					if (verbose) {
+						std::cout << "Parsing command alias: " << key << " with type " << value.type() << std::endl;
+					}
+
 					if (value.is_table()) {
-						auto commandOpt = parse_command(*value.as_table());
-						if (commandOpt) {
-							Command command = *commandOpt;
-							command.name = key;
-							commands.push_back(command);
-						} else {
-							return std::unexpected(commandOpt.error());
+						auto errorOpt = add_command_from_table(key, *value.as_table());
+						if (errorOpt) {
+							return std::unexpected(*errorOpt);
 						}
-					} else {
+					} else if (value.is_array()) {
+						for (const auto& item : *value.as_array()) {
+							if (item.is_table()) {
+								auto errorOpt = add_command_from_table(key, *item.as_table());
+								if (errorOpt) {
+									return std::unexpected(*errorOpt);
+								}
+							} else {
+								return std::unexpected("Alias array item is not a table for key");
+							}
+						}
+					}
+
+					else {
 						return std::unexpected("Alias entry is not a table for key");
 					}
 				}
