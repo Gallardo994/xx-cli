@@ -29,3 +29,7 @@ constraints = [ [ "osfamily", "windows" ] ]
 [[alias.install]]
 cmd = "sudo rm -f /usr/local/bin/xx && sudo cp build/xx/xx /usr/local/bin/xx"
 constraints = [ [ "osfamily", "unix" ] ]
+
+[[alias.install]]
+cmd = "Copy-Item -Path build/xx/xx.exe -Destination C:/tools/xx-cli/xx.exe -Force"
+constraints = [ [ "osfamily", "windows" ]
