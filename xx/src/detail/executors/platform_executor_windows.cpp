@@ -33,10 +33,10 @@ namespace xxlib::platform_executor {
 		return oss.str();
 	}
 
-	std::expected<int32_t, std::string> execute_command(const Command& command, bool dryRun) {
+	std::expected<int32_t, std::string> execute_command(const Command& command, const CommandContext& context) {
 		auto fullCommand = build_shell_command(command);
 
-		if (dryRun) {
+		if (context.dryRun) {
 			spdlog::info("Command to be executed: {}", fullCommand);
 			return 0;
 		}

@@ -258,7 +258,12 @@ int main(int argc, char** argv) {
 			spdlog::debug("yolo flag is set, requiresConfirmation will be ignored.");
 		}
 
-		auto execResult = xxlib::executor::execute_command(commandToRun, globalArgs.dryRunFlag);
+		auto execContext = CommandContext{
+			.dryRun = globalArgs.dryRunFlag,
+			.extras = extras,
+		};
+
+		auto execResult = xxlib::executor::execute_command(commandToRun, execContext);
 
 		if (!execResult) {
 			spdlog::error("Error executing command '{}': {}", commandName, execResult.error());

@@ -30,6 +30,11 @@ struct Command {
 	bool userScope = false;
 };
 
+struct CommandContext {
+	bool dryRun = false;
+	std::vector<std::string> extras{};
+};
+
 namespace xxlib {
 	namespace command {
 		CommandRenderEngine string_to_command_render_engine(const std::string& rendererStr);

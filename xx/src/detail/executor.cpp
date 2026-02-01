@@ -6,11 +6,11 @@
 
 namespace xxlib {
 	namespace executor {
-		std::expected<int32_t, std::string> execute_command(const Command& command, bool dryRun) {
+		std::expected<int32_t, std::string> execute_command(const Command& command, const CommandContext& context) {
 			if (command.executionEngine == CommandExecutionEngine::System) {
-				return xxlib::platform_executor::execute_command(command, dryRun);
+				return xxlib::platform_executor::execute_command(command, context);
 			} else if (command.executionEngine == CommandExecutionEngine::Lua) {
-				return xxlib::lua_executor::execute_command(command, dryRun);
+				return xxlib::lua_executor::execute_command(command, context);
 			} else {
 				return std::unexpected("Unknown execution engine");
 			}

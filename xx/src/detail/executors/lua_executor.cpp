@@ -3,13 +3,14 @@
 #include "detail/luavm.hpp"
 #include "detail/command.hpp"
 #include "detail/helpers.hpp"
+#include "detail/executor.hpp"
 
 #include <expected>
 #include <spdlog/spdlog.h>
 
 namespace xxlib {
 	namespace lua_executor {
-		std::expected<int32_t, std::string> execute_command(const Command& command, bool dryRun) {
+		std::expected<int32_t, std::string> execute_command(const Command& command, const CommandContext& context) {
 			auto state = xxlib::luavm::create();
 			std::string luaCommand;
 
@@ -17,7 +18,7 @@ namespace xxlib {
 				luaCommand += xxlib::command::render(part, command.templateVars, command.renderEngine) + " ";
 			}
 
-			if (dryRun) {
+			if (context.dryRun) {
 				spdlog::info("Lua script to be executed: {}", luaCommand);
 				return 0;
 			}
@@ -83,12 +84,17 @@ namespace xxlib {
 				const auto* shellCommand = xxlib::luavm::tostring(state);
 				spdlog::debug("Lua script returned shell command: {}", shellCommand);
 
-				Command shellExecCommand = command;
+				auto shellExecCommand = command;
 				shellExecCommand.cmd = {shellCommand};
 				shellExecCommand.executionEngine = CommandExecutionEngine::System;
 				shellExecCommand.requiresConfirmation = false;
 
-				return xxlib::platform_executor::execute_command(shellExecCommand, false);
+				auto shellExecContext = CommandContext{
+					.dryRun = false,
+					.extras = {},
+				};
+
+				return xxlib::platform_executor::execute_command(shellExecCommand, shellExecContext);
 
 			} else {
 				return std::unexpected("Lua script returned unsupported type");
