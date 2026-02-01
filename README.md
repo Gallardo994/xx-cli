@@ -87,6 +87,7 @@ Special thanks to the following open-source projects:
 - [tomlplusplus](https://github.com/marzer/tomlplusplus)
 - [spdlog](https://github.com/gabime/spdlog)
 - [inja](https://github.com/pantor/inja)
+- [Lua for CMake](https://github.com/walterschell/Lua) & [Lua](https://www.lua.org/)
 
 ## License
 
