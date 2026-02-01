@@ -32,8 +32,13 @@ namespace xxlib::platform_executor {
 		return oss.str();
 	}
 
-	std::expected<int32_t, std::string> execute_command(const Command& command) {
+	std::expected<int32_t, std::string> execute_command(const Command& command, bool dryRun) {
 		auto fullCommand = build_shell_command(command);
+
+		if (dryRun) {
+			spdlog::info("Command to be executed: {}", fullCommand);
+			return 0;
+		}
 
 		if (command.requiresConfirmation) {
 			if (xxlib::helpers::ask_for_confirmation("System Executor Engine wants to run (y/n): " + fullCommand)) {
