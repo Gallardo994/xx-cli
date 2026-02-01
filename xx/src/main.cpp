@@ -254,12 +254,12 @@ int main(int argc, char** argv) {
 
 		if (globalArgs.dryRunFlag) {
 			exitCode = 0;
-			spdlog::info("Dry run: Command to be executed: {}", xxlib::executor::build_shell_command(commandToRun));
+			spdlog::info("Dry run: Command to be executed: {}", xxlib::platform_executor::build_shell_command(commandToRun));
 			return;
 		}
 
 		if (commandToRun.requiresConfirmation && !yoloFlag) {
-			spdlog::info("Command to be executed: {}", xxlib::executor::build_shell_command(commandToRun));
+			spdlog::info("Command to be executed: {}", xxlib::platform_executor::build_shell_command(commandToRun));
 			spdlog::info("Type 'y' to confirm execution:");
 
 			auto symbol = std::getc(stdin);
@@ -273,7 +273,7 @@ int main(int argc, char** argv) {
 		std::expected<int32_t, std::string> execResult;
 
 		if (commandToRun.executionEngine == CommandExecutionEngine::System) {
-			execResult = xxlib::executor::execute_command(commandToRun);
+			execResult = xxlib::platform_executor::execute_command(commandToRun);
 		} else if (commandToRun.executionEngine == CommandExecutionEngine::Lua) {
 			// TODO: Way too nested. Move somewhere else.
 			auto state = xxlib::luavm::create();
@@ -329,7 +329,7 @@ int main(int argc, char** argv) {
 						Command shellExecCommand = commandToRun;
 						shellExecCommand.cmd = {shellCommand};
 						shellExecCommand.executionEngine = CommandExecutionEngine::System;
-						execResult = xxlib::executor::execute_command(shellExecCommand);
+						execResult = xxlib::platform_executor::execute_command(shellExecCommand);
 					} else {
 						execResult = std::unexpected("Lua script returned unsupported type");
 					}

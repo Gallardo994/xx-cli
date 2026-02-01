@@ -1,11 +1,11 @@
-#include "detail/executor.hpp"
+#include "detail/platform_executor.hpp"
 
 #include <windows.h>
 #include <sstream>
 #include <iostream>
 #include <spdlog/spdlog.h>
 
-namespace xxlib::executor {
+namespace xxlib::platform_executor {
 	std::string build_shell_command(const Command& command) {
 		// TODO: Very much unsafe. Needs better escaping.
 		const auto escape_arg = [](const std::string& arg) -> std::string {
@@ -47,4 +47,4 @@ namespace xxlib::executor {
 
 		return static_cast<int32_t>(returnCode);
 	}
-} // namespace xxlib::executor
+} // namespace xxlib::platform_executor

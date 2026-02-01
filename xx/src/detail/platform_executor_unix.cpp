@@ -1,4 +1,4 @@
-#include "detail/executor.hpp"
+#include "detail/platform_executor.hpp"
 
 #include <cstdlib>
 #include <string>
@@ -7,7 +7,7 @@
 #include <cstdlib>
 #include <spdlog/spdlog.h>
 
-namespace xxlib::executor {
+namespace xxlib::platform_executor {
 	std::string build_shell_command(const Command& command) {
 		std::ostringstream oss;
 		for (const auto& [key, value] : command.envs) {
@@ -34,4 +34,4 @@ namespace xxlib::executor {
 
 		return WEXITSTATUS(returnCode);
 	}
-} // namespace xxlib::executor
+} // namespace xxlib::platform_executor

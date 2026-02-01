@@ -1,5 +1,5 @@
-#ifndef XX_EXECUTOR_HPP
-#define XX_EXECUTOR_HPP
+#ifndef XX_PLATFORM_EXECUTOR_HPP
+#define XX_PLATFORM_EXECUTOR_HPP
 
 #include "detail/command.hpp"
 #include <string>
@@ -7,10 +7,10 @@
 #include <expected>
 
 namespace xxlib {
-	namespace executor {
+	namespace platform_executor {
 		std::string build_shell_command(const Command& command);
 		std::expected<int32_t, std::string> execute_command(const Command& command);
-	} // namespace executor
+	} // namespace platform_executor
 } // namespace xxlib
 
-#endif // XX_EXECUTOR_HPP
+#endif // XX_PLATFORM_EXECUTOR_HPP
