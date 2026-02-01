@@ -203,6 +203,7 @@ int main(int argc, char** argv) {
 
 		auto& commandToRun = plannedCommand.value();
 
+		// TODO: This should be handled by the command execution engine itself.
 		const auto& extras = run->remaining();
 		if (!extras.empty()) {
 			spdlog::debug("Appending {} extra arguments to command.", extras.size());
@@ -257,7 +258,7 @@ int main(int argc, char** argv) {
 			spdlog::debug("yolo flag is set, requiresConfirmation will be ignored.");
 		}
 
-		auto execResult = xxlib::executor::execute_command(commandToRun, globalArgs.dryRunFlag);
+		auto execResult = xxlib::executor::execute_command(commandToRun globalArgs.dryRunFlag);
 
 		if (!execResult) {
 			spdlog::error("Error executing command '{}': {}", commandName, execResult.error());
