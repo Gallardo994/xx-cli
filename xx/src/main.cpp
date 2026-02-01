@@ -252,96 +252,12 @@ int main(int argc, char** argv) {
 			}
 		}
 
-		if (globalArgs.dryRunFlag) {
-			exitCode = 0;
-			spdlog::info("Dry run: Command to be executed: {}", xxlib::platform_executor::build_shell_command(commandToRun));
-			return;
+		if (yoloFlag) {
+			commandToRun.requiresConfirmation = false;
+			spdlog::debug("yolo flag is set, requiresConfirmation will be ignored.");
 		}
 
-		if (commandToRun.requiresConfirmation && !yoloFlag) {
-			spdlog::info("Command to be executed: {}", xxlib::platform_executor::build_shell_command(commandToRun));
-			spdlog::info("Type 'y' to confirm execution:");
-
-			auto symbol = std::getc(stdin);
-			if (std::tolower(symbol) != 'y') {
-				spdlog::info("Command execution cancelled by user.");
-				exitCode = 0;
-				return;
-			}
-		}
-
-		std::expected<int32_t, std::string> execResult;
-
-		if (commandToRun.executionEngine == CommandExecutionEngine::System) {
-			execResult = xxlib::platform_executor::execute_command(commandToRun);
-		} else if (commandToRun.executionEngine == CommandExecutionEngine::Lua) {
-			// TODO: Way too nested. Move somewhere else.
-			auto state = xxlib::luavm::create();
-			std::string luaCommand;
-
-			for (const auto& part : commandToRun.cmd) {
-				luaCommand += xxlib::command::render(part, commandToRun.templateVars, commandToRun.renderEngine) + " ";
-			}
-			spdlog::debug("Executing Lua script: {}", luaCommand);
-
-			const auto push_as_table = [&](const std::unordered_map<std::string, std::string>& map, const char* tableName) {
-				xxlib::luavm::new_table(state);
-				for (const auto& [key, value] : map) {
-					xxlib::luavm::push_string(state, key);
-					xxlib::luavm::push_string(state, value);
-					xxlib::luavm::set_table(state, -3);
-				}
-				xxlib::luavm::set_global(state, tableName);
-			};
-
-			push_as_table(commandToRun.templateVars, "TEMPLATE_VARS");
-			push_as_table(commandToRun.envs, "ENVS");
-
-			xxlib::luavm::new_table(state);
-			{
-				xxlib::luavm::push_string(state, "command_name");
-				xxlib::luavm::push_string(state, commandToRun.name);
-				xxlib::luavm::set_table(state, -3);
-
-				xxlib::luavm::push_string(state, "is_dry_run");
-				xxlib::luavm::push_boolean(state, globalArgs.dryRunFlag);
-				xxlib::luavm::set_table(state, -3);
-			}
-			xxlib::luavm::set_global(state, "CTX");
-
-			auto loadStatus = xxlib::luavm::loadstring(state, luaCommand);
-			if (loadStatus == 0) {
-				auto pcallStatus = xxlib::luavm::pcall(state, 0, 1, 0);
-				if (pcallStatus == 0) {
-					if (xxlib::luavm::is_nil(state)) {
-						exitCode = 0;
-						spdlog::info("Lua script returned nil, treating as successful no-op.");
-					} else if (xxlib::luavm::is_integer(state)) {
-						exitCode = static_cast<int32_t>(xxlib::luavm::tointeger(state));
-						spdlog::debug("Lua script returned exit code: {}", exitCode);
-					} else if (xxlib::luavm::is_boolean(state)) {
-						bool boolResult = xxlib::luavm::toboolean(state);
-						exitCode = boolResult ? 0 : 1;
-						spdlog::debug("Lua script returned boolean: {}, treating as exit code: {}", boolResult, exitCode);
-					} else if (xxlib::luavm::is_string(state)) {
-						const auto* shellCommand = xxlib::luavm::tostring(state);
-						spdlog::debug("Lua script returned shell command: {}", shellCommand);
-						Command shellExecCommand = commandToRun;
-						shellExecCommand.cmd = {shellCommand};
-						shellExecCommand.executionEngine = CommandExecutionEngine::System;
-						execResult = xxlib::platform_executor::execute_command(shellExecCommand);
-					} else {
-						execResult = std::unexpected("Lua script returned unsupported type");
-					}
-				} else {
-					execResult = std::unexpected(std::string("Error loading Lua command: ") + xxlib::luavm::tostring(state));
-				}
-			} else {
-				execResult = std::unexpected(std::string("Error executing Lua command: ") + xxlib::luavm::tostring(state));
-			}
-		} else {
-			execResult = std::unexpected("Unknown execution engine");
-		}
+		auto execResult = xxlib::executor::execute_command(commandToRun, globalArgs.dryRunFlag);
 
 		if (!execResult) {
 			spdlog::error("Error executing command '{}': {}", commandName, execResult.error());

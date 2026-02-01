@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22)
 
-project(xx VERSION 0.5.1 LANGUAGES CXX)
+project(xx VERSION 0.6.0 LANGUAGES CXX)
 include(FetchContent)
 
 set(CMAKE_CXX_STANDARD 23)
@@ -12,13 +12,16 @@ set(SOURCES
     src/detail/parser.cpp
     src/detail/planner.cpp
     src/detail/platform.cpp
+    src/detail/executor.cpp
+    src/detail/executors/lua_executor.cpp
     src/detail/luavm.cpp
+    src/detail/helpers.cpp
     src/main.cpp
 )
 
 if (WIN32)
     message(STATUS "Configuring for Windows platform")
-    list(APPEND SOURCES src/detail/platform_executor_windows.cpp)
+    list(APPEND SOURCES src/detail/executors/platform_executor_windows.cpp)
     if(MSVC)
         message(STATUS "Using MSVC compiler")
         set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
@@ -28,7 +31,7 @@ if (WIN32)
     endif()
 elseif(UNIX)
     message(STATUS "Configuring for UNIX platform")
-    list(APPEND SOURCES src/detail/platform_executor_unix.cpp)
+    list(APPEND SOURCES src/detail/executors/platform_executor_unix.cpp)
 else()
     message(FATAL_ERROR "Unsupported platform: ${CMAKE_SYSTEM_NAME}")
 endif()

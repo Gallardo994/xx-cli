@@ -1,39 +1,42 @@
-#include "detail/platform_executor.hpp"
+#include "detail/executors/platform_executor.hpp"
+#include "detail/helpers.hpp"
 
-#include <windows.h>
+#include <cstdlib>
+#include <string>
 #include <sstream>
 #include <iostream>
+#include <cstdlib>
 #include <spdlog/spdlog.h>
 
 namespace xxlib::platform_executor {
 	std::string build_shell_command(const Command& command) {
-		// TODO: Very much unsafe. Needs better escaping.
-		const auto escape_arg = [](const std::string& arg) -> std::string {
-			std::string escaped;
-			for (char c : arg) {
-				if (c == '"') {
-					escaped += "\\\"";
-				} else {
-					escaped += c;
-				}
-			}
-			return escaped;
-		};
-
 		std::ostringstream oss;
-		oss << "powershell.exe -NoProfile -Command \"& { ";
 		for (const auto& [key, value] : command.envs) {
-			oss << "$env:" << key << "=\\\"" << escape_arg(value) << "\\\"; ";
+			oss << key << "=" << value << " ";
 		}
 		for (const auto& arg : command.cmd) {
-			oss << escape_arg(command::render(arg, command.templateVars, command.renderEngine)) << " ";
+			oss << command::render(arg, command.templateVars, command.renderEngine) << " ";
 		}
-		oss << " }\"";
 		return oss.str();
 	}
 
-	std::expected<int32_t, std::string> execute_command(const Command& command) {
+	std::expected<int32_t, std::string> execute_command(const Command& command, bool dryRun) {
 		auto fullCommand = build_shell_command(command);
+
+		if (dryRun) {
+			spdlog::info("Command to be executed: {}", fullCommand);
+			return 0;
+		}
+
+		if (command.requiresConfirmation) {
+			if (xxlib::helpers::ask_for_confirmation("System Executor Engine wants to run (y/n): " + fullCommand)) {
+				spdlog::info("User confirmed execution.");
+			} else {
+				spdlog::info("User denied execution.");
+				return 0;
+			}
+		}
+
 		spdlog::debug("Executing system command: {}", fullCommand);
 
 		// Recommended by https://en.cppreference.com/w/cpp/utility/program/system.html
@@ -45,6 +48,6 @@ namespace xxlib::platform_executor {
 			return std::unexpected("Failed to execute command");
 		}
 
-		return static_cast<int32_t>(returnCode);
+		return WEXITSTATUS(returnCode);
 	}
 } // namespace xxlib::platform_executor
