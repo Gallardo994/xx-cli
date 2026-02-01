@@ -3,7 +3,6 @@
 #include "detail/luavm.hpp"
 #include "detail/command.hpp"
 #include "detail/helpers.hpp"
-#include "detail/executor.hpp"
 
 #include <expected>
 #include <spdlog/spdlog.h>
