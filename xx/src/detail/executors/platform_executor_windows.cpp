@@ -1,4 +1,5 @@
 #include "detail/executors/platform_executor.hpp"
+#include "detail/helpers.hpp"
 
 #include <windows.h>
 #include <sstream>
