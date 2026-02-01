@@ -236,6 +236,7 @@ int main(int argc, char** argv) {
 					}
 				}
 			} else if (commandToRun.executionEngine == CommandExecutionEngine::Lua) {
+				// TODO: Remove copypaste from above
 				for (const auto& extra : extras) {
 					auto pos = extra.find('=');
 					if (pos != std::string::npos) {
@@ -274,6 +275,7 @@ int main(int argc, char** argv) {
 		if (commandToRun.executionEngine == CommandExecutionEngine::System) {
 			execResult = xxlib::executor::execute_command(commandToRun);
 		} else if (commandToRun.executionEngine == CommandExecutionEngine::Lua) {
+			// TODO: Way too nested. Move somewhere else.
 			auto state = xxlib::luavm::create();
 			std::string luaCommand;
 
@@ -307,29 +309,35 @@ int main(int argc, char** argv) {
 			}
 			xxlib::luavm::set_global(state, "CTX");
 
-			if (xxlib::luavm::loadstring(state, luaCommand) || xxlib::luavm::pcall(state, 0, 1, 0)) {
-				execResult = std::unexpected(std::string("Error executing Lua command: ") + xxlib::luavm::tostring(state));
-			}
-
-			if (xxlib::luavm::is_nil(state)) {
-				exitCode = 0;
-				spdlog::info("Lua script returned nil, treating as successful no-op.");
-			} else if (xxlib::luavm::is_integer(state)) {
-				exitCode = static_cast<int32_t>(xxlib::luavm::tointeger(state));
-				spdlog::debug("Lua script returned exit code: {}", exitCode);
-			} else if (xxlib::luavm::is_boolean(state)) {
-				bool boolResult = xxlib::luavm::toboolean(state);
-				exitCode = boolResult ? 0 : 1;
-				spdlog::debug("Lua script returned boolean: {}, treating as exit code: {}", boolResult, exitCode);
-			} else if (xxlib::luavm::is_string(state)) {
-				const auto* shellCommand = xxlib::luavm::tostring(state);
-				spdlog::debug("Lua script returned shell command: {}", shellCommand);
-				Command shellExecCommand = commandToRun;
-				shellExecCommand.cmd = {shellCommand};
-				shellExecCommand.executionEngine = CommandExecutionEngine::System;
-				execResult = xxlib::executor::execute_command(shellExecCommand);
+			auto loadStatus = xxlib::luavm::loadstring(state, luaCommand);
+			if (loadStatus == 0) {
+				auto pcallStatus = xxlib::luavm::pcall(state, 0, 1, 0);
+				if (pcallStatus == 0) {
+					if (xxlib::luavm::is_nil(state)) {
+						exitCode = 0;
+						spdlog::info("Lua script returned nil, treating as successful no-op.");
+					} else if (xxlib::luavm::is_integer(state)) {
+						exitCode = static_cast<int32_t>(xxlib::luavm::tointeger(state));
+						spdlog::debug("Lua script returned exit code: {}", exitCode);
+					} else if (xxlib::luavm::is_boolean(state)) {
+						bool boolResult = xxlib::luavm::toboolean(state);
+						exitCode = boolResult ? 0 : 1;
+						spdlog::debug("Lua script returned boolean: {}, treating as exit code: {}", boolResult, exitCode);
+					} else if (xxlib::luavm::is_string(state)) {
+						const auto* shellCommand = xxlib::luavm::tostring(state);
+						spdlog::debug("Lua script returned shell command: {}", shellCommand);
+						Command shellExecCommand = commandToRun;
+						shellExecCommand.cmd = {shellCommand};
+						shellExecCommand.executionEngine = CommandExecutionEngine::System;
+						execResult = xxlib::executor::execute_command(shellExecCommand);
+					} else {
+						execResult = std::unexpected("Lua script returned unsupported type");
+					}
+				} else {
+					execResult = std::unexpected(std::string("Error loading Lua command: ") + xxlib::luavm::tostring(state));
+				}
 			} else {
-				execResult = std::unexpected("Lua script returned unsupported type");
+				execResult = std::unexpected(std::string("Error executing Lua command: ") + xxlib::luavm::tostring(state));
 			}
 		} else {
 			execResult = std::unexpected("Unknown execution engine");
