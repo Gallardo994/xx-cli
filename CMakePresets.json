@@ -13,7 +13,7 @@
     {
       "name": "testing",
       "generator": "Ninja",
-      "binaryDir": "build-testing",
+      "binaryDir": "build",
       "cacheVariables": {
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
         "CMAKE_BUILD_TYPE": "Debug",
@@ -24,7 +24,7 @@
     {
       "name": "release",
       "generator": "Ninja",
-      "binaryDir": "build-release",
+      "binaryDir": "build",
       "cacheVariables": {
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
         "CMAKE_BUILD_TYPE": "Release"
