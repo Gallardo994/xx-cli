@@ -8,8 +8,8 @@ option(ENABLE_SANITIZERS "Enable sanitizers" OFF)
 
 if (ENABLE_SANITIZERS)
     if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address,undefined -fno-omit-frame-pointer")
-        set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -fsanitize=address,undefined")
+        string(APPEND CMAKE_CXX_FLAGS " -fsanitize=address,undefined -fno-omit-frame-pointer")
+        string(APPEND CMAKE_LINKER_FLAGS " -fsanitize=address,undefined")
 
         message(STATUS "Sanitizers enabled for GNU/Clang")
     elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
@@ -17,6 +17,16 @@ if (ENABLE_SANITIZERS)
     endif()
 else()
     message(STATUS "Sanitizers disabled")
+endif()
+
+if (WIN32)
+    if(MSVC)
+        message(STATUS "Using MSVC compiler")
+        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    else()
+        message(STATUS "Using non-MSVC compiler")
+        string(APPEND CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
+    endif()
 endif()
 
 FetchContent_Declare(
