@@ -13,5 +13,7 @@ namespace xxlib {
 #include "detail/planner.hpp"
 #include "detail/executor.hpp"
 #include "detail/luavm.hpp"
+#include "detail/platform.hpp"
+#include "detail/command.hpp"
 
 #endif // XXLIB_HPP

@@ -133,7 +133,7 @@ int main(int argc, char** argv) {
 	const auto workdir = std::filesystem::current_path().string();
 
 	app.add_subcommand("version", "Show version information")->callback([&]() {
-		spdlog::info("xxlib version {}", xxlib::version());
+		spdlog::info("xxlib version {} on {} {}", xxlib::version(), xxlib::platform::os_to_string(xxlib::platform::get_current_os()), xxlib::platform::architecture_to_string(xxlib::platform::get_current_architecture()));
 		spdlog::info("lua version {}", xxlib::luavm::version());
 	});
 
