@@ -6,10 +6,10 @@
 
 std::string create_test_file(const std::string& name, const std::string& content) {
 	auto tempFilePath = std::filesystem::temp_directory_path() / name;
-	std::ofstream outFile(tempFilePath);
+	std::ofstream outFile(tempFilePath, std::ios::binary);
 	outFile << content;
 	outFile.close();
-	return tempFilePath;
+	return tempFilePath.string();
 }
 
 struct TempFileDeleter {
