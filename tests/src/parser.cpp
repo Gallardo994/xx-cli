@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <fstream>
 #include <string>
+#include <memory>
 
 std::string create_test_file(const std::string& name, const std::string& content) {
 	auto tempFilePath = std::filesystem::temp_directory_path() / name;
@@ -56,120 +57,178 @@ TEST(Parser_ReadFile, FileTooLarge) {
 	EXPECT_EQ(result.error(), "File size exceeds 1 MB limit: " + tempFile.get());
 }
 
-TEST(Parser_ParseBuffer, BasicTomlSingleCommand) {
-	std::string str = R"(
-[[alias.build]]
-cmd = "echo Building project"
+TEST(Parser_ParseBuffer, BasicYamlSingleCommand) {
+	const auto yaml = R"(
+alias:
+  build:
+    - cmd: "echo Building project"
 )";
 
-	auto result = xxlib::parser::parse_buffer(str);
+	auto result = xxlib::parser::parse_buffer(yaml);
 	ASSERT_TRUE(result.has_value());
-	EXPECT_EQ(result->size(), 1);
+	EXPECT_EQ(result->size(), 1u);
 
-	auto& buildCommand = result->at(0);
-	EXPECT_EQ(buildCommand.name, "build");
-	EXPECT_EQ(buildCommand.cmd.size(), 1);
-	EXPECT_EQ(buildCommand.cmd.at(0), "echo Building project");
+	const auto& buildCmd = result->at(0);
+	EXPECT_EQ(buildCmd.name, "build");
+	ASSERT_EQ(buildCmd.cmd.size(), 1u);
+	EXPECT_EQ(buildCmd.cmd.at(0), "echo Building project");
 }
 
-TEST(Parser_ParseBuffer, BasicTomlArray) {
-	std::string str = R"(
-[[alias.cmd1]]
-cmd = "echo Building project"
-
-[[alias.cmd2]]
-cmd = "echo Running tests"
+TEST(Parser_ParseBuffer, BasicYamlArray) {
+	const auto yaml = R"(
+alias:
+  cmd1:
+    - cmd: "echo Building project"
+  cmd2:
+    - cmd: "echo Running tests"
 )";
 
-	auto result = xxlib::parser::parse_buffer(str);
+	auto result = xxlib::parser::parse_buffer(yaml);
 	ASSERT_TRUE(result.has_value());
-	EXPECT_EQ(result->size(), 2);
+	EXPECT_EQ(result->size(), 2u);
 
-	auto& cmd1 = result->at(0);
+	const auto& cmd1 = result->at(0);
 	EXPECT_EQ(cmd1.name, "cmd1");
-	EXPECT_EQ(cmd1.cmd.size(), 1);
+	ASSERT_EQ(cmd1.cmd.size(), 1u);
 	EXPECT_EQ(cmd1.cmd.at(0), "echo Building project");
 
-	auto& cmd2 = result->at(1);
+	const auto& cmd2 = result->at(1);
 	EXPECT_EQ(cmd2.name, "cmd2");
-	EXPECT_EQ(cmd2.cmd.size(), 1);
+	ASSERT_EQ(cmd2.cmd.size(), 1u);
 	EXPECT_EQ(cmd2.cmd.at(0), "echo Running tests");
 }
 
-TEST(Parser_ParseBuffer, TomlWithConstraints) {
-	std::string str = R"(
-[[alias.build]]
-cmd = "echo Building project"
-constraints = [ [ 'os', 'linux' ], [ 'arch', 'x86_64' ] ]
+TEST(Parser_ParseBuffer, YamlWithConstraints) {
+	const auto yaml = R"(
+alias:
+  build:
+    - cmd: "echo Building project"
+      constraints:
+        - os: linux
+        - arch: x86_64
 
-[[alias.test]]
-cmd = "echo Running tests"
-constraints = [ [ 'osfamily', 'windows' ] ]
+  test:
+    - cmd: "echo Running tests"
+      constraints:
+        - osfamily: windows
 )";
 
-	auto result = xxlib::parser::parse_buffer(str);
+	auto result = xxlib::parser::parse_buffer(yaml);
 	ASSERT_TRUE(result.has_value());
-	EXPECT_EQ(result->size(), 2);
+	EXPECT_EQ(result->size(), 2u);
 
-	auto& buildCommand = result->at(0);
-	EXPECT_EQ(buildCommand.name, "build");
-	EXPECT_EQ(buildCommand.cmd.size(), 1);
-	EXPECT_EQ(buildCommand.cmd.at(0), "echo Building project");
-	EXPECT_EQ(buildCommand.constraints.size(), 2);
-	EXPECT_EQ(buildCommand.constraints.at(0).first, "os");
-	EXPECT_EQ(buildCommand.constraints.at(0).second, "linux");
-	EXPECT_EQ(buildCommand.constraints.at(1).first, "arch");
-	EXPECT_EQ(buildCommand.constraints.at(1).second, "x86_64");
+	const auto& buildCmd = result->at(0);
+	EXPECT_EQ(buildCmd.name, "build");
+	ASSERT_EQ(buildCmd.cmd.size(), 1u);
+	EXPECT_EQ(buildCmd.cmd.at(0), "echo Building project");
+	ASSERT_EQ(buildCmd.constraints.size(), 2u);
+	EXPECT_EQ(buildCmd.constraints.at(0).first, "os");
+	EXPECT_EQ(buildCmd.constraints.at(0).second, "linux");
+	EXPECT_EQ(buildCmd.constraints.at(1).first, "arch");
+	EXPECT_EQ(buildCmd.constraints.at(1).second, "x86_64");
 
-	auto& testCommand = result->at(1);
-	EXPECT_EQ(testCommand.name, "test");
-	EXPECT_EQ(testCommand.cmd.size(), 1);
-	EXPECT_EQ(testCommand.cmd.at(0), "echo Running tests");
-	EXPECT_EQ(testCommand.constraints.size(), 1);
-	EXPECT_EQ(testCommand.constraints.at(0).first, "osfamily");
-	EXPECT_EQ(testCommand.constraints.at(0).second, "windows");
+	const auto& testCmd = result->at(1);
+	EXPECT_EQ(testCmd.name, "test");
+	ASSERT_EQ(testCmd.cmd.size(), 1u);
+	EXPECT_EQ(testCmd.cmd.at(0), "echo Running tests");
+	ASSERT_EQ(testCmd.constraints.size(), 1u);
+	EXPECT_EQ(testCmd.constraints.at(0).first, "osfamily");
+	EXPECT_EQ(testCmd.constraints.at(0).second, "windows");
 }
 
-TEST(Parser_ParseBuffer, InvalidToml) {
-	std::string str = R"(
-[[alias.invalid]]
-cmd = "echo I forgot to close the array"
-constraints = [ [ 'os', 'linux'
+TEST(Parser_ParseBuffer, InvalidYaml) {
+	const auto yaml = R"(
+alias:
+  invalid:
+    - cmd: "echo oops"
+      constraints: [ [ "os", "linux" ]
 )";
 
-	auto result = xxlib::parser::parse_buffer(str);
+	auto result = xxlib::parser::parse_buffer(yaml);
 	ASSERT_FALSE(result.has_value());
-	EXPECT_EQ(result.error(), "TOML parse error: Error while parsing array: encountered end-of-file");
+	EXPECT_TRUE(result.error().find("YAML parse error") != std::string::npos);
 }
 
 TEST(Parser_ParseBuffer, MissingCmdField) {
-	std::string str = R"(
-[[alias.empty_cmd]]
+	const std::string yaml = R"(
+alias:
+  empty_cmd: [ {} ]
 )";
 
-	auto result = xxlib::parser::parse_buffer(str);
+	auto result = xxlib::parser::parse_buffer(yaml);
 	ASSERT_FALSE(result.has_value());
-	EXPECT_EQ(result.error(), "Missing cmd field");
+	EXPECT_EQ(result.error(), "Missing 'cmd' field");
 }
 
 TEST(Parser_ParseBuffer, InvalidConstraintType) {
-	std::string str = R"(
-[[alias.invalid_constraint]]
-cmd = "echo Testing invalid constraint"
-constraints = [ "not_a_pair" ]
+	const std::string yaml = R"(
+alias:
+  invalid_constraint:
+    - cmd: "echo Testing invalid constraint"
+      constraints:
+        - not_a_pair
 )";
-	auto result = xxlib::parser::parse_buffer(str);
+
+	auto result = xxlib::parser::parse_buffer(yaml);
 	ASSERT_FALSE(result.has_value());
-	EXPECT_EQ(result.error(), "Invalid constraint item type or size");
+	EXPECT_EQ(result.error(), "Each constraint must be a map with a single key/value pair");
 }
 
 TEST(Parser_ParseBuffer, InvalidRequiresConfirmationType) {
-	std::string str = R"(
-[[alias.invalid_confirmation]]
-cmd = "echo Testing invalid confirmation"
-requires_confirmation = "yes"
+	const std::string yaml = R"(
+alias:
+  invalid_confirmation:
+    - cmd: "echo Testing invalid confirmation"
+      requires_confirmation: abc
 )";
-	auto result = xxlib::parser::parse_buffer(str);
+
+	auto result = xxlib::parser::parse_buffer(yaml);
 	ASSERT_FALSE(result.has_value());
-	EXPECT_EQ(result.error(), "Invalid requires_confirmation type");
+	EXPECT_EQ(result.error(), "'requires_confirmation' must be a boolean (true/false)");
+}
+
+TEST(Parser_ParseBuffer, TemplateVarsAndRenderEngine) {
+	const std::string yaml = R"(
+alias:
+  hello:
+    - cmd: 'echo "{{ greeting }}, {{ target }}!"'
+      render_engine: inja
+      template_vars:
+        greeting: Hello
+        target:   World
+)";
+
+	auto result = xxlib::parser::parse_buffer(yaml);
+	ASSERT_TRUE(result.has_value());
+	ASSERT_EQ(result->size(), 1u);
+
+	const Command& hello = result->at(0);
+	EXPECT_EQ(hello.name, "hello");
+	ASSERT_EQ(hello.cmd.size(), 1u);
+	EXPECT_EQ(hello.cmd.at(0), R"(echo "{{ greeting }}, {{ target }}!")");
+	EXPECT_EQ(hello.renderEngine, CommandRenderEngine::Inja);
+	EXPECT_EQ(hello.templateVars.at("greeting"), "Hello");
+	EXPECT_EQ(hello.templateVars.at("target"), "World");
+}
+
+TEST(Parser_ParseBuffer, FlatListLayout) {
+	const std::string yaml = R"(
+aliases:
+  - name: hello
+    cmd: 'echo "{{ greeting }}, {{ target }}!"'
+    render_engine: inja
+    template_vars:
+      greeting: Hello
+      target:   World
+)";
+
+	auto result = xxlib::parser::parse_buffer(yaml);
+	ASSERT_TRUE(result.has_value());
+	ASSERT_EQ(result->size(), 1u);
+
+	const Command& hello = result->at(0);
+	EXPECT_EQ(hello.name, "hello");
+	EXPECT_EQ(hello.renderEngine, CommandRenderEngine::Inja);
+	EXPECT_EQ(hello.templateVars.at("greeting"), "Hello");
+	EXPECT_EQ(hello.templateVars.at("target"), "World");
 }

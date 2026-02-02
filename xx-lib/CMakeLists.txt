@@ -31,7 +31,14 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(lua)
 
+FetchContent_Declare(
+  yaml-cpp
+  GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
+  GIT_TAG f0329d0efd2e62ceda5ee899c343ee445f6f7bd2
+)
+FetchContent_MakeAvailable(yaml-cpp)
+
 add_library(xx-lib ${SOURCES})
 target_compile_features(xx-lib PUBLIC cxx_std_23)
 target_include_directories(xx-lib PRIVATE include)
-target_link_libraries(xx-lib PRIVATE spdlog::spdlog lua_static)
+target_link_libraries(xx-lib PRIVATE spdlog::spdlog lua_static yaml-cpp)

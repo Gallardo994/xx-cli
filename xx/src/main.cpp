@@ -107,12 +107,12 @@ int main(int argc, char** argv) {
 	CLI::App app{"xx – Per‑project alias & preset tool"};
 	GlobalArgs globalArgs{};
 
-	app.add_option("-c,--config", globalArgs.configFile, "Path to project configuration file")->default_val(".xx.toml");
+	app.add_option("-c,--config", globalArgs.configFile, "Path to project configuration file")->default_val(".xx.yaml");
 	app.add_option("-u,--user-config", globalArgs.userConfigFile, "Path to user configuration file")
 #ifdef _WIN32
-		->default_val(std::getenv("APPDATA") + std::string("\\xx\\xx.toml"));
+		->default_val(std::getenv("APPDATA") + std::string("\\xx\\xx.yaml"));
 #elif __APPLE__ || __linux__
-		->default_val(std::getenv("HOME") + std::string("/.config/xx/xx.toml"));
+		->default_val(std::getenv("HOME") + std::string("/.config/xx/xx.yaml"));
 #else
 		static_assert(false, "Unsupported platform");
 #endif
@@ -133,7 +133,10 @@ int main(int argc, char** argv) {
 	const auto workdir = std::filesystem::current_path().string();
 
 	app.add_subcommand("version", "Show version information")->callback([&]() {
-		spdlog::info("xxlib version {} on {} {}", xxlib::version(), xxlib::platform::os_to_string(xxlib::platform::get_current_os()), xxlib::platform::architecture_to_string(xxlib::platform::get_current_architecture()));
+		spdlog::info("xxlib version {} on {} {}",
+					 xxlib::version(),
+					 xxlib::platform::os_to_string(xxlib::platform::get_current_os()),
+					 xxlib::platform::architecture_to_string(xxlib::platform::get_current_architecture()));
 		spdlog::info("lua version {}", xxlib::luavm::version());
 	});
 

@@ -11,66 +11,74 @@ It is both suitable for running locally, as well as in CI/CD pipelines by wget'i
 
 This project is a work in progress. The features and syntax are subject to change.
 
-## Example TOML Configuration
+## Example YAML Configuration
 
-`.xx.toml` file in current working directory:
-```toml
-# `xx run helloworld` will print "Hello World!" to the console.
-# `xx run helloworld greeting=Hi target=Everyone` will print "Hi Everyone!" to the console.
-# `xx run helloworld greeting=It\'s target=$(date)` will print "It's, <current date>!" to the console, if your shell supports command substitution.
-# User will be prompted for confirmation before executing the command unless --yolo flag is provided.
-[[alias.helloworld]]
-cmd = "echo \"{{ greeting }} {{ target }}!\""
-render_engine = "inja"
-template_vars = { greeting = "Hello", target = "World" }
-requires_confirmation = true
+`.xx.yaml` file in current working directory:
 
-# `xx run luacode values="1,2,3,4,5"` will print sum of those values to the console using embedded Lua VM. No dependency on external Lua installation.
-[[alias.luacode]]
-cmd = """
-local t = {}
--- Use TEMPLATE_VARS, ENVS and CTX tables to read context information.
-for str in string.gmatch(TEMPLATE_VARS.values, '([^,]+)') do
-    table.insert(t, tonumber(str))
-end
+```yaml
+alias:
+  # `xx run helloworld` will print "Hello World!" to the console.
+  # `xx run helloworld greeting=Hi target=Everyone` will print "Hi Everyone!" to the console.
+  # `xx run helloworld greeting=It\'s target=$(date)` will print "It's, <current date>!" to the console, if your shell supports command substitution.
+  # User will be prompted for confirmation before executing the command unless --yolo flag is provided.
+  helloworld:
+    cmd: 'echo "{{ greeting }} {{ target }}!"'
+    render_engine: inja
+    template_vars:
+      greeting: "Hello"
+      target: "World"
+    requires_confirmation: true
 
-local sum = 0
-for k,v in pairs(t) do
-    sum = sum + v
-end
+  # `xx run luacode values="1,2,3,4,5"` will print sum of those values to the console using embedded Lua VM. No dependency on external Lua installation.
+  luacode:
+    cmd: |
+      local t = {}
+      -- Use TEMPLATE_VARS, ENVS and CTX tables to read context information.
+      for str in string.gmatch(TEMPLATE_VARS.values, '([^,]+)') do
+          table.insert(t, tonumber(str))
+      end
 
-print(tostring(sum))
+      local sum = 0
+      for k,v in pairs(t) do
+          sum = sum + v
+      end
 
--- Returning 0 indicates success, just as not returning anything at all.
--- Returning a string will treat it as a command to execute in system shell.
-return 0
-"""
-execution_engine = "lua"
-template_vars = { values = "0" }
+      print(tostring(sum))
 
-# `xx run build` will configure and build the project using CMake and Ninja. Linux+MacOS and Windows versions are separate.
-[[alias.build]]
-cmd = "cmake . --preset default --fresh && ninja -C build/"
-constraints = [ [ "osfamily", "unix" ] ]
+      -- Returning 0 indicates success, just as not returning anything at all.
+      -- Returning a string will treat it as a command to execute in system shell.
+      return 0
+    execution_engine: lua
+    template_vars:
+      values: "0"
 
-[[alias.build]]
-cmd = "cmake . --preset default --fresh; if ($?) { ninja -C build/ }"
-constraints = [ [ "osfamily", "windows" ] ]
-env = { 'CC' = 'C:/tools/msys64/clang64/bin/clang.exe', 'CXX' = 'C:/tools/msys64/clang64/bin/clang++.exe' }
+  # `xx run build` will configure and build the project using CMake and Ninja. Linux+MacOS and Windows versions are separate.
+  build:
+    - cmd: "cmake . --preset default --fresh && ninja -C build/"
+      constraints:
+        - osfamily: unix
 
-# `xx run path` will print the PATH environment variable on both Unix-like systems and Windows.
-[[alias.path]]
-cmd = "echo $PATH"
-constraints = [ [ "osfamily", "unix" ] ]
+    - cmd: "cmake . --preset default --fresh; if ($?) { ninja -C build/ }"
+      constraints:
+        - osfamily: windows
+      env:
+        CC: "C:/tools/msys64/clang64/bin/clang.exe"
+        CXX: "C:/tools/msys64/clang64/bin/clang++.exe"
 
-[[alias.path]]
-cmd = "echo $Env:Path"
-constraints = [ [ "osfamily", "windows" ] ]
+  path:
+    - cmd: "echo $PATH"
+      constraints:
+        - osfamily: unix
+
+    - cmd: "echo $Env:Path"
+      constraints:
+        - osfamily: windows
 ```
 
 User-defined configuration is stored in these locations:
-- `~/.config/xx/xx.toml` on Linux and MacOS
-- `%APPDATA%\xx\xx.toml` on Windows
+
+- `~/.config/xx/xx.yaml` on Linux and MacOS
+- `%APPDATA%\xx\xx.yaml` on Windows
 
 Be sure to name your aliases uniquely as they may conflict between project-level and user-level configurations.
 
@@ -85,7 +93,7 @@ Use `xx --help` to see the list of available commands.
 Special thanks to the following open-source projects:
 
 - [CLI11](https://github.com/CLIUtils/CLI11)
-- [tomlplusplus](https://github.com/marzer/tomlplusplus)
+- [yaml-cpp](https://github.com/jbeder/yaml-cpp)
 - [spdlog](https://github.com/gabime/spdlog)
 - [inja](https://github.com/pantor/inja)
 - [Lua for CMake](https://github.com/walterschell/Lua) & [Lua](https://www.lua.org/)

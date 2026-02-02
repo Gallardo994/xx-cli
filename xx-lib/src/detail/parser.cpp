@@ -1,6 +1,7 @@
 #include "detail/parser.hpp"
-#include "third_party/toml.hpp"
+#include <yaml-cpp/yaml.h>
 
+#include <fstream>
 #include <iostream>
 #include <spdlog/spdlog.h>
 
@@ -26,88 +27,103 @@ namespace xxlib::parser {
 		}
 	}
 
-	std::expected<Command, std::string> parse_command(const toml::table& table) {
+	std::expected<Command, std::string> parse_command(const YAML::Node& node) {
 		Command command;
 
 		try {
-			if (auto cmdValue = table["cmd"]) {
-				if (cmdValue.is_string()) {
-					command.cmd.push_back(cmdValue.as_string()->get());
-				} else if (cmdValue.is_array()) {
-					for (const auto& item : *cmdValue.as_array()) {
-						if (item.is_string()) {
-							command.cmd.push_back(item.as_string()->get());
-						} else {
-							return std::unexpected("Invalid cmd array item type");
-						}
+			if (!node["cmd"]) {
+				return std::unexpected("Missing 'cmd' field");
+			}
+
+			const auto& cmdNode = node["cmd"];
+			if (cmdNode.IsScalar()) {
+				command.cmd.emplace_back(cmdNode.as<std::string>());
+			} else if (cmdNode.IsSequence()) {
+				for (const auto& item : cmdNode) {
+					if (!item.IsScalar()) {
+						return std::unexpected("Invalid element inside 'cmd' array – must be a string");
 					}
-				} else {
-					return std::unexpected("Invalid cmd type");
+
+					command.cmd.emplace_back(item.as<std::string>());
 				}
 			} else {
-				return std::unexpected("Missing cmd field");
+				return std::unexpected("'cmd' must be either a scalar or an array of scalars");
 			}
 
-			command.renderEngine = CommandRenderEngine::None;
-			if (auto cmdRendererValue = table["render_engine"]) {
-				if (cmdRendererValue.is_string()) {
-					command.renderEngine = command::string_to_command_render_engine(cmdRendererValue.as_string()->get());
-				} else {
-					return std::unexpected("Invalid renderer type");
-				}
+			if (auto renderEngine = node["render_engine"]; renderEngine && renderEngine.IsScalar()) {
+				command.renderEngine = command::string_to_command_render_engine(renderEngine.as<std::string>());
+			} else if (renderEngine) {
+				return std::unexpected("'render_engine' must be a string");
 			}
 
-			command.executionEngine = CommandExecutionEngine::System;
-			if (auto cmdExecutorValue = table["execution_engine"]) {
-				if (cmdExecutorValue.is_string()) {
-					command.executionEngine = command::string_to_command_execution_engine(cmdExecutorValue.as_string()->get());
-				} else {
-					return std::unexpected("Invalid execution_engine type");
-				}
+			if (auto executionEngine = node["execution_engine"]; executionEngine && executionEngine.IsScalar()) {
+				command.executionEngine = command::string_to_command_execution_engine(executionEngine.as<std::string>());
+			} else if (executionEngine) {
+				return std::unexpected("'execution_engine' must be a string");
 			}
 
-			if (auto templateVarsTable = table["template_vars"].as_table()) {
-				for (const auto& [key, value] : *templateVarsTable) {
-					if (value.is_string()) {
-						command.templateVars.emplace(key, value.as_string()->get());
-					} else {
-						return std::unexpected("Invalid template_var value type for key");
+			if (auto templateVars = node["template_vars"]; templateVars && templateVars.IsMap()) {
+				for (const auto& kv : templateVars) {
+					if (!kv.second.IsScalar() && !kv.second.IsNull()) {
+						return std::unexpected("All values in 'template_vars' must be strings or null");
 					}
+
+					auto valueStr = kv.second.IsNull() ? "" : kv.second.as<std::string>();
+					command.templateVars.emplace(kv.first.as<std::string>(), valueStr);
 				}
+			} else if (templateVars) {
+				return std::unexpected("'template_vars' must be a map");
 			}
 
-			if (auto envsTable = table["env"].as_table()) {
-				for (const auto& [key, value] : *envsTable) {
-					if (value.is_string()) {
-						command.envs.emplace(key, value.as_string()->get());
-					} else {
-						return std::unexpected("Invalid env value type for key");
+			if (auto env = node["env"]; env && env.IsMap()) {
+				for (const auto& kv : env) {
+					if (!kv.second.IsScalar()) {
+						return std::unexpected("All values in 'env' must be strings");
 					}
+
+					command.envs.emplace(kv.first.as<std::string>(), kv.second.as<std::string>());
 				}
+			} else if (env) {
+				return std::unexpected("'env' must be a map");
 			}
 
-			if (auto constraintsArray = table["constraints"].as_array()) {
-				for (const auto& item : *constraintsArray) {
-					if (item.is_array() && item.as_array()->size() == 2) {
-						const auto& pair = *item.as_array();
-						if (pair[0].is_string() && pair[1].is_string()) {
-							command.constraints.emplace_back(pair[0].as_string()->get(), pair[1].as_string()->get());
-						} else {
-							return std::unexpected("Invalid constraint pair types");
-						}
-					} else {
-						return std::unexpected("Invalid constraint item type or size");
+			if (auto constraints = node["constraints"]; constraints && constraints.IsSequence()) {
+				for (auto i = 0; i < constraints.size(); ++i) {
+					const auto& item = constraints[i];
+
+					if (!item.IsMap() || item.size() != 1) {
+						return std::unexpected("Each constraint must be a map with a single key/value pair");
 					}
+
+					const auto pair = item.begin();
+
+					const auto key = pair->first;
+					const auto value = pair->second;
+
+					if (!key.IsScalar() || !value.IsScalar()) {
+						return std::unexpected("Constraint keys and values must be strings");
+					}
+
+					command.constraints.emplace_back(key.Scalar(), value.Scalar());
 				}
+			} else if (constraints) {
+				return std::unexpected("'constraints' must be a sequence");
 			}
 
-			if (auto confirmValue = table["requires_confirmation"]) {
-				if (confirmValue.is_boolean()) {
-					command.requiresConfirmation = confirmValue.as_boolean()->get();
+			if (auto requiresConfirmation = node["requires_confirmation"]; requiresConfirmation && requiresConfirmation.IsScalar()) {
+				const auto raw = requiresConfirmation.Scalar();
+				if (raw == "true") {
+					command.requiresConfirmation = true;
+				} else if (raw == "false") {
+					command.requiresConfirmation = false;
 				} else {
-					return std::unexpected("Invalid requires_confirmation type");
+					return std::unexpected("'requires_confirmation' must be a boolean (true/false)");
 				}
+			} else if (requiresConfirmation) {
+				return std::unexpected("'requires_confirmation' must be a boolean");
 			}
+		} catch (const YAML::Exception& e) {
+			return std::unexpected(std::string("YAML parsing error: ") + e.what());
 		} catch (const std::exception& e) {
 			return std::unexpected(std::string("Error parsing command: ") + e.what());
 		}
@@ -121,62 +137,85 @@ namespace xxlib::parser {
 
 	std::expected<std::vector<Command>, std::string> parse_buffer(const std::string& buffer) {
 		try {
-			auto tomlData = toml::parse(buffer);
+			const YAML::Node root = YAML::Load(buffer);
+			if (!root.IsMap()) {
+				return std::unexpected("Root of the config must be a map");
+			}
+
+			const auto aliasNode = root["alias"];
+			if (!aliasNode) {
+				const auto flatNode = root["aliases"];
+				if (!flatNode || !flatNode.IsSequence()) {
+					return std::unexpected("No 'alias' (or 'aliases') section found in config");
+				}
+
+				std::vector<Command> cmds;
+
+				for (const auto& entry : flatNode) {
+					if (!entry.IsMap()) {
+						return std::unexpected("Each element of 'aliases' must be a map");
+					}
+
+					const auto nameNode = entry["name"];
+					if (!nameNode || !nameNode.IsScalar()) {
+						return std::unexpected("Alias entry is missing a string 'name' field");
+					}
+
+					const auto aliasName = nameNode.as<std::string>();
+
+					auto opt = parse_command(entry);
+					if (!opt) {
+						return std::unexpected(opt.error());
+					}
+
+					auto cmd = *opt;
+					cmd.name = aliasName;
+					cmds.emplace_back(std::move(cmd));
+				}
+				return cmds;
+			}
+
 			std::vector<Command> commands;
 
-			const auto add_command_from_table = [&](const std::string_view key, const toml::table& table) -> std::optional<std::string> {
-				spdlog::debug("Parsing command: {}", key);
+			for (const auto& aliasPair : aliasNode) {
+				const auto aliasName = aliasPair.first.as<std::string>();
+				const auto aliasVal = aliasPair.second;
 
-				auto commandOpt = parse_command(table);
-				if (commandOpt) {
-					Command command = *commandOpt;
-					command.name = key;
-					commands.push_back(command);
-					return std::nullopt;
+				if (aliasVal.IsMap()) {
+					auto opt = parse_command(aliasVal);
+					if (!opt) {
+						return std::unexpected(opt.error());
+					}
+
+					auto cmd = *opt;
+					cmd.name = aliasName;
+					commands.emplace_back(std::move(cmd));
+				} else if (aliasVal.IsSequence()) {
+					for (const auto& item : aliasVal) {
+						if (!item.IsMap()) {
+							return std::unexpected("Each element of alias." + aliasName + " must be a table");
+						}
+
+						auto opt = parse_command(item);
+						if (!opt) {
+							return std::unexpected(opt.error());
+						}
+
+						auto cmd = *opt;
+						cmd.name = aliasName;
+						commands.emplace_back(std::move(cmd));
+					}
 				} else {
-					return commandOpt.error();
-				}
-			};
-
-			if (auto aliasTable = tomlData["alias"].as_table()) {
-				spdlog::debug("Found {} command aliases in configuration.", aliasTable->size());
-
-				commands.reserve(aliasTable->size());
-
-				for (const auto& [key, value] : *aliasTable) {
-					// TODO: Implement type formatter as it's an enum.
-					spdlog::debug("Parsing command alias: {}", key.str());
-
-					if (value.is_table()) {
-						auto errorOpt = add_command_from_table(key, *value.as_table());
-						if (errorOpt) {
-							return std::unexpected(*errorOpt);
-						}
-					} else if (value.is_array()) {
-						for (const auto& item : *value.as_array()) {
-							if (item.is_table()) {
-								auto errorOpt = add_command_from_table(key, *item.as_table());
-								if (errorOpt) {
-									return std::unexpected(*errorOpt);
-								}
-							} else {
-								return std::unexpected("Alias array item is not a table for key");
-							}
-						}
-					}
-
-					else {
-						return std::unexpected("Alias entry is not a table for key");
-					}
+					return std::unexpected("Alias '" + aliasName + "' must be a table or an array of tables");
 				}
 			}
 
 			return commands;
-		} catch (const toml::parse_error& e) {
-			return std::unexpected(std::string("TOML parse error: ") + e.what());
+		} catch (const YAML::ParserException& e) {
+			return std::unexpected(std::string("YAML parse error: ") + e.what());
 		} catch (const std::exception& e) {
 			return std::unexpected(std::string("Error parsing buffer: ") + e.what());
 		}
-	};
+	}
 
 } // namespace xxlib::parser
