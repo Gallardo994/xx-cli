@@ -69,7 +69,7 @@ constraints = [ [ "osfamily", "windows" ] ]
 
 [[alias.install]]
 cmd = """
-src="{{ source }}/xx/xx"
+src="./{{ source }}/xx/xx"
 dst="/usr/local/bin/xx"
 
 if sudo cp "$src" "$dst"; then
@@ -83,7 +83,7 @@ template_vars = { source = "build-release" }
 
 [[alias.install]]
 cmd = """
-$src="{{ source }}\\xx\\xx.exe"
+$src=".\\{{ source }}\\xx\\xx.exe"
 $dst="C:/tools/xx-cli/xx.exe"
 
 try {
