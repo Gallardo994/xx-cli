@@ -3,7 +3,7 @@
 
 namespace xxlib::helpers {
 	bool ask_for_confirmation(const std::string& text) {
-		std::cout << text;
+		std::cout << text << "\nConfirm (y/n): " << std::flush;
 		auto symbol = std::getc(stdin);
 		return std::tolower(symbol) == 'y';
 	}

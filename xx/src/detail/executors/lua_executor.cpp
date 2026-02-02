@@ -53,7 +53,7 @@ namespace xxlib {
 			}
 
 			if (command.requiresConfirmation) {
-				if (xxlib::helpers::ask_for_confirmation("Lua Executor Engine wants to run: " + luaCommand)) {
+				if (xxlib::helpers::ask_for_confirmation("Lua Executor Engine wants to run: \n" + luaCommand)) {
 					spdlog::info("User confirmed execution.");
 				} else {
 					spdlog::info("User denied execution.");

@@ -51,7 +51,7 @@ namespace xxlib::platform_executor {
 		}
 
 		if (command.requiresConfirmation) {
-			if (xxlib::helpers::ask_for_confirmation("System Executor Engine wants to run (y/n): " + fullCommand)) {
+			if (xxlib::helpers::ask_for_confirmation("System Executor Engine wants to run: \n" + fullCommand)) {
 				spdlog::info("User confirmed execution.");
 			} else {
 				spdlog::info("User denied execution.");
