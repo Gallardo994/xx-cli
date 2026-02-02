@@ -52,9 +52,9 @@ namespace xxlib::platform_executor {
 
 		if (command.requiresConfirmation) {
 			if (xxlib::helpers::ask_for_confirmation("System Executor Engine wants to run: \n" + fullCommand)) {
-				spdlog::info("User confirmed execution.");
+				spdlog::debug("User confirmed execution.");
 			} else {
-				spdlog::info("User denied execution.");
+				spdlog::debug("User denied execution.");
 				return 0;
 			}
 		}
