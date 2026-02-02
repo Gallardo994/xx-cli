@@ -5,7 +5,7 @@
 
 namespace xxlib {
     inline std::string version() {
-        return "0.6.0";
+        return "0.6.2";
     }
 } // namespace xxlib
 
