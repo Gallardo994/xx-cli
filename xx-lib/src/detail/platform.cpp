@@ -3,7 +3,7 @@
 namespace xxlib {
 	namespace platform {
 		OSFamily get_current_os_family() {
-#ifdef _WIN32
+#if _WIN32
 			return OSFamily::Windows;
 #elif __APPLE__
 			return OSFamily::Unix;
@@ -15,7 +15,7 @@ namespace xxlib {
 		}
 
 		OS get_current_os() {
-#ifdef _WIN32
+#if _WIN32
 			return OS::Windows;
 #elif __APPLE__
 			return OS::MacOS;
@@ -27,9 +27,9 @@ namespace xxlib {
 		}
 
 		Architecture get_current_architecture() {
-#ifdef __x86_64__
+#if __x86_64__ || _M_X64
 			return Architecture::x86_64;
-#elif __aarch64__
+#elif __aarch64__ || __arm64__
 			return Architecture::arm64;
 #else
 			return Architecture::unknown;

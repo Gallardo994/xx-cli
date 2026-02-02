@@ -2,23 +2,23 @@
 #include "detail/platform.hpp"
 #include <gtest/gtest.h>
 
-#if defined(__linux__)
-const xxlib::platform::OS currentOs = xxlib::platform::OS::Linux;
-const xxlib::platform::OSFamily currentOsFamily = xxlib::platform::OSFamily::Unix;
-#elif defined(__APPLE__)
-const xxlib::platform::OS currentOs = xxlib::platform::OS::MacOS;
-const xxlib::platform::OSFamily currentOsFamily = xxlib::platform::OSFamily::Unix;
-#elif defined(_WIN32)
+#if _WIN32
 const xxlib::platform::OS currentOs = xxlib::platform::OS::Windows;
 const xxlib::platform::OSFamily currentOsFamily = xxlib::platform::OSFamily::Windows;
+#elif __APPLE__
+const xxlib::platform::OS currentOs = xxlib::platform::OS::MacOS;
+const xxlib::platform::OSFamily currentOsFamily = xxlib::platform::OSFamily::Unix;
+#elif __linux__
+const xxlib::platform::OS currentOs = xxlib::platform::OS::Linux;
+const xxlib::platform::OSFamily currentOsFamily = xxlib::platform::OSFamily::Unix;
 #else
 const xxlib::platform::OS currentOs = xxlib::platform::OS::Unknown;
 const xxlib::platform::OSFamily currentOsFamily = xxlib::platform::OSFamily::Unknown;
 #endif
 
-#if defined(__x86_64__)
+#if __x86_64__ || _M_X64
 const xxlib::platform::Architecture currentArchitecture = xxlib::platform::Architecture::x86_64;
-#elif defined(__aarch64__)
+#elif __aarch64__ || __arm64__
 const xxlib::platform::Architecture currentArchitecture = xxlib::platform::Architecture::arm64;
 #else
 const xxlib::platform::Architecture currentArchitecture = xxlib::platform::Architecture::unknown;
