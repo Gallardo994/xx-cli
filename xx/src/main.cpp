@@ -55,11 +55,11 @@ namespace {
 	}
 
 	std::vector<Command> load_commands(const GlobalArgs& globalArgs, const std::string& workdir) {
-		spdlog::debug("Loading configuration from workdir: {}", workdir);
-
 		std::vector<Command> commands;
 
 		if (!globalArgs.userConfigOnlyFlag) {
+			spdlog::debug("Loading configuration from workdir: {}", workdir);
+
 			auto configPathOpt = find_config(workdir, globalArgs.configFile, globalArgs.upFlag);
 			if (configPathOpt) {
 				spdlog::debug("Configuration file found at: {}", *configPathOpt);
