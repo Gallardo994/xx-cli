@@ -69,11 +69,11 @@ render_engine = "inja"
 template_vars = { preset = "default" }
 
 [[alias.test]]
-cmd = "cmake . --preset testing --fresh && cmake --build build/ && ./build/tests/tests"
+cmd = "cmake . --preset testing --fresh && cmake --build build/ && ctest --output-on-failure --test-dir build/tests"
 constraints = [ [ "osfamily", "unix" ] ]
 
 [[alias.test]]
-cmd = "cmake . --preset testing --fresh; if ($?) { cmake --build build/; if ($?) { ./build/tests/tests.exe } }"
+cmd = "cmake . --preset testing --fresh; if ($?) { cmake --build build/; if ($?) { ctest --output-on-failure --test-dir build/tests; } }"
 constraints = [ [ "osfamily", "windows" ] ]
 env = { 'CC' = 'C:/tools/msys64/clang64/bin/clang.exe', 'CXX' = 'C:/tools/msys64/clang64/bin/clang++.exe' }
 
