@@ -10,7 +10,7 @@ namespace xxlib {
 #elif __linux__
 			return OSFamily::Unix;
 #else
-			return OSFamily::Unknown;
+            static assert(false, "Unsupported OS detected");
 #endif
 		}
 
@@ -22,17 +22,17 @@ namespace xxlib {
 #elif __linux__
 			return OS::Linux;
 #else
-			return OS::Unknown;
+            static_assert(false, "Unsupported OS detected");
 #endif
 		}
 
 		Architecture get_current_architecture() {
 #if __x86_64__ || _M_X64
 			return Architecture::x86_64;
-#elif __aarch64__ || __arm64__
+#elif __aarch64__ || _M_ARM64
 			return Architecture::arm64;
 #else
-			return Architecture::unknown;
+            static_assert(false, "Unsupported architecture detected");
 #endif
 		}
 	} // namespace platform

@@ -12,15 +12,17 @@ const xxlib::platform::OSFamily currentOsFamily = xxlib::platform::OSFamily::Uni
 const xxlib::platform::OS currentOs = xxlib::platform::OS::Linux;
 const xxlib::platform::OSFamily currentOsFamily = xxlib::platform::OSFamily::Unix;
 #else
+static_assert(false, "Unsupported OS detected in tests");
 const xxlib::platform::OS currentOs = xxlib::platform::OS::Unknown;
 const xxlib::platform::OSFamily currentOsFamily = xxlib::platform::OSFamily::Unknown;
 #endif
 
 #if __x86_64__ || _M_X64
 const xxlib::platform::Architecture currentArchitecture = xxlib::platform::Architecture::x86_64;
-#elif __aarch64__ || __arm64__
+#elif __aarch64__ || _M_ARM64
 const xxlib::platform::Architecture currentArchitecture = xxlib::platform::Architecture::arm64;
 #else
+static_assert(false, "Unsupported architecture detected in tests");
 const xxlib::platform::Architecture currentArchitecture = xxlib::platform::Architecture::unknown;
 #endif
 
@@ -29,7 +31,7 @@ TEST(Planner_MatchesConstraints, MatchesOS) {
 		.name = "test-command",
 		.constraints = {{"os", xxlib::platform::os_to_string(currentOs)}},
 	};
-	EXPECT_TRUE(xxlib::planner::matches_constraints(command));
+	EXPECT_TRUE(xxlib::planner::matches_constraints(command)) << "Current OS: " << xxlib::platform::os_to_string(currentOs);
 }
 
 TEST(Planner_MatchesConstraints, MismatchesOS) {
@@ -37,7 +39,7 @@ TEST(Planner_MatchesConstraints, MismatchesOS) {
 		.name = "test-command",
 		.constraints = {{"os", "nonexistent_os"}},
 	};
-	EXPECT_FALSE(xxlib::planner::matches_constraints(command));
+	EXPECT_FALSE(xxlib::planner::matches_constraints(command)) << "Current OS: " << xxlib::platform::os_to_string(currentOs);
 }
 
 TEST(Planner_MatchesConstraints, MatchesArchitecture) {
@@ -45,7 +47,7 @@ TEST(Planner_MatchesConstraints, MatchesArchitecture) {
 		.name = "test-command",
 		.constraints = {{"arch", xxlib::platform::architecture_to_string(currentArchitecture)}},
 	};
-	EXPECT_TRUE(xxlib::planner::matches_constraints(command));
+	EXPECT_TRUE(xxlib::planner::matches_constraints(command)) << "Current architecture: " << xxlib::platform::architecture_to_string(currentArchitecture);
 }
 
 TEST(Planner_MatchesConstraints, MismatchesArchitecture) {
@@ -53,7 +55,7 @@ TEST(Planner_MatchesConstraints, MismatchesArchitecture) {
 		.name = "test-command",
 		.constraints = {{"arch", "nonexistent_arch"}},
 	};
-	EXPECT_FALSE(xxlib::planner::matches_constraints(command));
+	EXPECT_FALSE(xxlib::planner::matches_constraints(command)) << "Current architecture: " << xxlib::platform::architecture_to_string(currentArchitecture);
 }
 
 TEST(Planner_MatchesConstraints, MatchesOSFamily) {
@@ -69,7 +71,7 @@ TEST(Planner_MatchesConstraints, MismatchesOSFamily) {
 		.name = "test-command",
 		.constraints = {{"osfamily", "nonexistent_osfamily"}},
 	};
-	EXPECT_FALSE(xxlib::planner::matches_constraints(command));
+	EXPECT_FALSE(xxlib::planner::matches_constraints(command)) << "Current OS family: " << xxlib::platform::os_family_to_string(currentOsFamily);
 }
 
 TEST(Planner_MatchesConstraints, MatchesMultipleConstraints) {
@@ -77,7 +79,7 @@ TEST(Planner_MatchesConstraints, MatchesMultipleConstraints) {
 		.name = "test-command",
 		.constraints = {{"os", xxlib::platform::os_to_string(currentOs)}, {"arch", xxlib::platform::architecture_to_string(currentArchitecture)}},
 	};
-	EXPECT_TRUE(xxlib::planner::matches_constraints(command));
+	EXPECT_TRUE(xxlib::planner::matches_constraints(command)) << "Current OS: " << xxlib::platform::os_to_string(currentOs) << ", Current architecture: " << xxlib::platform::architecture_to_string(currentArchitecture);
 }
 
 TEST(Planner_MatchesConstraints, MismatchesMultipleConstraints) {
@@ -85,7 +87,7 @@ TEST(Planner_MatchesConstraints, MismatchesMultipleConstraints) {
 		.name = "test-command",
 		.constraints = {{"os", xxlib::platform::os_to_string(currentOs)}, {"arch", "nonexistent_arch"}},
 	};
-	EXPECT_FALSE(xxlib::planner::matches_constraints(command));
+	EXPECT_FALSE(xxlib::planner::matches_constraints(command)) << "Current OS: " << xxlib::platform::os_to_string(currentOs) << ", Current architecture: " << xxlib::platform::architecture_to_string(currentArchitecture);
 }
 
 TEST(Planner_PlanSingle, PlansSingleCommand) {
