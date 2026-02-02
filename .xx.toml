@@ -44,6 +44,16 @@ constraints = [ [ "osfamily", "unix" ] ]
 [[alias.test]]
 cmd = "cmake . --preset testing --fresh; if ($?) { cmake --build build-testing/; if ($?) { ./build-testing/tests/tests.exe } }"
 constraints = [ [ "osfamily", "windows" ] ]
+env = { 'CC' = 'C:/tools/msys64/clang64/bin/clang.exe', 'CXX' = 'C:/tools/msys64/clang64/bin/clang++.exe' }
+
+[[alias.build-release]]
+cmd = "cmake . --preset release --fresh && cmake --build build-release/"
+constraints = [ [ "osfamily", "unix" ] ]
+
+[[alias.build-release]]
+cmd = "cmake . --preset release --fresh; if ($?) { cmake --build build-release/; }"
+constraints = [ [ "osfamily", "windows" ] ]
+env = { 'CC' = 'C:/tools/msys64/clang64/bin/clang.exe', 'CXX' = 'C:/tools/msys64/clang64/bin/clang++.exe' }
 
 # path
 
@@ -58,14 +68,33 @@ constraints = [ [ "osfamily", "windows" ] ]
 # install
 
 [[alias.install]]
-cmd = "sudo rm -f /usr/local/bin/xx && sudo cp build/xx/xx /usr/local/bin/xx"
+cmd = """
+src="{{ source }}/xx/xx"
+dst="/usr/local/bin/xx"
+
+if sudo cp "$src" "$dst"; then
+    echo "Successfully installed from $src to $dst"
+fi
+"""
 constraints = [ [ "osfamily", "unix" ] ]
 requires_confirmation = true
+render_engine = "inja"
+template_vars = { source = "build-release" }
 
 [[alias.install]]
-cmd = "Copy-Item -Path build/xx/xx.exe -Destination C:/tools/xx-cli/xx.exe -Force"
+cmd = """
+$src="{{ source }}\\xx\\xx.exe"
+$dst="C:/tools/xx-cli/xx.exe"
+
+try {
+    Copy-Item -Path $src -Destination $dst -Force
+    Write-Host "Successfully installed from $src to $dst"
+}
+"""
 constraints = [ [ "osfamily", "windows" ] ]
 requires_confirmation = true
+render_engine = "inja"
+template_vars = { source = "build-release" }
 
 # TUI apps
 

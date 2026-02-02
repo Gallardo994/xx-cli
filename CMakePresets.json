@@ -20,6 +20,15 @@
         "BUILD_TESTS": "ON",
         "ENABLE_SANITIZERS": "ON"
       }
+    },
+    {
+      "name": "release",
+      "generator": "Ninja",
+      "binaryDir": "build-release",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "CMAKE_BUILD_TYPE": "Release"
+      }
     }
   ],
   "buildPresets": [
@@ -30,6 +39,10 @@
     {
       "name": "testing",
       "configurePreset": "testing"
+    },
+    {
+      "name": "release",
+      "configurePreset": "release"
     }
   ]
 }
