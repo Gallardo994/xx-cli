@@ -8,7 +8,7 @@
 
 namespace xxlib {
 	namespace lua_executor {
-		std::expected<int32_t, std::string> execute_command(const Command& command, const CommandContext& context);
+		std::expected<int32_t, std::string> execute_command(Command& command, CommandContext& context);
 	} // namespace lua_executor
 } // namespace xxlib
 

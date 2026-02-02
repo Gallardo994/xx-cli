@@ -9,10 +9,40 @@
 
 namespace xxlib {
 	namespace lua_executor {
-		std::expected<int32_t, std::string> execute_command(const Command& command, const CommandContext& context) {
-			auto state = xxlib::luavm::create();
-			std::string luaCommand;
+		void push_as_table(xxlib::luavm::LuaStatePtr& state, const std::unordered_map<std::string, std::string>& map, const std::string& tableName) {
+			xxlib::luavm::new_table(state);
+			for (const auto& [key, value] : map) {
+				xxlib::luavm::push_string(state, key);
+				xxlib::luavm::push_string(state, value);
+				xxlib::luavm::set_table(state, -3);
+			}
+			xxlib::luavm::set_global(state, tableName);
+		}
 
+		void push_as_table(xxlib::luavm::LuaStatePtr& state, const std::vector<std::string>& vec, const std::string& tableName) {
+			xxlib::luavm::new_table(state);
+			auto index = 1;
+			for (const auto& value : vec) {
+				xxlib::luavm::push_string(state, value);
+				xxlib::luavm::seti(state, -2, index++);
+			}
+			xxlib::luavm::set_global(state, tableName);
+		}
+
+		std::expected<int32_t, std::string> execute_command(Command& command, CommandContext& context) {
+			const auto extrasResult = xxlib::helpers::split_extras(context.extras);
+			std::vector<std::string> positional;
+
+			for (const auto& [key, value] : extrasResult.kv) {
+				if (command.templateVars.find(key) != command.templateVars.end()) {
+					command.templateVars[key] = value;
+					spdlog::debug("Setting template variable: {}={}", key, value);
+					continue;
+				} else {
+				}
+			}
+
+			std::string luaCommand;
 			for (const auto& part : command.cmd) {
 				luaCommand += xxlib::command::render(part, command.templateVars, command.renderEngine) + " ";
 			}
@@ -33,18 +63,11 @@ namespace xxlib {
 
 			spdlog::debug("Executing Lua script: {}", luaCommand);
 
-			const auto push_as_table = [&](const std::unordered_map<std::string, std::string>& map, const char* tableName) {
-				xxlib::luavm::new_table(state);
-				for (const auto& [key, value] : map) {
-					xxlib::luavm::push_string(state, key);
-					xxlib::luavm::push_string(state, value);
-					xxlib::luavm::set_table(state, -3);
-				}
-				xxlib::luavm::set_global(state, tableName);
-			};
+			auto state = xxlib::luavm::create();
 
-			push_as_table(command.templateVars, "TEMPLATE_VARS");
-			push_as_table(command.envs, "ENVS");
+			push_as_table(state, command.templateVars, "TEMPLATE_VARS");
+			push_as_table(state, command.envs, "ENVS");
+			push_as_table(state, positional, "POSITIONAL_EXTRAS");
 
 			xxlib::luavm::new_table(state);
 			{

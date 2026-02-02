@@ -66,5 +66,9 @@ namespace xxlib {
 		void set_global(LuaStatePtr& luaState, const std::string& name) {
 			lua_setglobal(luaState.get(), name.c_str());
 		}
+		
+		void seti(LuaStatePtr& luaState, int32_t index, int64_t n) {
+            lua_seti(luaState.get(), index, static_cast<lua_Integer>(n));
+        }
 	} // namespace luavm
 } // namespace xxlib

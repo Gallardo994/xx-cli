@@ -203,56 +203,6 @@ int main(int argc, char** argv) {
 
 		auto& commandToRun = plannedCommand.value();
 
-		// TODO: This should be handled by the command execution engine itself.
-		const auto& extras = run->remaining();
-		if (!extras.empty()) {
-			spdlog::debug("Appending {} extra arguments to command.", extras.size());
-			for (const auto& extra : extras) {
-				spdlog::debug("  Extra argument: {}", extra);
-			}
-
-			if (commandToRun.executionEngine == CommandExecutionEngine::System) {
-				if (commandToRun.renderEngine == CommandRenderEngine::None) {
-					spdlog::debug("Using simple append for extra arguments (no rendering).");
-
-					commandToRun.cmd.insert(commandToRun.cmd.end(), extras.begin(), extras.end());
-				} else {
-					spdlog::debug("Using template variable rendering for extra arguments.");
-
-					for (const auto& extra : extras) {
-						auto pos = extra.find('=');
-						if (pos != std::string::npos) {
-							auto key = extra.substr(0, pos);
-							if (commandToRun.templateVars.find(key) != commandToRun.templateVars.end()) {
-								auto value = extra.substr(pos + 1);
-								commandToRun.templateVars[key] = value;
-
-								spdlog::debug("Adding template variable: {}={}", key, value);
-								continue;
-							}
-						}
-
-						spdlog::debug("Adding simple append variable (not part of template_vars / k=v format): {}", extra);
-						commandToRun.cmd.push_back(extra);
-					}
-				}
-			} else if (commandToRun.executionEngine == CommandExecutionEngine::Lua) {
-				// TODO: Remove copypaste from above
-				for (const auto& extra : extras) {
-					auto pos = extra.find('=');
-					if (pos != std::string::npos) {
-						auto key = extra.substr(0, pos);
-						auto value = extra.substr(pos + 1);
-						commandToRun.templateVars[key] = value;
-
-						spdlog::debug("Adding template variable: {}={}", key, value);
-					} else {
-						spdlog::debug("Skipping non-kv variable: {}", extra);
-					}
-				}
-			}
-		}
-
 		if (yoloFlag) {
 			commandToRun.requiresConfirmation = false;
 			spdlog::debug("yolo flag is set, requiresConfirmation will be ignored.");
@@ -260,7 +210,7 @@ int main(int argc, char** argv) {
 
 		auto execContext = CommandContext{
 			.dryRun = globalArgs.dryRunFlag,
-			.extras = extras,
+			.extras = run->remaining(),
 		};
 
 		auto execResult = xxlib::executor::execute_command(commandToRun, execContext);

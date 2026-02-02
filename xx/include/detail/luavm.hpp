@@ -35,6 +35,7 @@ namespace xxlib {
 		void push_boolean(LuaStatePtr& luaState, bool value);
 		void set_table(LuaStatePtr& luaState, int32_t index);
 		void set_global(LuaStatePtr& luaState, const std::string& name);
+		void seti(LuaStatePtr& luaState, int32_t index, int64_t n);
 	} // namespace luavm
 } // namespace xxlib
 

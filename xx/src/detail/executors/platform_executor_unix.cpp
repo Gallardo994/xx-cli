@@ -20,7 +20,29 @@ namespace xxlib::platform_executor {
 		return oss.str();
 	}
 
-	std::expected<int32_t, std::string> execute_command(const Command& command, const CommandContext& context) {
+	std::expected<int32_t, std::string> execute_command(Command& command, CommandContext& context) {
+		if (command.renderEngine == CommandRenderEngine::None) {
+			spdlog::debug("Using simple append for extra arguments (no rendering).");
+
+			command.cmd.insert(command.cmd.end(), context.extras.begin(), context.extras.end());
+		} else {
+			spdlog::debug("Using template variable rendering for extra arguments.");
+
+			auto extrasResult = xxlib::helpers::split_extras(context.extras);
+			for (const auto& [key, value] : extrasResult.kv) {
+				if (command.templateVars.find(key) != command.templateVars.end()) {
+					command.templateVars[key] = value;
+					spdlog::debug("Setting template variable: {}={}", key, value);
+					continue;
+				}
+			}
+
+			for (const auto& positional : extrasResult.positional) {
+				spdlog::debug("Adding positional extra argument: {}", positional);
+				command.cmd.push_back(positional);
+			}
+		}
+
 		auto fullCommand = build_shell_command(command);
 
 		if (context.dryRun) {
