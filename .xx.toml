@@ -62,20 +62,39 @@ render_engine = "inja"
 template_vars = { preset = "default" }
 
 [[alias.build]]
-cmd = "cmake . --preset {{ preset }} --fresh; if ($?) { cmake --build build/; }"
+cmd = """
+& '{{ vcvarsall_dir }}\\vcvarsall.bat' {{ arch }};
+if ($?) {
+    cmake . --preset {{ preset }} --fresh;
+    if ($?) {
+        cmake --build build/;
+    }
+}
+"""
 constraints = [ [ "osfamily", "windows" ] ]
-env = { 'CC' = 'C:/tools/msys64/clang64/bin/clang.exe', 'CXX' = 'C:/tools/msys64/clang64/bin/clang++.exe' }
 render_engine = "inja"
-template_vars = { preset = "default" }
+template_vars = { vcvarsall_dir = "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Auxiliary\\Build", arch = "arm64", preset = "default" }
 
 [[alias.test]]
 cmd = "cmake . --preset testing --fresh && cmake --build build/ && ctest --output-on-failure --test-dir build/tests"
 constraints = [ [ "osfamily", "unix" ] ]
 
 [[alias.test]]
-cmd = "cmake . --preset testing --fresh; if ($?) { cmake --build build/; if ($?) { ctest --output-on-failure --test-dir build/tests; } }"
+cmd = """
+& '{{ vcvarsall_dir }}\\vcvarsall.bat' {{ arch }};
+if ($?) {
+    cmake . --preset testing --fresh;
+    if ($?) {
+        cmake --build build/;
+        if ($?) {
+            ctest --output-on-failure --test-dir build/tests;
+        }
+    }
+}
+"""
 constraints = [ [ "osfamily", "windows" ] ]
-env = { 'CC' = 'C:/tools/msys64/clang64/bin/clang.exe', 'CXX' = 'C:/tools/msys64/clang64/bin/clang++.exe' }
+render_engine = "inja"
+template_vars = { vcvarsall_dir = "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Auxiliary\\Build", arch = "arm64" }
 
 # path
 
