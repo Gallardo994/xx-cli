@@ -32,6 +32,13 @@ if (WIN32)
     endif()
 endif()
 
+if (APPLE)
+    if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+        string(APPEND CMAKE_EXE_LINKER_FLAGS " -pthread")
+        message(STATUS "Added -pthread to linker flags for Apple platforms")
+    endif()
+endif()
+
 FetchContent_Declare(
     spdlog
     GIT_REPOSITORY https://github.com/gabime/spdlog.git
