@@ -43,6 +43,19 @@ namespace xxlib::platform_executor {
 			}
 		}
 
+		const auto unsetVars = xxlib::helpers::get_uset_vars(command.templateVars);
+		if (!unsetVars.empty()) {
+			std::ostringstream errOss;
+			errOss << "The following template variables are not set: ";
+			for (size_t i = 0; i < unsetVars.size(); ++i) {
+				errOss << unsetVars[i];
+				if (i < unsetVars.size() - 1) {
+					errOss << ", ";
+				}
+			}
+			return std::unexpected(errOss.str());
+		}
+
 		auto fullCommand = build_shell_command(command);
 
 		if (context.dryRun) {

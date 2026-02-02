@@ -29,4 +29,14 @@ namespace xxlib::helpers {
 
 		return result;
 	}
+
+	std::vector<std::string> get_uset_vars(const std::unordered_map<std::string, std::string>& templateVars) {
+		std::vector<std::string> unsetVars;
+		for (const auto& [key, value] : templateVars) {
+			if (value.empty()) {
+				unsetVars.push_back(key);
+			}
+		}
+		return unsetVars;
+	}
 } // namespace xxlib::helpers

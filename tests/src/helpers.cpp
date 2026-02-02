@@ -17,3 +17,18 @@ TEST(Helpers_SplitExtras, SplitExtras) {
 	EXPECT_EQ(result.positional[0], "positional1");
 	EXPECT_EQ(result.positional[1], "positional2");
 }
+
+TEST(Helpers_GetUnsetVars, GetUnsetVars) {
+	auto templateVars = std::unordered_map<std::string, std::string>{
+		{"var1", "value1"},
+		{"var2", ""},
+		{"var3", "value3"},
+		{"var4", ""},
+	};
+
+	auto unsetVars = xxlib::helpers::get_uset_vars(templateVars);
+
+	EXPECT_EQ(unsetVars.size(), 2);
+	EXPECT_NE(std::find(unsetVars.begin(), unsetVars.end(), "var2"), unsetVars.end());
+	EXPECT_NE(std::find(unsetVars.begin(), unsetVars.end(), "var4"), unsetVars.end());
+}

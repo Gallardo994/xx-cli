@@ -14,6 +14,7 @@ namespace xxlib {
 
 		bool ask_for_confirmation(const std::string& text);
 		ExtrasResult split_extras(const std::vector<std::string>& extras);
+		std::vector<std::string> get_uset_vars(const std::unordered_map<std::string, std::string>& templateVars);
 	} // namespace helpers
 } // namespace xxlib
 

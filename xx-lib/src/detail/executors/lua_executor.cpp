@@ -39,8 +39,20 @@ namespace xxlib {
 					command.templateVars[key] = value;
 					spdlog::debug("Setting template variable: {}={}", key, value);
 					continue;
-				} else {
 				}
+			}
+
+			const auto unsetVars = xxlib::helpers::get_uset_vars(command.templateVars);
+			if (!unsetVars.empty()) {
+				std::ostringstream errOss;
+				errOss << "The following template variables are not set: ";
+				for (size_t i = 0; i < unsetVars.size(); ++i) {
+					errOss << unsetVars[i];
+					if (i < unsetVars.size() - 1) {
+						errOss << ", ";
+					}
+				}
+				return std::unexpected(errOss.str());
 			}
 
 			std::string luaCommand;
