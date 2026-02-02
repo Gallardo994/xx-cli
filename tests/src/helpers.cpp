@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 
-TEST(HelpersSplitExtras, SplitExtras) {
+TEST(Helpers_SplitExtras, SplitExtras) {
 	auto extras = std::vector<std::string>{"key1=value1", "key2=value2", "positional1", "key3=value3", "positional2"};
 
 	auto result = xxlib::helpers::split_extras(extras);

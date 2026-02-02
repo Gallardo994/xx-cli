@@ -14,6 +14,7 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 add_executable(tests
+    src/planner.cpp
     src/helpers.cpp
 )
 target_compile_features(tests PUBLIC cxx_std_23)
