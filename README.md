@@ -65,6 +65,7 @@ alias:
         CC: "C:/tools/msys64/clang64/bin/clang.exe"
         CXX: "C:/tools/msys64/clang64/bin/clang++.exe"
 
+  # `xx run path` will print the PATH environment variable according to the OS.
   path:
     - cmd: "echo $PATH"
       constraints:
