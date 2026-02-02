@@ -1,5 +1,7 @@
 #include "detail/helpers.hpp"
 #include <gtest/gtest.h>
+#include <vector>
+#include <string>
 
 TEST(HelpersSplitExtras, SplitExtras) {
 	auto extras = std::vector<std::string>{"key1=value1", "key2=value2", "positional1", "key3=value3", "positional2"};
