@@ -54,58 +54,62 @@ namespace {
 		return std::nullopt;
 	}
 
+	void load_project_configuration(std::vector<Command>& commands, const std::string& configFile, const bool upFlag, const std::string& workdir) {
+		spdlog::debug("Loading configuration from workdir: {}", workdir);
+
+		auto configPathOpt = find_config(workdir, configFile, upFlag);
+		if (configPathOpt) {
+			spdlog::debug("Configuration file found at: {}", *configPathOpt);
+
+			const auto buffer = xxlib::parser::read_file(*configPathOpt);
+			if (buffer) {
+				auto parseResult = xxlib::parser::parse_buffer(*buffer);
+				if (!parseResult) {
+					throw std::runtime_error("Error parsing configuration: " + parseResult.error());
+				}
+
+				commands.insert(commands.end(), parseResult->begin(), parseResult->end());
+				spdlog::debug("Loaded {} project commands.", parseResult->size());
+			} else {
+				spdlog::debug("Error reading configuration file: {}", buffer.error());
+			}
+		} else {
+			spdlog::debug("No configuration file found.");
+		}
+	}
+
+	void load_user_configuration(std::vector<Command>& commands, const std::string& userConfigFile) {
+		const auto userConfigFilePath = std::filesystem::path(userConfigFile);
+		const auto userBuffer = xxlib::parser::read_file(userConfigFilePath.string());
+		if (userBuffer) {
+			spdlog::debug("User configuration found: {}", userConfigFilePath.string());
+
+			auto userParseResult = xxlib::parser::parse_buffer(*userBuffer);
+			if (userParseResult) {
+				auto& userCommands = *userParseResult;
+				for (auto& cmd : userCommands) {
+					cmd.userScope = true;
+				}
+
+				commands.insert(commands.end(), userCommands.begin(), userCommands.end());
+				spdlog::debug("Loaded {} user commands.", userCommands.size());
+			} else {
+				spdlog::debug("Error parsing user configuration: {}", userParseResult.error());
+			}
+		} else {
+			spdlog::debug("No user configuration file found at: {}", userConfigFilePath.string());
+		}
+	}
+
 	std::vector<Command> load_commands(const GlobalArgs& globalArgs, const std::string& workdir) {
 		std::vector<Command> commands;
 
 		if (!globalArgs.userConfigOnlyFlag) {
-			spdlog::debug("Loading configuration from workdir: {}", workdir);
-
-			auto configPathOpt = find_config(workdir, globalArgs.configFile, globalArgs.upFlag);
-			if (configPathOpt) {
-				spdlog::debug("Configuration file found at: {}", *configPathOpt);
-
-				const auto buffer = xxlib::parser::read_file(*configPathOpt);
-				if (buffer) {
-					auto parseResult = xxlib::parser::parse_buffer(*buffer);
-					if (!parseResult) {
-						throw std::runtime_error("Error parsing configuration: " + parseResult.error());
-					}
-
-					commands.insert(commands.end(), parseResult->begin(), parseResult->end());
-					spdlog::debug("Loaded {} project commands.", parseResult->size());
-				} else {
-					spdlog::debug("Error reading configuration file: {}", buffer.error());
-				}
-			} else {
-				spdlog::debug("No configuration file found.");
-			}
-		} else {
-			spdlog::debug("User config only flag is set; skipping project configuration load.");
+			load_project_configuration(commands, globalArgs.configFile, globalArgs.upFlag, workdir);
 		}
 
 		if (!globalArgs.projectOnlyFlag) {
-			const auto userConfigFilePath = std::filesystem::path(globalArgs.userConfigFile);
-			const auto userBuffer = xxlib::parser::read_file(userConfigFilePath.string());
-			if (userBuffer) {
-				spdlog::debug("User configuration found: {}", userConfigFilePath.string());
-
-				auto userParseResult = xxlib::parser::parse_buffer(*userBuffer);
-				if (userParseResult) {
-					auto& userCommands = *userParseResult;
-					for (auto& cmd : userCommands) {
-						cmd.userScope = true;
-					}
-
-					commands.insert(commands.end(), userCommands.begin(), userCommands.end());
-					spdlog::debug("Loaded {} user commands.", userCommands.size());
-				} else {
-					spdlog::debug("Error parsing user configuration: {}", userParseResult.error());
-				}
-			} else {
-				spdlog::debug("No user configuration file found at: {}", userConfigFilePath.string());
-			}
-		} else {
-			spdlog::debug("Project only flag is set; skipping user configuration load.");
+			load_user_configuration(commands, globalArgs.userConfigFile);
 		}
 
 		return commands;
@@ -127,8 +131,8 @@ int main(int argc, char** argv) {
 #endif
 	app.add_flag("--up", globalArgs.upFlag, "Instead of using the current directory to locate the project configuration file, search parent directories");
 	app.add_flag("-v,--verbose", globalArgs.verboseFlag, "Enable verbose output");
-	app.add_flag("--useronly", globalArgs.userConfigOnlyFlag, "Load only user configuration, ignoring project configuration");
-	app.add_flag("--projectonly", globalArgs.projectOnlyFlag, "Load only project configuration, ignoring user configuration");
+	app.add_flag("--user", globalArgs.userConfigOnlyFlag, "Load only user configuration, ignoring project configuration");
+	app.add_flag("--project", globalArgs.projectOnlyFlag, "Load only project configuration, ignoring user configuration");
 
 	app.parse_complete_callback([&]() {
 		if (globalArgs.verboseFlag) {
@@ -137,6 +141,15 @@ int main(int argc, char** argv) {
 		} else {
 			spdlog::set_level(spdlog::level::info);
 			spdlog::set_pattern("%v");
+		}
+
+		if (globalArgs.userConfigOnlyFlag && globalArgs.projectOnlyFlag) {
+			spdlog::error("Cannot use both --user and --project flags at once as they are mutually exclusive.");
+			std::exit(1);
+		}
+
+		if (globalArgs.projectOnlyFlag && globalArgs.upFlag) {
+			spdlog::warn("The --up flag has no effect when --project flag is used.");
 		}
 	});
 
