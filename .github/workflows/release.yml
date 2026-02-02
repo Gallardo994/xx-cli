@@ -127,8 +127,6 @@ jobs:
             git tag ${{ github.event.inputs.tag }}
             git push origin ${{ github.event.inputs.tag }}
           fi
-          git tag ${{ github.event.inputs.tag }}
-          git push origin ${{ github.event.inputs.tag }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload Release Assets
