@@ -3,17 +3,16 @@
 
 #include <memory>
 #include <string>
-#include <lua.hpp>
+
+struct lua_State;
 
 namespace xxlib {
 	namespace luavm {
 		struct Deleter {
-			void operator()(lua_State* state) const {
-				if (state) {
-					lua_close(state);
-				}
-			}
+			void operator()(lua_State* state) const;
 		};
+
+		std::string version();
 
 		using LuaStatePtr = std::unique_ptr<lua_State, Deleter>;
 

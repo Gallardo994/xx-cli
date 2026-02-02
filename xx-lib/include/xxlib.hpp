@@ -1,7 +1,13 @@
 #ifndef XXLIB_HPP
 #define XXLIB_HPP
 
-constexpr const char* XXLIB_VERSION = "0.6.0";
+#include <string>
+
+namespace xxlib {
+    inline std::string version() {
+        return "0.6.0";
+    }
+} // namespace xxlib
 
 #include "detail/parser.hpp"
 #include "detail/planner.hpp"

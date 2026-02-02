@@ -29,13 +29,21 @@ template_vars = { values = "0" }
 # build
 
 [[alias.build]]
-cmd = "cmake . --preset default --fresh -DCMAKE_BUILD_TYPE=\"Release\" && ninja -C build/"
+cmd = "cmake . --preset default --fresh && cmake --build build/"
 constraints = [ [ "osfamily", "unix" ] ]
 
 [[alias.build]]
-cmd = "cmake . --preset default --fresh -DCMAKE_BUILD_TYPE=\"Release\"; if ($?) { ninja -C build/ }"
+cmd = "cmake . --preset default --fresh; if ($?) { cmake --build build/; }"
 constraints = [ [ "osfamily", "windows" ] ]
 env = { 'CC' = 'C:/tools/msys64/clang64/bin/clang.exe', 'CXX' = 'C:/tools/msys64/clang64/bin/clang++.exe' }
+
+[[alias.test]]
+cmd = "cmake . --preset testing --fresh && cmake --build build-testing/ && ./build-testing/tests/tests"
+constraints = [ [ "osfamily", "unix" ] ]
+
+[[alias.test]]
+cmd = "cmake . --preset testing --fresh; if ($?) { cmake --build build-testing/; if ($?) { ./build-testing/tests/tests.exe } }"
+constraints = [ [ "osfamily", "windows" ] ]
 
 # path
 

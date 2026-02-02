@@ -58,6 +58,7 @@ compile_commands.json
 
 # Build directories
 build/
+build-*/
 
 # Final binaries
 build/xx/xx

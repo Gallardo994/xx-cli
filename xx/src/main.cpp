@@ -133,8 +133,8 @@ int main(int argc, char** argv) {
 	const auto workdir = std::filesystem::current_path().string();
 
 	app.add_subcommand("version", "Show version information")->callback([&]() {
-		spdlog::info("xxlib version {}", XXLIB_VERSION);
-		spdlog::info("lua version {}", LUA_VERSION);
+		spdlog::info("xxlib version {}", xxlib::version());
+		spdlog::info("lua version {}", xxlib::luavm::version());
 	});
 
 	auto* list = app.add_subcommand("list", "List all available commands");
