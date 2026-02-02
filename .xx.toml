@@ -26,6 +26,33 @@ return 0
 execution_engine = "lua"
 template_vars = { values = "0" }
 
+[[alias.luadump]]
+cmd = """
+function dump(o)
+   if type(o) == 'table' then
+      local s = '{ '
+      for k,v in pairs(o) do
+         if type(k) ~= 'number' then k = '"'..k..'"' end
+         s = s .. '['..k..'] = ' .. dump(v) .. ','
+      end
+      return s .. '} '
+   else
+      return tostring(o)
+   end
+end
+
+print("TEMPLATE_VARS:")
+print(dump(TEMPLATE_VARS))
+
+print("ENVS:")
+print(dump(ENVS))
+
+print("CTX:")
+print(dump(CTX))
+"""
+execution_engine = "lua"
+env = { 'EXAMPLE_ENV_VAR' = "example_value" }
+
 # build
 
 [[alias.build]]

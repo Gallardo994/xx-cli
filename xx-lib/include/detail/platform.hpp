@@ -15,6 +15,16 @@ namespace xxlib {
 				return OSFamily::Unknown;
 			}
 		}
+		inline std::string os_family_to_string(OSFamily osFamily) {
+			switch (osFamily) {
+			case OSFamily::Windows:
+				return "windows";
+			case OSFamily::Unix:
+				return "unix";
+			default:
+				return "unknown";
+			}
+		}
 
 		enum class OS { Windows, MacOS, Linux, Unknown };
 		inline OS string_to_os(const std::string& os) {
@@ -28,6 +38,18 @@ namespace xxlib {
 				return OS::Unknown;
 			}
 		}
+		inline std::string os_to_string(OS os) {
+			switch (os) {
+			case OS::Windows:
+				return "windows";
+			case OS::MacOS:
+				return "macos";
+			case OS::Linux:
+				return "linux";
+			default:
+				return "unknown";
+			}
+		}
 
 		enum class Architecture { x86_64, arm64, unknown };
 		inline Architecture string_to_architecture(const std::string& arch) {
@@ -37,6 +59,16 @@ namespace xxlib {
 				return Architecture::arm64;
 			} else {
 				return Architecture::unknown;
+			}
+		}
+		inline std::string architecture_to_string(Architecture arch) {
+			switch (arch) {
+			case Architecture::x86_64:
+				return "x86_64";
+			case Architecture::arm64:
+				return "arm64";
+			default:
+				return "unknown";
 			}
 		}
 

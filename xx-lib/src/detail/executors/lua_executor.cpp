@@ -3,6 +3,7 @@
 #include "detail/luavm.hpp"
 #include "detail/command.hpp"
 #include "detail/helpers.hpp"
+#include "detail/platform.hpp"
 
 #include <expected>
 #include <spdlog/spdlog.h>
@@ -74,6 +75,18 @@ namespace xxlib {
 				xxlib::luavm::push_string(state, "command_name");
 				xxlib::luavm::push_string(state, command.name);
 				xxlib::luavm::set_table(state, -3);
+
+				xxlib::luavm::push_string(state, "os");
+				xxlib::luavm::push_string(state, xxlib::platform::os_to_string(xxlib::platform::get_current_os()));
+				xxlib::luavm::set_table(state, -3);
+
+				xxlib::luavm::push_string(state, "arch");
+				xxlib::luavm::push_string(state, xxlib::platform::architecture_to_string(xxlib::platform::get_current_architecture()));
+				xxlib::luavm::set_table(state, -3);
+
+				xxlib::luavm::push_string(state, "osfamily");
+				xxlib::luavm::push_string(state, xxlib::platform::os_family_to_string(xxlib::platform::get_current_os_family()));
+				xxlib::luavm::set_table(state, -3);
 			}
 			xxlib::luavm::set_global(state, "CTX");
 
@@ -88,7 +101,7 @@ namespace xxlib {
 			}
 
 			if (xxlib::luavm::is_nil(state)) {
-				spdlog::info("Lua script returned nil, treating as successful no-op.");
+				spdlog::debug("Lua script returned nil, treating as successful no-op.");
 				return 0;
 
 			} else if (xxlib::luavm::is_integer(state)) {
