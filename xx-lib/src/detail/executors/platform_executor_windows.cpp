@@ -4,32 +4,53 @@
 #include <windows.h>
 #include <sstream>
 #include <iostream>
+#include <filesystem>
+#include <fstream>
+#include <array>
 #include <spdlog/spdlog.h>
 
 namespace xxlib::platform_executor {
-	std::string build_shell_command(const Command& command) {
-		// TODO: Very much unsafe. Needs better escaping.
-		const auto escape_arg = [](const std::string& arg) -> std::string {
-			std::string escaped;
-			for (char c : arg) {
-				if (c == '"') {
-					escaped += "\\\"";
+	struct TempFile {
+		std::string path;
+
+		TempFile() {
+			auto tempDir = std::filesystem::temp_directory_path().string();
+
+			std::array<char, MAX_PATH> tempFileName{};
+			if (GetTempFileNameA(tempDir.c_str(), "xxcli", 0, tempFileName.data()) == 0) {
+				throw std::runtime_error("Failed to create temporary file");
+			}
+
+			path = std::string(tempFileName.data()) + ".ps1";
+			std::filesystem::rename(std::string(tempFileName.data()), path);
+
+			spdlog::debug("Created temporary file {}", path);
+		}
+
+		~TempFile() {
+			if (!path.empty() && std::filesystem::exists(path)) {
+				std::error_code ec;
+				std::filesystem::remove(path, ec);
+				if (ec) {
+					spdlog::warn("Failed to delete temporary file {}: {}", path, ec.message());
 				} else {
-					escaped += c;
+					spdlog::debug("Deleted temporary file {}", path);
 				}
 			}
-			return escaped;
-		};
+		}
 
+		TempFile(const TempFile&) = delete;
+		TempFile& operator=(const TempFile&) = delete;
+	};
+
+	std::string build_shell_command(const Command& command) {
 		std::ostringstream oss;
-		oss << "powershell.exe -NoProfile -Command \"& { ";
 		for (const auto& [key, value] : command.envs) {
-			oss << "$env:" << key << "=\\\"" << escape_arg(value) << "\\\"; ";
+			oss << "$env:" << key << "=\"" << value << "\"; ";
 		}
 		for (const auto& arg : command.cmd) {
-			oss << escape_arg(command::render(arg, command.templateVars, command.renderEngine)) << " ";
+			oss << command::render(arg, command.templateVars, command.renderEngine) << " ";
 		}
-		oss << " }\"";
 		return oss.str();
 	}
 
@@ -77,7 +98,16 @@ namespace xxlib::platform_executor {
 		// Recommended by https://en.cppreference.com/w/cpp/utility/program/system.html
 		std::cout << std::flush;
 
-		auto returnCode = std::system(fullCommand.c_str());
+		auto tempFile = TempFile();
+		std::ofstream ofs(tempFile.path);
+		if (!ofs) {
+			return std::unexpected("Failed to create temporary script file");
+		}
+		ofs << fullCommand;
+		ofs.close();
+
+		auto cmd = "powershell -ExecutionPolicy Bypass -File \"" + tempFile.path + "\"";
+		auto returnCode = std::system(cmd.c_str());
 		spdlog::debug("Command exited with return code: {}", returnCode);
 		if (returnCode == -1) {
 			return std::unexpected("Failed to execute command");
