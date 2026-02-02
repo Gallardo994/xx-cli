@@ -34,8 +34,12 @@ endif()
 
 if (APPLE)
     if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-        string(APPEND CMAKE_EXE_LINKER_FLAGS " -pthread")
-        message(STATUS "Added -pthread to linker flags for Apple platforms")
+        # MacOS + gcc results into linker errors for threads: https://stackoverflow.com/questions/54587052/cmake-on-mac-could-not-find-threads-missing-threads-found
+        set(CMAKE_THREAD_LIBS_INIT "-lpthread")
+        set(CMAKE_HAVE_THREADS_LIBRARY 1)
+        set(CMAKE_USE_WIN32_THREADS_INIT 0)
+        set(CMAKE_USE_PTHREADS_INIT 1)
+        set(THREADS_PREFER_PTHREAD_FLAG ON)
     endif()
 endif()
 
