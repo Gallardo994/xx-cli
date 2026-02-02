@@ -13,7 +13,8 @@ struct GlobalArgs {
 	std::string userConfigFile;
 	bool upFlag = false;
 	bool verboseFlag = false;
-	bool dryRunFlag = false;
+	bool userConfigOnlyFlag = false;
+	bool projectOnlyFlag = false;
 };
 
 namespace {
@@ -58,45 +59,53 @@ namespace {
 
 		std::vector<Command> commands;
 
-		auto configPathOpt = find_config(workdir, globalArgs.configFile, globalArgs.upFlag);
-		if (configPathOpt) {
-			spdlog::debug("Configuration file found at: {}", *configPathOpt);
+		if (!globalArgs.userConfigOnlyFlag) {
+			auto configPathOpt = find_config(workdir, globalArgs.configFile, globalArgs.upFlag);
+			if (configPathOpt) {
+				spdlog::debug("Configuration file found at: {}", *configPathOpt);
 
-			const auto buffer = xxlib::parser::read_file(*configPathOpt);
-			if (buffer) {
-				auto parseResult = xxlib::parser::parse_buffer(*buffer);
-				if (!parseResult) {
-					throw std::runtime_error("Error parsing configuration: " + parseResult.error());
+				const auto buffer = xxlib::parser::read_file(*configPathOpt);
+				if (buffer) {
+					auto parseResult = xxlib::parser::parse_buffer(*buffer);
+					if (!parseResult) {
+						throw std::runtime_error("Error parsing configuration: " + parseResult.error());
+					}
+
+					commands.insert(commands.end(), parseResult->begin(), parseResult->end());
+					spdlog::debug("Loaded {} project commands.", parseResult->size());
+				} else {
+					spdlog::debug("Error reading configuration file: {}", buffer.error());
 				}
-
-				commands.insert(commands.end(), parseResult->begin(), parseResult->end());
-				spdlog::debug("Loaded {} project commands.", parseResult->size());
 			} else {
-				spdlog::debug("Error reading configuration file: {}", buffer.error());
+				spdlog::debug("No configuration file found.");
 			}
 		} else {
-			spdlog::debug("No configuration file found.");
+			spdlog::debug("User config only flag is set; skipping project configuration load.");
 		}
 
-		const auto userConfigFilePath = std::filesystem::path(globalArgs.userConfigFile);
-		const auto userBuffer = xxlib::parser::read_file(userConfigFilePath.string());
-		if (userBuffer) {
-			spdlog::debug("User configuration found: {}", userConfigFilePath.string());
+		if (!globalArgs.projectOnlyFlag) {
+			const auto userConfigFilePath = std::filesystem::path(globalArgs.userConfigFile);
+			const auto userBuffer = xxlib::parser::read_file(userConfigFilePath.string());
+			if (userBuffer) {
+				spdlog::debug("User configuration found: {}", userConfigFilePath.string());
 
-			auto userParseResult = xxlib::parser::parse_buffer(*userBuffer);
-			if (userParseResult) {
-				auto& userCommands = *userParseResult;
-				for (auto& cmd : userCommands) {
-					cmd.userScope = true;
+				auto userParseResult = xxlib::parser::parse_buffer(*userBuffer);
+				if (userParseResult) {
+					auto& userCommands = *userParseResult;
+					for (auto& cmd : userCommands) {
+						cmd.userScope = true;
+					}
+
+					commands.insert(commands.end(), userCommands.begin(), userCommands.end());
+					spdlog::debug("Loaded {} user commands.", userCommands.size());
+				} else {
+					spdlog::debug("Error parsing user configuration: {}", userParseResult.error());
 				}
-
-				commands.insert(commands.end(), userCommands.begin(), userCommands.end());
-				spdlog::debug("Loaded {} user commands.", userCommands.size());
 			} else {
-				spdlog::debug("Error parsing user configuration: {}", userParseResult.error());
+				spdlog::debug("No user configuration file found at: {}", userConfigFilePath.string());
 			}
 		} else {
-			spdlog::debug("No user configuration file found at: {}", userConfigFilePath.string());
+			spdlog::debug("Project only flag is set; skipping user configuration load.");
 		}
 
 		return commands;
@@ -118,7 +127,8 @@ int main(int argc, char** argv) {
 #endif
 	app.add_flag("--up", globalArgs.upFlag, "Instead of using the current directory to locate the project configuration file, search parent directories");
 	app.add_flag("-v,--verbose", globalArgs.verboseFlag, "Enable verbose output");
-	app.add_flag("-n,--dry", globalArgs.dryRunFlag, "Perform a dry run without executing commands, act like they succeeded");
+	app.add_flag("--useronly", globalArgs.userConfigOnlyFlag, "Load only user configuration, ignoring project configuration");
+	app.add_flag("--projectonly", globalArgs.projectOnlyFlag, "Load only project configuration, ignoring user configuration");
 
 	app.parse_complete_callback([&]() {
 		if (globalArgs.verboseFlag) {
@@ -192,8 +202,10 @@ int main(int argc, char** argv) {
 	auto* run = app.add_subcommand("run", "Run a specified command");
 	std::string commandName;
 	bool yoloFlag = false;
+	bool dryRunFlag = false;
 	run->add_option("command", commandName, "Name of the command to run")->required();
-	run->add_flag("--yolo", yoloFlag, "Run the command without confirmation, even if it requires confirmation");
+	run->add_flag("-y,--yolo", yoloFlag, "Run the command without confirmation, even if it requires confirmation");
+	run->add_flag("-n,--dry", dryRunFlag, "Perform a dry run without executing commands, act like they succeeded");
 	run->allow_extras();
 	run->callback([&]() {
 		const auto commands = load_commands(globalArgs, workdir);
@@ -212,7 +224,7 @@ int main(int argc, char** argv) {
 		}
 
 		auto execContext = CommandContext{
-			.dryRun = globalArgs.dryRunFlag,
+			.dryRun = dryRunFlag,
 			.extras = run->remaining(),
 		};
 

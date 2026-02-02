@@ -85,7 +85,7 @@ Be sure to name your aliases uniquely as they may conflict between project-level
 
 ## Commands
 
-Generally you're going to use `xx run <alias>` (use `--dry` to simulate command execution without actually running it) and `xx list` to see all the available aliases (with `--grep abc` to quickly find what you're looking for).
+Generally you're going to use `xx run <alias>` (use `xx run --dry <alias>` to simulate command execution without actually running it) and `xx list` to see all the available aliases (with `--grep abc` to quickly find what you're looking for).
 
 Use `xx --help` to see the list of available commands.
 
