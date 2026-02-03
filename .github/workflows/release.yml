@@ -26,19 +26,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - windows-latest
-          - ubuntu-latest
-          - ubuntu-24.04-arm
-          - macos-latest
-        compiler:
-          - llvm-20 # llvm-21 is currently broken on macos: https://github.com/llvm/llvm-project/issues/155531
-          - gcc
         include:
           - os: "windows-latest"
             compiler: "msvc"
           - os: "windows-11-arm"
             compiler: "msvc"
+          - os: "ubuntu-latest"
+            compiler: "llvm"
+          - os: "ubuntu-24.04-arm"
+            compiler: "llvm"
+          - os: "macos-latest"
+            compiler: "llvm-20" # llvm-21 is currently broken on macos: https://github.com/llvm/llvm-project/issues/155531
     steps:
       - uses: actions/checkout@v3
 
@@ -73,18 +71,39 @@ jobs:
         run: |
           cmake --build ./build
 
-      - name: "Upload Build Artifacts [Windows]"
+      - name: "Upload Windows x86_64 Build Artifacts"
         if: matrix.os == 'windows-latest' || matrix.os == 'windows-11-arm'
         uses: actions/upload-artifact@v6
         with:
-          name: build-${{ matrix.os }}-${{ matrix.compiler }}-${{ env.BUILD_PRESET }}
+          name: xx-windows-x86_64-${{ env.BUILD_PRESET }}.exe
           path: ./build/xx/xx.exe
 
-      - name: "Upload Build Artifacts [Linux/MacOS]"
-        if: matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-24.04-arm' || matrix.os == 'macos-latest'
+      - name: "Upload Windows ARM Build Artifacts"
+        if: matrix.os == 'windows-11-arm'
         uses: actions/upload-artifact@v6
         with:
-          name: build-${{ matrix.os }}-${{ matrix.compiler }}-${{ env.BUILD_PRESET }}
+          name: xx-windows-arm64-${{ env.BUILD_PRESET }}.exe
+          path: ./build/xx/xx.exe
+
+      - name: "Upload Linux x86_64 Build Artifacts"
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v6
+        with:
+          name: xx-linux-x86_64-${{ env.BUILD_PRESET }}
+          path: ./build/xx/xx
+
+      - name: "Upload Linux ARM Build Artifacts"
+        if: matrix.os == 'ubuntu-24.04-arm'
+        uses: actions/upload-artifact@v6
+        with:
+          name: xx-linux-arm64-${{ env.BUILD_PRESET }}
+          path: ./build/xx/xx
+
+      - name: "Upload macOS ARM Build Artifacts"
+        if: matrix.os == 'macos-latest'
+        uses: actions/upload-artifact@v6
+        with:
+          name: xx-macos-arm64-${{ env.BUILD_PRESET }}
           path: ./build/xx/xx
   release:
     if: github.event_name == 'workflow_dispatch' || github.ref_type == 'tag'
@@ -98,24 +117,10 @@ jobs:
       - name: Download all artifacts
         uses: actions/download-artifact@v5
         with:
-          path: ./downloaded-artifacts
+          path: ./artifacts
           pattern: build-*
           merge-multiple: false
-      - name: Rename artifacts
-        run: |
-          mkdir -p ./artifacts
-          for artifact in ./downloaded-artifacts/*; do
-            file=$(find "$artifact" -maxdepth 1 -type f)
-            filename=$(basename -- "$file")
-            extension="${filename##*.}"
-            os_compiler_buildtype=$(basename "$artifact")
-            os_compiler_buildtype="${os_compiler_buildtype//-/_}"
-            if [[ "$extension" == "exe" ]]; then
-              mv "$file" "./artifacts/xx-${os_compiler_buildtype}.exe"
-            else
-              mv "$file" "./artifacts/xx-${os_compiler_buildtype}"
-            fi
-          done
+
       - name: Tag the release
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.tag != ''
         run: |
@@ -129,6 +134,7 @@ jobs:
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v1
         with:
@@ -145,7 +151,7 @@ jobs:
       - name: Update homebrew-tap formula
         if: ${{ (github.event_name == 'workflow_dispatch' || github.ref_type == 'tag') && github.event.inputs.stable == 'true' }}
         run: |
-          git clone https://github.com/gallardo994/homebrew-tap.git
+          git clone https://x-access-token:${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}@github.com/gallardo994/homebrew-tap.git
 
           TEMPLATE_PATH="./homebrew-tap/FormulaTemplates/xx.rb.template"
           FORMULA_PATH="./homebrew-tap/Formula/xx.rb"
@@ -153,22 +159,22 @@ jobs:
           VERSION="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag != '' && github.event.inputs.tag || github.ref_name }}"
           BASE_URL="https://github.com/Gallardo994/xx-cli/releases/download/$VERSION"
 
-          MAC_ARM_NAME="xx-build_macos_latest_llvm_20_release"
-          LINUX_INTEL_NAME="xx-build_ubuntu_latest_llvm_20_release"
-          LINUX_ARM_NAME="xx-build_ubuntu_24.04_arm_llvm_20_release"
+          MAC_ARM64_NAME="xx-macos-arm64-${{ env.BUILD_PRESET }}
+          LINUX_X86_64_NAME="xx-linux-x86_64-${{ env.BUILD_PRESET }}"
+          LINUX_ARM64_NAME="xx-linux-arm64-${{ env.BUILD_PRESET }}"
 
-          SHA_MAC_ARM=$(shasum -a 256 ./artifacts/$MAC_ARM_NAME | awk '{ print $1 }')
-          SHA_LINUX_INTEL=$(shasum -a 256 ./artifacts/$LINUX_INTEL_NAME | awk '{ print $1 }')
-          SHA_LINUX_ARM=$(shasum -a 256 ./artifacts/$LINUX_ARM_NAME | awk '{ print $1 }')
+          SHA_MAC_ARM64=$(shasum -a 256 ./artifacts/$MAC_ARM64_NAME | awk '{ print $1 }')
+          SHA_LINUX_X86_64=$(shasum -a 256 ./artifacts/$LINUX_X86_64_NAME | awk '{ print $1 }')
+          SHA_LINUX_ARM64=$(shasum -a 256 ./artifacts/$LINUX_ARM64_NAME | awk '{ print $1 }')
 
           sed -e "s|__VERSION__|$VERSION|g" \
               -e "s|__BASE_URL__|$BASE_URL|g" \
-              -e "s|__FILE_NAME_MAC_ARM__|$MAC_ARM_NAME|g" \
-              -e "s|__FILE_NAME_LINUX_INTEL__|$LINUX_INTEL_NAME|g" \
-              -e "s|__FILE_NAME_LINUX_ARM__|$LINUX_ARM_NAME|g" \
-              -e "s|__SHA_MAC_ARM__|$SHA_MAC_ARM|g" \
-              -e "s|__SHA_LINUX_INTEL__|$SHA_LINUX_INTEL|g" \
-              -e "s|__SHA_LINUX_ARM__|$SHA_LINUX_ARM|g" \
+              -e "s|__FILE_NAME_MAC_ARM64__|$MAC_ARM64_NAME|g" \
+              -e "s|__FILE_NAME_LINUX_X86_64__|$LINUX_X86_64_NAME|g" \
+              -e "s|__FILE_NAME_LINUX_ARM64__|$LINUX_ARM64_NAME|g" \
+              -e "s|__SHA_MAC_ARM64__|$SHA_MAC_ARM64|g" \
+              -e "s|__SHA_LINUX_X86_64__|$SHA_LINUX_X86_64|g" \
+              -e "s|__SHA_LINUX_ARM64__|$SHA_LINUX_ARM64|g" \
               $TEMPLATE_PATH > $FORMULA_PATH
 
           cd homebrew-tap
