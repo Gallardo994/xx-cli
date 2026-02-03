@@ -185,6 +185,7 @@ TEST(LuaVM_JsonDump, ConvertsArrayJsonToString) {
 	EXPECT_TRUE(xxlib::luavm::is_string(luaState));
 	EXPECT_EQ(std::string(xxlib::luavm::tostring(luaState)), R"(["first","second","third"])");
 }
+
 TEST(LuaVM_JsonDump, ModifyAndDumpJson) {
 	auto luaState = xxlib::luavm::create();
 	xxlib::luavm::add_json_library(luaState);
