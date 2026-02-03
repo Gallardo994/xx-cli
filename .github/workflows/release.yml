@@ -159,7 +159,7 @@ jobs:
           VERSION="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag != '' && github.event.inputs.tag || github.ref_name }}"
           BASE_URL="https://github.com/Gallardo994/xx-cli/releases/download/$VERSION"
 
-          MAC_ARM64_NAME="xx-macos-arm64-${{ env.BUILD_PRESET }}
+          MAC_ARM64_NAME="xx-macos-arm64-${{ env.BUILD_PRESET }}"
           LINUX_X86_64_NAME="xx-linux-x86_64-${{ env.BUILD_PRESET }}"
           LINUX_ARM64_NAME="xx-linux-arm64-${{ env.BUILD_PRESET }}"
 
