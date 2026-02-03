@@ -15,7 +15,7 @@ namespace nlohmann {
 		lua() = delete;
 
 	  public:
-		static constexpr const char* MetadataTableName = "JSON";
+		static constexpr const char* MetadataTableName = "json";
 
 	  public:
 		[[nodiscard]] static int json_new(lua_State* L);
