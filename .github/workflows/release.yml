@@ -118,7 +118,7 @@ jobs:
         uses: actions/download-artifact@v5
         with:
           path: ./artifacts
-          pattern: build-*
+          pattern: xx-*
           merge-multiple: false
 
       - name: Tag the release
