@@ -6,11 +6,9 @@
 #include <string>
 #include <expected>
 
-namespace xxlib {
-	namespace planner {
-		bool matches_constraints(const Command& command);
-		std::expected<Command, std::string> plan_single(const std::vector<Command>& commands, const std::string& commandName);
-	} // namespace planner
-} // namespace xxlib
+namespace xxlib::planner {
+	bool matches_constraints(const Command& command);
+	std::expected<Command, std::string> plan_single(const std::vector<Command>& commands, const std::string& commandName);
+} // namespace xxlib::planner
 
 #endif // XX_PLANNER_HPP

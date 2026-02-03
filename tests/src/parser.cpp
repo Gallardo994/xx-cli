@@ -206,7 +206,7 @@ alias:
 	EXPECT_EQ(hello.name, "hello");
 	ASSERT_EQ(hello.cmd.size(), 1u);
 	EXPECT_EQ(hello.cmd.at(0), R"(echo "{{ greeting }}, {{ target }}!")");
-	EXPECT_EQ(hello.renderEngine, CommandRenderEngine::Inja);
+	EXPECT_EQ(hello.renderEngine, xxlib::renderer::Engine::Inja);
 	EXPECT_EQ(hello.templateVars.at("greeting"), "Hello");
 	EXPECT_EQ(hello.templateVars.at("target"), "World");
 }
@@ -228,7 +228,7 @@ aliases:
 
 	const Command& hello = result->at(0);
 	EXPECT_EQ(hello.name, "hello");
-	EXPECT_EQ(hello.renderEngine, CommandRenderEngine::Inja);
+	EXPECT_EQ(hello.renderEngine, xxlib::renderer::Engine::Inja);
 	EXPECT_EQ(hello.templateVars.at("greeting"), "Hello");
 	EXPECT_EQ(hello.templateVars.at("target"), "World");
 }

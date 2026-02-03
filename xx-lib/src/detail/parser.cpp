@@ -1,4 +1,5 @@
 #include "detail/parser.hpp"
+#include "detail/renderer.hpp"
 #include <yaml-cpp/yaml.h>
 
 #include <fstream>
@@ -51,13 +52,13 @@ namespace xxlib::parser {
 			}
 
 			if (auto renderEngine = node["render_engine"]; renderEngine && renderEngine.IsScalar()) {
-				command.renderEngine = command::string_to_command_render_engine(renderEngine.as<std::string>());
+				command.renderEngine = xxlib::renderer::string_to_render_engine(renderEngine.as<std::string>());
 			} else if (renderEngine) {
 				return std::unexpected("'render_engine' must be a string");
 			}
 
 			if (auto executionEngine = node["execution_engine"]; executionEngine && executionEngine.IsScalar()) {
-				command.executionEngine = command::string_to_command_execution_engine(executionEngine.as<std::string>());
+				command.executionEngine = xxlib::executor::string_to_execution_engine(executionEngine.as<std::string>());
 			} else if (executionEngine) {
 				return std::unexpected("'execution_engine' must be a string");
 			}

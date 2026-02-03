@@ -1,16 +1,22 @@
 #ifndef XX_EXECUTOR_HPP
 #define XX_EXECUTOR_HPP
 
-#include "detail/command.hpp"
-
 #include <string>
 #include <expected>
 #include <cstdint>
 
-namespace xxlib {
-	namespace executor {
-		std::expected<int32_t, std::string> execute_command(Command& command, CommandContext& context);
-	} // namespace executor
-} // namespace xxlib
+class Command;
+class CommandContext;
+
+namespace xxlib::executor {
+	enum class Engine {
+		System,
+		Lua,
+	};
+
+	Engine string_to_execution_engine(const std::string& executorStr);
+
+	std::expected<int32_t, std::string> execute_command(Command& command, CommandContext& context);
+} // namespace xxlib::executor
 
 #endif // XX_EXECUTOR_HPP

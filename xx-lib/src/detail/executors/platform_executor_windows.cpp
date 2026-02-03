@@ -1,5 +1,6 @@
 #include "detail/executors/platform_executor.hpp"
 #include "detail/helpers.hpp"
+#include "detail/renderer.hpp"
 
 #include <windows.h>
 #include <sstream>
@@ -49,13 +50,13 @@ namespace xxlib::platform_executor {
 			oss << "$env:" << key << "=\"" << value << "\"; ";
 		}
 		for (const auto& arg : command.cmd) {
-			oss << command::render(arg, command.templateVars, command.renderEngine) << " ";
+			oss << xxlib::renderer::render(arg, command.templateVars, command.renderEngine) << " ";
 		}
 		return oss.str();
 	}
 
 	std::expected<int32_t, std::string> execute_command(Command& command, CommandContext& context) {
-		if (command.renderEngine == CommandRenderEngine::None) {
+		if (command.renderEngine == xxlib::renderer::Engine::None) {
 			spdlog::debug("Using simple append for extra arguments (no rendering).");
 
 			command.cmd.insert(command.cmd.end(), context.extras.begin(), context.extras.end());

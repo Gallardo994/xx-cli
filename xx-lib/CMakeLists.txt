@@ -8,12 +8,18 @@ set(SOURCES
     src/detail/parser.cpp
     src/detail/planner.cpp
     src/detail/platform.cpp
+
     src/detail/executor.cpp
     src/detail/executors/lua_executor.cpp
+
+    src/detail/renderer.cpp
+    src/detail/renderers/inja_renderer.cpp
+
     src/detail/luavm.cpp
+    src/third_party/nlohmann_lua.cpp
+
     src/detail/helpers.cpp
 
-    src/third_party/nlohmann_lua.cpp
 )
 
 if (WIN32)
