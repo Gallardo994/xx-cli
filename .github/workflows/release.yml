@@ -120,14 +120,15 @@ jobs:
           path: ./artifacts
           pattern: xx-*
           merge-multiple: false
-          
+
       - name: Move artifacts to the root of the artifacts directory, renaming them to the folder name
         run: |
-          mv ./artifacts/xx-windows-x86_64-${{ env.BUILD_PRESET }}/xx.exe ./artifacts/xx-windows-x86_64-${{ env.BUILD_PRESET }}.exe
-          mv ./artifacts/xx-windows-arm64-${{ env.BUILD_PRESET }}/xx.exe ./artifacts/xx-windows-arm64-${{ env.BUILD_PRESET }}.exe
-          mv ./artifacts/xx-linux-x86_64-${{ env.BUILD_PRESET }}/xx ./artifacts/xx-linux-x86_64-${{ env.BUILD_PRESET }}
-          mv ./artifacts/xx-linux-arm64-${{ env.BUILD_PRESET }}/xx ./artifacts/xx-linux-arm64-${{ env.BUILD_PRESET }}
-          mv ./artifacts/xx-macos-arm64-${{ env.BUILD_PRESET }}/xx ./artifacts/xx-macos-arm64-${{ env.BUILD_PRESET }}
+          mkdir binaries/
+          mv ./artifacts/xx-windows-x86_64-${{ env.BUILD_PRESET }}/xx.exe ./binaries/xx-windows-x86_64-${{ env.BUILD_PRESET }}.exe
+          mv ./artifacts/xx-windows-arm64-${{ env.BUILD_PRESET }}/xx.exe ./binaries/xx-windows-arm64-${{ env.BUILD_PRESET }}.exe
+          mv ./artifacts/xx-linux-x86_64-${{ env.BUILD_PRESET }}/xx ./binaries/xx-linux-x86_64-${{ env.BUILD_PRESET }}
+          mv ./artifacts/xx-linux-arm64-${{ env.BUILD_PRESET }}/xx ./binaries/xx-linux-arm64-${{ env.BUILD_PRESET }}
+          mv ./artifacts/xx-macos-arm64-${{ env.BUILD_PRESET }}/xx ./binaries/xx-macos-arm64-${{ env.BUILD_PRESET }}
 
       - name: Tag the release
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.tag != ''
@@ -152,11 +153,11 @@ jobs:
           draft: false
           prerelease: ${{ github.event.inputs.stable != 'true' }}
           files: |
-            ./artifacts/xx-windows-x86_64-${{ env.BUILD_PRESET }}.exe
-            ./artifacts/xx-windows-arm64-${{ env.BUILD_PRESET }}.exe
-            ./artifacts/xx-linux-x86_64-${{ env.BUILD_PRESET }}
-            ./artifacts/xx-linux-arm64-${{ env.BUILD_PRESET }}
-            ./artifacts/xx-macos-arm64-${{ env.BUILD_PRESET }}
+            ./binaries/xx-windows-x86_64-${{ env.BUILD_PRESET }}.exe
+            ./binaries/xx-windows-arm64-${{ env.BUILD_PRESET }}.exe
+            ./binaries/xx-linux-x86_64-${{ env.BUILD_PRESET }}
+            ./binaries/xx-linux-arm64-${{ env.BUILD_PRESET }}
+            ./binaries/xx-macos-arm64-${{ env.BUILD_PRESET }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -175,9 +176,9 @@ jobs:
           LINUX_X86_64_NAME="xx-linux-x86_64-${{ env.BUILD_PRESET }}"
           LINUX_ARM64_NAME="xx-linux-arm64-${{ env.BUILD_PRESET }}"
 
-          SHA_MAC_ARM64=$(shasum -a 256 ./artifacts/$MAC_ARM64_NAME | awk '{ print $1 }')
-          SHA_LINUX_X86_64=$(shasum -a 256 ./artifacts/$LINUX_X86_64_NAME | awk '{ print $1 }')
-          SHA_LINUX_ARM64=$(shasum -a 256 ./artifacts/$LINUX_ARM64_NAME | awk '{ print $1 }')
+          SHA_MAC_ARM64=$(shasum -a 256 ./binaries/$MAC_ARM64_NAME | awk '{ print $1 }')
+          SHA_LINUX_X86_64=$(shasum -a 256 ./binaries/$LINUX_X86_64_NAME | awk '{ print $1 }')
+          SHA_LINUX_ARM64=$(shasum -a 256 ./binaries/$LINUX_ARM64_NAME | awk '{ print $1 }')
 
           sed -e "s|__VERSION__|$VERSION|g" \
               -e "s|__BASE_URL__|$BASE_URL|g" \
