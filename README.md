@@ -13,6 +13,8 @@ This project is a work in progress. The features and syntax are subject to chang
 
 ## Install
 
+### Script installation
+
 MacOS/Linux:
 
 ```bash
@@ -25,6 +27,10 @@ Windows:
 3. Rename the downloaded file to `xx.exe` and place it somewhere in your PATH.
 
 If you're unsure which architecture you have, you most likely have x86_64.
+
+### Homebrew (MacOS)
+
+TODO
 
 ## Example YAML Configuration
 
