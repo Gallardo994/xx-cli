@@ -119,6 +119,22 @@ Special thanks to the following open-source projects:
 - [Lua for CMake](https://github.com/walterschell/Lua) & [Lua](https://www.lua.org/)
 - [nlohmann_json_lua](https://github.com/graymadness/nlohmann_json_lua)
 
+## Building and Testing
+
+See .xx.yaml for currently used build presets. Generally you can use CMake to configure and build the project:
+
+```bash
+cmake --preset testing # or default / release
+cmake --build --preset testing # or default / release
+```
+
+Or just use `xx` binary itself, if you have it installed locally:
+
+```bash
+xx run test # runs the test suite
+xx run build preset=testing # or default / release
+```
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
