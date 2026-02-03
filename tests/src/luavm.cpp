@@ -134,3 +134,73 @@ TEST(LuaVM_JsonParse, ArrayParsing) {
 	EXPECT_TRUE(xxlib::luavm::is_string(luaState, -1));
 	EXPECT_EQ(std::string(xxlib::luavm::tostring(luaState, -1)), "third");
 }
+
+TEST(LuaVM_JsonDump, ConvertsJsonToString) {
+	auto luaState = xxlib::luavm::create();
+	xxlib::luavm::add_json_library(luaState);
+
+	auto loadStatus = xxlib::luavm::loadstring(luaState, R"(
+        local j = json.parse('{"key": "value", "number": 123}')
+        return tostring(j)
+    )");
+	EXPECT_EQ(loadStatus, 0);
+
+	auto pcallStatus = xxlib::luavm::pcall(luaState, 0, 1, 0);
+	EXPECT_EQ(pcallStatus, 0);
+
+	EXPECT_TRUE(xxlib::luavm::is_string(luaState));
+	EXPECT_EQ(std::string(xxlib::luavm::tostring(luaState)), R"({"key":"value","number":123})");
+}
+
+TEST(LuaVM_JsonDump, ConvertsNestedJsonToString) {
+	auto luaState = xxlib::luavm::create();
+	xxlib::luavm::add_json_library(luaState);
+
+	auto loadStatus = xxlib::luavm::loadstring(luaState, R"(
+        local j = json.parse('{"outer": {"inner": "deep value"}}')
+        return tostring(j)
+    )");
+	EXPECT_EQ(loadStatus, 0);
+
+	auto pcallStatus = xxlib::luavm::pcall(luaState, 0, 1, 0);
+	EXPECT_EQ(pcallStatus, 0);
+
+	EXPECT_TRUE(xxlib::luavm::is_string(luaState));
+	EXPECT_EQ(std::string(xxlib::luavm::tostring(luaState)), R"({"outer":{"inner":"deep value"}})");
+}
+
+TEST(LuaVM_JsonDump, ConvertsArrayJsonToString) {
+	auto luaState = xxlib::luavm::create();
+	xxlib::luavm::add_json_library(luaState);
+
+	auto loadStatus = xxlib::luavm::loadstring(luaState, R"(
+        local j = json.parse('["first", "second", "third"]')
+        return tostring(j)
+    )");
+	EXPECT_EQ(loadStatus, 0);
+
+	auto pcallStatus = xxlib::luavm::pcall(luaState, 0, 1, 0);
+	EXPECT_EQ(pcallStatus, 0);
+
+	EXPECT_TRUE(xxlib::luavm::is_string(luaState));
+	EXPECT_EQ(std::string(xxlib::luavm::tostring(luaState)), R"(["first","second","third"])");
+}
+TEST(LuaVM_JsonDump, ModifyAndDumpJson) {
+	auto luaState = xxlib::luavm::create();
+	xxlib::luavm::add_json_library(luaState);
+
+	auto loadStatus = xxlib::luavm::loadstring(luaState, R"(
+        local j = json.parse('{"key": "value", "number1": 123, "number2": 456.78}')
+        j.key = "new value"
+        j.number1 = 456
+        j.number2 = 910.11
+        return tostring(j)
+    )");
+	EXPECT_EQ(loadStatus, 0);
+
+	auto pcallStatus = xxlib::luavm::pcall(luaState, 0, 1, 0);
+	EXPECT_EQ(pcallStatus, 0);
+
+	EXPECT_TRUE(xxlib::luavm::is_string(luaState));
+	EXPECT_EQ(std::string(xxlib::luavm::tostring(luaState)), R"({"key":"new value","number1":456,"number2":910.11})");
+}

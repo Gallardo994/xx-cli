@@ -172,7 +172,13 @@ namespace nlohmann {
 		}
 		case LUA_TNUMBER: {
 			double v = luaL_checknumber(L, 3);
-			value = v;
+			// Fixed in xx-lib, setting a whole number should store it as an integer type.
+			// Previously setting e.g. 123 would store it as a 123.0 in the resulting JSON.
+			if (auto intV = static_cast<int64_t>(v); v == intV) {
+                value = intV;
+            } else {
+                value = v;
+            }
 			return 0;
 		}
 		case LUA_TBOOLEAN: {
