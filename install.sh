@@ -3,9 +3,10 @@
 readonly RELEASES_URL="https://api.github.com/repos/gallardo994/xx-cli/releases"
 readonly INSTALL_DIRECTORY="/usr/local/bin"
 readonly BINARY_NAME="xx"
-readonly DOWNLOAD_URL_TEMPLATE="https://github.com/Gallardo994/xx-cli/releases/download/%s/xx-build_%s_release"
+readonly DOWNLOAD_URL_TEMPLATE="https://github.com/Gallardo994/xx-cli/releases/download/%s/xx-%s-%s-release"
 
-readonly LLVM_COMPILER_NAME="llvm_20"
+readonly SUPPORTED_MACOS_ARCHS=("arm64")
+readonly SUPPORTED_LINUX_ARCHS=("x86_64" "arm64")
 
 get_latest_release() {
     curl -sSL "${RELEASES_URL}/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'
@@ -33,7 +34,7 @@ install_xx_cli() {
     esac
 
     case "${PLATFORM}" in
-        darwin) PLATFORM="darwin" ;;
+        darwin) PLATFORM="macos" ;;
         linux) PLATFORM="linux" ;;
         *)
             echo "Unsupported platform: ${PLATFORM}. Cancelling." >&2
@@ -41,44 +42,29 @@ install_xx_cli() {
             ;;
     esac
 
-    local DOWNLOAD_TARGET=""
-
-    if [ "${PLATFORM}" = "darwin" ]; then
-        if [ "${ARCH}" = "arm64" ]; then
-            DOWNLOAD_TARGET="macos_latest_${LLVM_COMPILER_NAME}"
-        else
+    if [ "${PLATFORM}" = "macos" ]; then
+        if [[ ! " ${SUPPORTED_MACOS_ARCHS[*]} " =~ " ${ARCH} " ]]; then
             echo "Unsupported architecture for macOS: ${ARCH}. Cancelling." >&2
             exit 1
         fi
-    fi
-
-    if [ "${PLATFORM}" = "linux" ]; then
-        if [ "${ARCH}" = "x86_64" ]; then
-            DOWNLOAD_TARGET="ubuntu_latest_${LLVM_COMPILER_NAME}"
-        elif [ "${ARCH}" = "arm64" ]; then
-            DOWNLOAD_TARGET="ubuntu_24.04_arm_${LLVM_COMPILER_NAME}"
-        else
+    elif [ "${PLATFORM}" = "linux" ]; then
+        if [[ ! " ${SUPPORTED_LINUX_ARCHS[*]} " =~ " ${ARCH} " ]]; then
             echo "Unsupported architecture for Linux: ${ARCH}. Cancelling." >&2
             exit 1
         fi
     fi
 
-    if [ -z "${DOWNLOAD_TARGET}" ]; then
-        echo "Unsupported platform: ${PLATFORM} ${ARCH}. Cancelling." >&2
-        exit 1
-    fi
-
-    DOWNLOAD_URL=$(printf "${DOWNLOAD_URL_TEMPLATE}" "${LATEST_RELEASE}" "${DOWNLOAD_TARGET}")
+    DOWNLOAD_URL=$(printf "${DOWNLOAD_URL_TEMPLATE}" "${LATEST_RELEASE}" "${PLATFORM}" "${ARCH}")
     DOWNLOAD_TEMP_FILE="$(mktemp)"
 
-    printf "Downloading ${DOWNLOAD_TARGET} from %s\n" "${DOWNLOAD_URL}"
+    printf "Downloading ${PLATFORM}-${ARCH} from %s\n" "${DOWNLOAD_URL}"
     curl -L -o "${DOWNLOAD_TEMP_FILE}" "${DOWNLOAD_URL}"
     chmod +x "${DOWNLOAD_TEMP_FILE}"
+    printf "File downloaded to %s\n" "${DOWNLOAD_TEMP_FILE}"
 
     printf "Installing xx-cli to %s\n" "${INSTALL_DIRECTORY}/${BINARY_NAME}"
     sudo mv "${DOWNLOAD_TEMP_FILE}" "${INSTALL_DIRECTORY}/${BINARY_NAME}"
 
-    # Verify installation
     if command -v xx >/dev/null 2>&1; then
         xx version
     else
