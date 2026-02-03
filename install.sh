@@ -54,9 +54,9 @@ install_xx_cli() {
 
     if [ "${PLATFORM}" = "linux" ]; then
         if [ "${ARCH}" = "x86_64" ]; then
-            DOWNLOAD_TARGET="linux_x86_64_latest_${LLVM_COMPILER_NAME}"
-        elif [ "${arch}" = "aarch64" ]; then
-            DOWNLOAD_TARGET="linux_aarch64_latest_${LLVM_COMPILER_NAME}"
+            DOWNLOAD_TARGET="ubuntu_latest_${LLVM_COMPILER_NAME}"
+        elif [ "${arch}" = "arm64" ]; then
+            DOWNLOAD_TARGET="ubuntu_24.04_arm_${LLVM_COMPILER_NAME}"
         else
             echo "Unsupported architecture for Linux: ${ARCH}. Cancelling." >&2
             exit 1
