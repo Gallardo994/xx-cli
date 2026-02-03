@@ -144,7 +144,11 @@ jobs:
           draft: false
           prerelease: ${{ github.event.inputs.stable != 'true' }}
           files: |
-            ./artifacts/**
+            ./artifacts/xx-windows-x86_64-${{ env.BUILD_PRESET }}.exe
+            ./artifacts/xx-windows-arm64-${{ env.BUILD_PRESET }}.exe
+            ./artifacts/xx-linux-x86_64-${{ env.BUILD_PRESET }}
+            ./artifacts/xx-linux-arm64-${{ env.BUILD_PRESET }}
+            ./artifacts/xx-macos-arm64-${{ env.BUILD_PRESET }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -183,5 +187,3 @@ jobs:
           git add Formula/xx.rb
           git commit -m "Update xx formula to $VERSION"
           git push origin main
-        env:
-          GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
