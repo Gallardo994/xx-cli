@@ -1,9 +1,12 @@
 #ifndef NLOHMANN_LUA_HPP
 #define NLOHMANN_LUA_HPP
 
+extern "C" {
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
+}
+
 #include <memory>
 #include "third_party/json.hpp"
 
