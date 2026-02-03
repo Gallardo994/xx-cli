@@ -13,7 +13,17 @@ This project is a work in progress. The features and syntax are subject to chang
 
 ## Install
 
-### Script installation
+### Homebrew (MacOS/Linux) (recommended)
+
+On MacOS you can install xx-cli via Homebrew:
+
+```bash
+brew install gallardo994/tap/xx
+```
+
+To update, be sure to use `brew update` before `brew upgrade xx`.
+
+### Script installation (MacOS/Linux)
 
 MacOS/Linux:
 
@@ -21,16 +31,14 @@ MacOS/Linux:
 curl -sSL https://raw.githubusercontent.com/Gallardo994/xx-cli/refs/heads/main/install.sh | bash
 ```
 
+### Manual installation (Windows)
+
 Windows:
 1. Visit the [releases page](https://github.com/Gallardo994/xx-cli/releases)
 2. Download the latest `xx-build_windows_latest_msvc_release.exe` if you're on Windows x86_64, or `xx-build_windows_11_arm_msvc_release.exe` if you're on Windows ARM64.
 3. Rename the downloaded file to `xx.exe` and place it somewhere in your PATH.
 
 If you're unsure which architecture you have, you most likely have x86_64.
-
-### Homebrew (MacOS)
-
-TODO
 
 ## Example YAML Configuration
 
