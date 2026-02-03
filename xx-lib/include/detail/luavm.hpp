@@ -17,6 +17,10 @@ namespace xxlib {
 		using LuaStatePtr = std::unique_ptr<lua_State, Deleter>;
 
 		LuaStatePtr create();
+		void destroy(LuaStatePtr& luaState);
+
+		void add_json_library(LuaStatePtr& luaState);
+
 		int32_t loadstring(LuaStatePtr& luaState, const std::string& code);
 		int32_t pcall(LuaStatePtr& luaState, int32_t nargs, int32_t nresults, int32_t errfunc);
 

@@ -1,11 +1,12 @@
 #include "detail/luavm.hpp"
+#include "third_party/nlohmann_lua.hpp"
 
 #include <lua.hpp>
 
 namespace xxlib::luavm {
-    void Deleter::operator()(lua_State* state) const {
-        lua_close(state);
-    }
+	void Deleter::operator()(lua_State* state) const {
+		lua_close(state);
+	}
 
 	LuaStatePtr create() {
 		lua_State* state = luaL_newstate();
@@ -18,6 +19,10 @@ namespace xxlib::luavm {
 
 	void destroy(LuaStatePtr& luaState) {
 		lua_close(luaState.get());
+	}
+
+	void add_json_library(LuaStatePtr& luaState) {
+		nlohmann::lua::luaopen_array(luaState.get());
 	}
 
 	std::string version() {

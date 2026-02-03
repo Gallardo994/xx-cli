@@ -77,6 +77,7 @@ namespace xxlib {
 			spdlog::debug("Executing Lua script: {}", luaCommand);
 
 			auto state = xxlib::luavm::create();
+			xxlib::luavm::add_json_library(state);
 
 			push_as_table(state, command.templateVars, "TEMPLATE_VARS");
 			push_as_table(state, command.envs, "ENVS");

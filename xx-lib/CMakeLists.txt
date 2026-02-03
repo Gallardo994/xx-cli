@@ -12,6 +12,8 @@ set(SOURCES
     src/detail/executors/lua_executor.cpp
     src/detail/luavm.cpp
     src/detail/helpers.cpp
+
+    src/third_party/nlohmann_lua.cpp
 )
 
 if (WIN32)

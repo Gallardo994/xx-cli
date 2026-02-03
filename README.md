@@ -98,6 +98,7 @@ Special thanks to the following open-source projects:
 - [spdlog](https://github.com/gabime/spdlog)
 - [inja](https://github.com/pantor/inja)
 - [Lua for CMake](https://github.com/walterschell/Lua) & [Lua](https://www.lua.org/)
+- [nlohmann_json_lua](https://github.com/graymadness/nlohmann_json_lua)
 
 ## License
 

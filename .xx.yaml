@@ -48,6 +48,12 @@ alias:
 
         print("CTX:")
         print(dump(CTX))
+
+        local j = '{ "key": "value", "number": 42, "nested": { "a": 1, "b": 2 } }'
+        local parsed = json.parse(j)
+        print("JSON parsed:")
+        print(#parsed)
+        print(dump(parsed))
       execution_engine: lua
       env:
         EXAMPLE_ENV_VAR: example_value
