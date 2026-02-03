@@ -85,8 +85,12 @@ namespace nlohmann {
 				luaL_argerror(L, 2, "Integer key is not supported");
 				throw std::runtime_error("Unreachable, `luaL_argerror` never returns");
 			case vt::array: {
+			    // Fixed in xx-lib, the original code uses 0-based indexing for Lua arrays which might be unintended.
 				lua_Integer key = luaL_checkinteger(L, index);
-				return j[key];
+				if (key < 1 || static_cast<std::size_t>(key) > j.size()) {
+					luaL_argerror(L, index, "array index out of range");
+				}
+				return j[static_cast<std::size_t>(key) - 1];
 			}
 			case vt::object: {
 				lua_Integer key = luaL_checkinteger(L, index);

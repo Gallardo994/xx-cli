@@ -18,6 +18,7 @@ add_executable(tests
     src/parser.cpp
     src/helpers.cpp
     src/renderers/inja_renderer.cpp
+    src/luavm.cpp
 )
 target_compile_features(tests PUBLIC cxx_std_23)
 target_include_directories(tests PRIVATE
