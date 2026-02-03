@@ -153,11 +153,7 @@ jobs:
           draft: false
           prerelease: ${{ github.event.inputs.stable != 'true' }}
           files: |
-            ./binaries/xx-windows-x86_64-${{ env.BUILD_PRESET }}.exe
-            ./binaries/xx-windows-arm64-${{ env.BUILD_PRESET }}.exe
-            ./binaries/xx-linux-x86_64-${{ env.BUILD_PRESET }}
-            ./binaries/xx-linux-arm64-${{ env.BUILD_PRESET }}
-            ./binaries/xx-macos-arm64-${{ env.BUILD_PRESET }}
+            ./binaries/**
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
