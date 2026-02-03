@@ -20,6 +20,7 @@ add_executable(tests
     src/renderers/inja_renderer.cpp
     src/luavm.cpp
     src/command.cpp
+    src/executor.cpp
 )
 target_compile_features(tests PUBLIC cxx_std_23)
 target_include_directories(tests PRIVATE
