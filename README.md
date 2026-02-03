@@ -89,6 +89,25 @@ Generally you're going to use `xx run <alias>` (use `xx run --dry <alias>` to si
 
 Use `xx --help` to see the list of available commands.
 
+## System shell execution
+
+On Linux and MacOS, the default system shell (e.g. `/bin/sh`) is used, while on Windows specifically `powershell.exe` is used.
+
+## Lua execution engine
+
+When using the Lua execution engine, the following global tables are available within the Lua script:
+- `TEMPLATE_VARS`: A table containing the template variables passed to the alias.
+- `ENVS`: A table containing the environment variables defined for the alias.
+- `CTX`: A table containing context information such as OS type, architecture, etc.
+
+The Lua script can return:
+- A number: Treated as the exit code of the command.
+- A string: Treated as a command to be executed in the system shell.
+- A nil value (or no return): Treated as a successful execution (exit code 0).
+
+Available plugins/modules:
+- `json`: For JSON serialization and deserialization using nlohmann_json_lua, e.g. `local t = json.parse(s)`
+
 ## Third-Party Libraries
 
 Special thanks to the following open-source projects:
