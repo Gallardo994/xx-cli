@@ -17,6 +17,7 @@ add_executable(tests
     src/planner.cpp
     src/parser.cpp
     src/helpers.cpp
+    src/renderer.cpp
     src/renderers/inja_renderer.cpp
     src/luavm.cpp
     src/command.cpp
