@@ -141,3 +141,41 @@ jobs:
             ./artifacts/**
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update homebrew-tap formula
+        if: (github.event_name == 'workflow_dispatch' || github.ref_type == 'tag') && ${{ github.event.inputs.stable == 'true' }}
+        run: |
+          git clone https://gitub.com/gallardo994/homebrew-tap.git
+
+          TEMPLATE_PATH="./homebrew-tap/FormulaTemplates/xx.rb.template"
+          FORMULA_PATH="./homebrew-tap/Formula/xx.rb"
+
+          VERSION="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag != '' && github.event.inputs.tag || github.ref_name }}"
+          BASE_URL="https://github.com/Gallardo994/xx-cli/releases/download/$VERSION"
+
+          MAC_ARM_NAME="xx-build_macos_latest_llvm_20_release"
+          LINUX_INTEL_NAME="xx-build_ubuntu_latest_llvm_20_release"
+          LINUX_ARM_NAME="xx-build_ubuntu_24.04_arm_llvm_20_release"
+
+          SHA_MAC_ARM=$(shasum -a 256 ./artifacts/$MAC_ARM_NAME | awk '{ print $1 }')
+          SHA_LINUX_INTEL=$(shasum -a 256 ./artifacts/$LINUX_INTEL_NAME | awk '{ print $1 }')
+          SHA_LINUX_ARM=$(shasum -a 256 ./artifacts/$LINUX_ARM_NAME | awk '{ print $1 }')
+
+          sed -e "s|__VERSION__|$VERSION|g" \
+              -e "s|__BASE_URL__|$BASE_URL|g" \
+              -e "s|__FILE_NAME_MAC_ARM__|$MAC_ARM_NAME|g" \
+              -e "s|__FILE_NAME_LINUX_INTEL__|$LINUX_INTEL_NAME|g" \
+              -e "s|__FILE_NAME_LINUX_ARM__|$LINUX_ARM_NAME|g" \
+              -e "s|__SHA_MAC_ARM__|$SHA_MAC_ARM|g" \
+              -e "s|__SHA_LINUX_INTEL__|$SHA_LINUX_INTEL|g" \
+              -e "s|__SHA_LINUX_ARM__|$SHA_LINUX_ARM|g" \
+              $TEMPLATE_PATH > $FORMULA_PATH
+
+          cd homebrew-tap
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add Formula/xx.rb
+          git commit -m "Update xx formula to $VERSION"
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
