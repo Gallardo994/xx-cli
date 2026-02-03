@@ -120,6 +120,13 @@ jobs:
           path: ./artifacts
           pattern: xx-*
           merge-multiple: false
+          
+      - name: Rename artifacts
+        run: |
+          for file in ./artifacts/xx-*; do
+            filename=$(basename "$file")
+            mv "$file" "./artifacts/$filename"
+          done
 
       - name: Tag the release
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.tag != ''
