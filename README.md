@@ -11,6 +11,21 @@ It is both suitable for running locally, as well as in CI/CD pipelines by wget'i
 
 This project is a work in progress. The features and syntax are subject to change.
 
+## Install
+
+MacOS/Linux:
+
+```bash
+curl -sSL https://raw.githubusercontent.com/Gallardo994/xx-cli/refs/heads/main/install.sh | bash
+```
+
+Windows:
+1. Visit the [releases page](https://github.com/Gallardo994/xx-cli/releases)
+2. Download the latest `xx-build_windows_latest_msvc_release.exe` if you're on Windows x86_64, or `xx-build_windows_11_arm_msvc_release.exe` if you're on Windows ARM64.
+3. Rename the downloaded file to `xx.exe` and place it somewhere in your PATH.
+
+If you're unsure which architecture you have, you most likely have x86_64.
+
 ## Example YAML Configuration
 
 `.xx.yaml` file in current working directory:
