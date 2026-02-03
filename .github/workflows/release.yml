@@ -143,7 +143,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update homebrew-tap formula
-        if: (github.event_name == 'workflow_dispatch' || github.ref_type == 'tag') && ${{ github.event.inputs.stable == 'true' }}
+        if: ${{ (github.event_name == 'workflow_dispatch' || github.ref_type == 'tag') && github.event.inputs.stable == 'true' }}
         run: |
           git clone https://gitub.com/gallardo994/homebrew-tap.git
 
