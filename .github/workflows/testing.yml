@@ -17,15 +17,18 @@ jobs:
           - windows-latest
           - ubuntu-latest
           - ubuntu-24.04-arm
-          - macos-latest
         compiler:
-          - llvm-20 # llvm-21 is currently broken on macos: https://github.com/llvm/llvm-project/issues/155531
+          - llvm
           - gcc
         include:
           - os: "windows-latest"
             compiler: "msvc"
           - os: "windows-11-arm"
             compiler: "msvc"
+          - os: "macos-latest"
+            compiler: "llvm-20" # llvm-21 is currently broken on macos: https://github.com/llvm/llvm-project/issues/155531
+          - os: "macos-latest"
+            compiler: "gcc"
     steps:
       - uses: actions/checkout@v3
 
