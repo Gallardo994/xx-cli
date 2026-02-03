@@ -72,7 +72,7 @@ jobs:
           cmake --build ./build
 
       - name: "Upload Windows x86_64 Build Artifacts"
-        if: matrix.os == 'windows-latest' || matrix.os == 'windows-11-arm'
+        if: matrix.os == 'windows-latest'
         uses: actions/upload-artifact@v6
         with:
           name: xx-windows-x86_64-${{ env.BUILD_PRESET }}.exe
