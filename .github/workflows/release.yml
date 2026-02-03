@@ -75,14 +75,14 @@ jobs:
         if: matrix.os == 'windows-latest'
         uses: actions/upload-artifact@v6
         with:
-          name: xx-windows-x86_64-${{ env.BUILD_PRESET }}.exe
+          name: xx-windows-x86_64-${{ env.BUILD_PRESET }}
           path: ./build/xx/xx.exe
 
       - name: "Upload Windows ARM Build Artifacts"
         if: matrix.os == 'windows-11-arm'
         uses: actions/upload-artifact@v6
         with:
-          name: xx-windows-arm64-${{ env.BUILD_PRESET }}.exe
+          name: xx-windows-arm64-${{ env.BUILD_PRESET }}
           path: ./build/xx/xx.exe
 
       - name: "Upload Linux x86_64 Build Artifacts"
@@ -121,12 +121,13 @@ jobs:
           pattern: xx-*
           merge-multiple: false
           
-      - name: Rename artifacts
+      - name: Move artifacts to the root of the artifacts directory, renaming them to the folder name
         run: |
-          for file in ./artifacts/xx-*; do
-            filename=$(basename "$file")
-            mv "$file" "./artifacts/$filename"
-          done
+          mv ./artifacts/xx-windows-x86_64-${{ env.BUILD_PRESET }}/xx.exe ./artifacts/xx-windows-x86_64-${{ env.BUILD_PRESET }}.exe
+          mv ./artifacts/xx-windows-arm64-${{ env.BUILD_PRESET }}/xx.exe ./artifacts/xx-windows-arm64-${{ env.BUILD_PRESET }}.exe
+          mv ./artifacts/xx-linux-x86_64-${{ env.BUILD_PRESET }}/xx ./artifacts/xx-linux-x86_64-${{ env.BUILD_PRESET }}
+          mv ./artifacts/xx-linux-arm64-${{ env.BUILD_PRESET }}/xx ./artifacts/xx-linux-arm64-${{ env.BUILD_PRESET }}
+          mv ./artifacts/xx-macos-arm64-${{ env.BUILD_PRESET }}/xx ./artifacts/xx-macos-arm64-${{ env.BUILD_PRESET }}
 
       - name: Tag the release
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.tag != ''
