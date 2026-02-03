@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22)
 
-project(xx-root VERSION 0.8.2 LANGUAGES CXX)
+project(xx-root VERSION 0.9.0 LANGUAGES CXX)
 include(FetchContent)
 
 option(BUILD_TESTS "Build tests" OFF)
