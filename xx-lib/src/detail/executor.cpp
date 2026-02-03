@@ -2,7 +2,9 @@
 #include "detail/executors/platform_executor.hpp"
 #include "detail/executors/lua_executor.hpp"
 #include "detail/command.hpp"
-#include <spdlog/spdlog.h>
+
+#include <stdexcept>
+
 
 namespace xxlib {
 	namespace executor {

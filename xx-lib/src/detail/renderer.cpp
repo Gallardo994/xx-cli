@@ -1,6 +1,8 @@
 #include "detail/renderer.hpp"
 #include "detail/renderers/inja_renderer.hpp"
 
+#include <stdexcept>
+
 namespace xxlib::renderer {
 	Engine string_to_render_engine(const std::string& rendererStr) {
 		if (rendererStr == "inja") {
