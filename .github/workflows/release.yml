@@ -145,7 +145,7 @@ jobs:
       - name: Update homebrew-tap formula
         if: ${{ (github.event_name == 'workflow_dispatch' || github.ref_type == 'tag') && github.event.inputs.stable == 'true' }}
         run: |
-          git clone https://gitub.com/gallardo994/homebrew-tap.git
+          git clone https://github.com/gallardo994/homebrew-tap.git
 
           TEMPLATE_PATH="./homebrew-tap/FormulaTemplates/xx.rb.template"
           FORMULA_PATH="./homebrew-tap/Formula/xx.rb"
