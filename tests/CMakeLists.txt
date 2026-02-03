@@ -17,6 +17,7 @@ add_executable(tests
     src/planner.cpp
     src/parser.cpp
     src/helpers.cpp
+    src/renderers/inja_renderer.cpp
 )
 target_compile_features(tests PUBLIC cxx_std_23)
 target_include_directories(tests PRIVATE
