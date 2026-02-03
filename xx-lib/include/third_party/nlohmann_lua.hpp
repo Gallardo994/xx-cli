@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NLOHMANN_LUA_HPP
+#define NLOHMANN_LUA_HPP
 
 #include <lua.h>
 #include <lualib.h>
@@ -42,3 +43,5 @@ namespace nlohmann {
 		static const std::vector<struct luaL_Reg> jsonLib_m;
 	};
 } // namespace nlohmann
+
+#endif // NLOHMANN_LUA_HPP
