@@ -1,6 +1,7 @@
 #include "detail/executors/platform_executor.hpp"
 #include "detail/helpers.hpp"
 #include "detail/renderer.hpp"
+#include "detail/tempfile.hpp"
 
 #include <windows.h>
 #include <sstream>
@@ -11,39 +12,6 @@
 #include <spdlog/spdlog.h>
 
 namespace xxlib::platform_executor {
-	struct TempFile {
-		std::string path;
-
-		TempFile() {
-			auto tempDir = std::filesystem::temp_directory_path().string();
-
-			std::array<char, MAX_PATH> tempFileName{};
-			if (GetTempFileNameA(tempDir.c_str(), "xxcli", 0, tempFileName.data()) == 0) {
-				throw std::runtime_error("Failed to create temporary file");
-			}
-
-			path = std::string(tempFileName.data()) + ".ps1";
-			std::filesystem::rename(std::string(tempFileName.data()), path);
-
-			spdlog::debug("Created temporary file {}", path);
-		}
-
-		~TempFile() {
-			if (!path.empty() && std::filesystem::exists(path)) {
-				std::error_code ec;
-				std::filesystem::remove(path, ec);
-				if (ec) {
-					spdlog::warn("Failed to delete temporary file {}: {}", path, ec.message());
-				} else {
-					spdlog::debug("Deleted temporary file {}", path);
-				}
-			}
-		}
-
-		TempFile(const TempFile&) = delete;
-		TempFile& operator=(const TempFile&) = delete;
-	};
-
 	std::string build_shell_command(const Command& command) {
 		std::ostringstream oss;
 		for (const auto& [key, value] : command.envs) {
@@ -112,7 +80,7 @@ namespace xxlib::platform_executor {
 		// Recommended by https://en.cppreference.com/w/cpp/utility/program/system.html
 		std::cout << std::flush;
 
-		auto tempFile = TempFile();
+		auto tempFile = TempFile(".ps1");
 		std::ofstream ofs(tempFile.path);
 		if (!ofs) {
 			return std::unexpected("Failed to create temporary script file");

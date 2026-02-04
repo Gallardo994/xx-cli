@@ -10,6 +10,10 @@ TEST(Executor_StringToExecutionEngine, Lua) {
 	EXPECT_EQ(xxlib::executor::string_to_execution_engine("lua"), xxlib::executor::Engine::Lua);
 }
 
+TEST(Executor_StringToExecutionEngine, DotnetRun) {
+    EXPECT_EQ(xxlib::executor::string_to_execution_engine("dotnet_run"), xxlib::executor::Engine::DotnetRun);
+}
+
 TEST(Executor_StringToExecutionEngine, Invalid) {
 	EXPECT_THROW(xxlib::executor::string_to_execution_engine("invalid"), std::invalid_argument);
 }
@@ -22,7 +26,7 @@ TEST(Executor_ExecuteCommand, SystemEngine) {
 	};
 
 	auto context = CommandContext{
-		.dryRun = false,
+		.dryRun = true,
 	};
 
 	auto result = xxlib::executor::execute_command(command, context);
@@ -33,17 +37,33 @@ TEST(Executor_ExecuteCommand, SystemEngine) {
 TEST(Executor_ExecuteCommand, LuaEngine) {
 	auto command = Command{
 		.name = "test",
-		.cmd = {"return 40 + 2"},
+		.cmd = {"return 0"},
 		.executionEngine = xxlib::executor::Engine::Lua,
 	};
 
 	auto context = CommandContext{
-		.dryRun = false,
+		.dryRun = true,
 	};
 
 	auto result = xxlib::executor::execute_command(command, context);
 	EXPECT_TRUE(result.has_value());
-	EXPECT_EQ(result.value(), 42);
+	EXPECT_EQ(result.value(), 0);
+}
+
+TEST(Executor_ExecuteCommand, DotnetRunEngine) {
+    auto command = Command{
+        .name = "test",
+        .cmd = {"using System; Console.WriteLine(6 * 7);"},
+        .executionEngine = xxlib::executor::Engine::DotnetRun,
+    };
+
+    auto context = CommandContext{
+        .dryRun = true,
+    };
+
+    auto result = xxlib::executor::execute_command(command, context);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result.value(), 0);
 }
 
 TEST(Executor_ExecuteCommand, UnknownEngine) {
@@ -54,7 +74,7 @@ TEST(Executor_ExecuteCommand, UnknownEngine) {
 	};
 
 	auto context = CommandContext{
-		.dryRun = false,
+		.dryRun = true,
 	};
 
 	auto result = xxlib::executor::execute_command(command, context);

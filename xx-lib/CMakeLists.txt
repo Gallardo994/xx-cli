@@ -11,6 +11,7 @@ set(SOURCES
 
     src/detail/executor.cpp
     src/detail/executors/lua_executor.cpp
+    src/detail/executors/dotnet_run_executor.cpp
 
     src/detail/renderer.cpp
     src/detail/renderers/inja_renderer.cpp

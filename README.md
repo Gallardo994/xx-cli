@@ -137,6 +137,12 @@ The Lua script can return:
 Available plugins/modules:
 - `json`: For JSON serialization and deserialization using nlohmann_json_lua, e.g. `local t = json.parse(s)`
 
+## Dotnet Run execution engine
+
+When using the Dotnet Run execution engine, the command specified should be a single-file C# program, which will be fed to system's `dotnet run` command.
+
+This requires .NET SDK to be installed on the system and `dotnet` available in PATH.
+
 ## Third-Party Libraries
 
 Special thanks to the following open-source projects:

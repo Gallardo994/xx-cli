@@ -12,6 +12,7 @@ namespace xxlib::executor {
 	enum class Engine {
 		System,
 		Lua,
+		DotnetRun,
 	};
 
 	Engine string_to_execution_engine(const std::string& executorStr);
