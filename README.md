@@ -35,7 +35,7 @@ curl -sSL https://raw.githubusercontent.com/Gallardo994/xx-cli/refs/heads/main/i
 
 Windows:
 1. Visit the [releases page](https://github.com/Gallardo994/xx-cli/releases)
-2. Download the latest `xx-build_windows_latest_msvc_release.exe` if you're on Windows x86_64, or `xx-build_windows_11_arm_msvc_release.exe` if you're on Windows ARM64.
+2. Download the latest `xx-windows-x86_64-release.exe` if you're on Windows x86_64, or `xx-windows-arm64-release.exe` if you're on Windows ARM64.
 3. Rename the downloaded file to `xx.exe` and place it somewhere in your PATH.
 
 If you're unsure which architecture you have, you most likely have x86_64.
