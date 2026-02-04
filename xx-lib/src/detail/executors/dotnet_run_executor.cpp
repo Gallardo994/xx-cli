@@ -13,6 +13,30 @@
 
 namespace xxlib::dotnet_run_executor {
 	std::expected<int32_t, std::string> execute_command(Command& command, CommandContext& context) {
+		const auto extrasResult = xxlib::helpers::split_extras(context.extras);
+		std::vector<std::string> positional;
+
+		for (const auto& [key, value] : extrasResult.kv) {
+			if (command.templateVars.find(key) != command.templateVars.end()) {
+				command.templateVars[key] = value;
+				spdlog::debug("Setting template variable: {}={}", key, value);
+				continue;
+			}
+		}
+
+		const auto unsetVars = xxlib::helpers::get_uset_vars(command.templateVars);
+		if (!unsetVars.empty()) {
+			std::ostringstream errOss;
+			errOss << "The following template variables are not set: ";
+			for (size_t i = 0; i < unsetVars.size(); ++i) {
+				errOss << unsetVars[i];
+				if (i < unsetVars.size() - 1) {
+					errOss << ", ";
+				}
+			}
+			return std::unexpected(errOss.str());
+		}
+
 		std::string dotnetCommand;
 		for (const auto& part : command.cmd) {
 			dotnetCommand += xxlib::renderer::render(part, command.templateVars, command.renderEngine) + " ";
