@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <string>
 #include <system_error>
+#include <array>
 
 #include <spdlog/spdlog.h>
 
