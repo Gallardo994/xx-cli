@@ -23,13 +23,12 @@ namespace xxlib {
 		std::string path;
 
 		explicit TempFile(const std::string& fileSuffix = "", bool thisDirectory = false) {
-			const auto tempDir = (thisDirectory ? std::filesystem::current_path().string() : std::filesystem::temp_directory_path().string()) + std::filesystem::path::preferred_separator;
-
+			const auto tempDir = thisDirectory ? std::filesystem::current_path().string() : std::filesystem::temp_directory_path().string();
 			spdlog::debug("Using temporary directory: {}", tempDir);
 
 #ifdef _WIN32
 			std::array<char, MAX_PATH> tmpName{};
-			if (GetTempFileNameA(tempDir.c_str(), "xxcli", 0, tmpName.data()) == 0) {
+			if (GetTempFileNameA(tempDir.c_str(), "/xxcli", 0, tmpName.data()) == 0) {
 				throw std::runtime_error("Failed to create temporary file (WinAPI)");
 			}
 
@@ -38,7 +37,7 @@ namespace xxlib {
 
 			spdlog::debug("Created temporary file {}", path);
 #else
-			std::string templateFile = tempDir + "xxcliXXXXXX";
+			std::string templateFile = tempDir + "/xxcliXXXXXX";
 
 			auto* tmpl_c = strdup(templateFile.c_str());
 			if (!tmpl_c) {
