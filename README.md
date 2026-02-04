@@ -5,7 +5,7 @@
 
 xx-cli is a CLI tool for executing pre-made command aliases on per-project basis, meaning the commands can be shared across team members working on the same project. Alongside aliases, xx-cli includes self-contained Lua VM that can make abstracting OS differences easier.
 
-It is both suitable for running locally, as well as in CI/CD pipelines by wget'ing or curl'ing a pre-compiled binary from the releases page. No extra dependencies are required to run the binaries.
+It is both suitable for running locally, as well as in CI/CD pipelines by wget'ing or curl'ing a pre-compiled binary from the releases page. No extra dependencies are required to run the binaries, however, some execution engines might require external dependencies (e.g. Dotnet Run engine requires .NET SDK to be installed).
 
 ## Work in Progress
 
