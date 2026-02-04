@@ -34,7 +34,7 @@ namespace xxlib::dotnet_run_executor {
 
 		spdlog::debug("Executing Dotnet Run command: {}", dotnetCommand);
 
-		auto tempFile = TempFile(".cs");
+		auto tempFile = TempFile(".cs", true);
 		spdlog::debug("Created temporary dotnet file at path: {}", tempFile.path);
 
 		std::ofstream ofs(tempFile.path);
@@ -45,7 +45,7 @@ namespace xxlib::dotnet_run_executor {
 		ofs.close();
 
 		auto shellExecCommand = command;
-		shellExecCommand.cmd = {"dotnet run", tempFile.path};
+		shellExecCommand.cmd = {"dotnet run --file", tempFile.path};
 		shellExecCommand.executionEngine = xxlib::executor::Engine::System;
 		shellExecCommand.requiresConfirmation = false;
 

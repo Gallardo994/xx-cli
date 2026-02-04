@@ -80,7 +80,7 @@ namespace xxlib::platform_executor {
 		// Recommended by https://en.cppreference.com/w/cpp/utility/program/system.html
 		std::cout << std::flush;
 
-		auto tempFile = TempFile(".ps1");
+		auto tempFile = TempFile(".ps1", true);
 		std::ofstream ofs(tempFile.path);
 		if (!ofs) {
 			return std::unexpected("Failed to create temporary script file");
