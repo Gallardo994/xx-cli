@@ -80,6 +80,23 @@ alias:
     execution_engine: lua
     template_vars:
       values: "0"
+      
+  # `xx run dotnetcode` will execute a simple C# program using Dotnet Run execution engine, with a Nuget dependency. Requires .NET 10 to be installed.
+  dotnetcode:
+    - cmd: |
+        #:package Humanizer@2.14.1
+
+        using System;
+        using System.Linq;
+        using Humanizer;
+
+        var currentDirectory = Environment.CurrentDirectory;
+        var timeToMidnight = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0).AddDays(1) - DateTime.Now;
+
+        Console.WriteLine($"Current Directory: {currentDirectory}");
+        Console.WriteLine($"Time to Midnight: {timeToMidnight.Humanize()}");
+
+      execution_engine: dotnet_run
 
   # `xx run build` will configure and build the project using CMake and Ninja. Linux+MacOS and Windows versions are separate.
   build:

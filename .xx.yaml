@@ -6,14 +6,19 @@ alias:
         greeting: Hello
         target: World
 
-  dotnet_test:
+  dotnetcode:
     - cmd: |
+        #:package Humanizer@2.14.1
+
         using System;
         using System.Linq;
+        using Humanizer;
 
-        Console.WriteLine(System.Environment.CurrentDirectory);
-        Console.WriteLine(System.IO.Directory.GetCurrentDirectory());
-        Console.WriteLine(Environment.CurrentDirectory);
+        var currentDirectory = Environment.CurrentDirectory;
+        var timeToMidnight = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0).AddDays(1) - DateTime.Now;
+
+        Console.WriteLine($"Current Directory: {currentDirectory}");
+        Console.WriteLine($"Time to Midnight: {timeToMidnight.Humanize()}");
 
       execution_engine: dotnet_run
 
