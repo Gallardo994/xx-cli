@@ -24,3 +24,4 @@ target_link_libraries(xx PRIVATE
     nlohmann_json::nlohmann_json
     semver::semver
 )
+target_link_libraries(xx PRIVATE -static)
