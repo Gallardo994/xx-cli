@@ -56,7 +56,7 @@ jobs:
             ~/Library/Caches/ccache
             ${{ env.LOCALAPPDATA }}/ccache
             ${{ env.XDG_CACHE_HOME }}/ccache
-          key: ${{ runner.os }}-${{ matrix.compiler }}-${{ env.BUILD_PRESET }}-${{ hashFiles('**/CMakeLists.txt', './vcpkg.json') }}
+          key: v2-${{ runner.os }}-${{ matrix.compiler }}-${{ env.BUILD_PRESET }}-${{ hashFiles('**/CMakeLists.txt', './vcpkg.json') }}
           restore-keys: |
             ${{ runner.os }}-${{ env.BUILD_PRESET }}-${{ hashFiles('./vcpkg.json') }}
 
@@ -68,6 +68,16 @@ jobs:
           cmake: true
           ninja: true
           vcpkg: true
+
+      - name: Setup VCPKG_ROOT (Windows)
+        if: ${{ contains(matrix.os, 'windows') }}
+        run: |
+          echo "VCPKG_ROOT=C:\Users\runneradmin\vcpkg" >> $GITHUB_ENV
+
+      - name: Setup VCPKG_ROOT (Linux/macOS)
+        if: ${{ !contains(matrix.os, 'windows') }}
+        run: |
+          echo "VCPKG_ROOT=$HOME/vcpkg" >> $GITHUB_ENV
 
       - name: Configure CMake
         run: |
