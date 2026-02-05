@@ -5,5 +5,6 @@
     "spdlog",
     "yaml-cpp",
     "lua"
-  ]
+  ],
+  "builtin-baseline": "5a874b05fb981e2643fd0c1c9ad63e19dfe76b27"
 }
