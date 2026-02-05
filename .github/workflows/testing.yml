@@ -7,6 +7,7 @@ on:
       - experimental
 env:
   BUILD_PRESET: "testing"
+  VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -68,10 +69,10 @@ jobs:
           vcpkg list
           vcpkg version
 
-          ls ./vcpkg
-          ls ./vcpkg/scripts/
-          ls ./vcpkg/scripts/buildsystems/
-          cat ./vcpkg/scripts/buildsystems/vcpkg.cmake
+          ls ${VCPKG_ROOT}
+          ls ${VCPKG_ROOT}/scripts
+          ls ${VCPKG_ROOT}/scripts/buildsystems
+          cat ${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake
 
       - name: Configure CMake
         run: |
