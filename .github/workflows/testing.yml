@@ -64,8 +64,8 @@ jobs:
       - name: Print vcpkg debug info
         if: ${{ always() }}
         run: |
+          vcpkg install
           vcpkg list
-          vcpkg integrate project
           vcpkg version
 
           ls ./vcpkg
