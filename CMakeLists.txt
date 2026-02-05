@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22)
 
-project(xx-root VERSION 0.9.3 LANGUAGES CXX)
+project(xx-root VERSION 1.0.0 LANGUAGES CXX)
 
 option(BUILD_TESTS "Build tests" OFF)
 option(ENABLE_SANITIZERS "Enable sanitizers" OFF)

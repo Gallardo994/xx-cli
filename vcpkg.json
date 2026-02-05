@@ -1,9 +1,11 @@
 {
   "dependencies": [
+    "cpr",
     "inja",
+    "lua",
     "nlohmann-json",
     "spdlog",
     "yaml-cpp",
-    "lua"
+    "neargye-semver"
   ]
 }

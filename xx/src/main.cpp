@@ -7,6 +7,9 @@
 #include <string>
 #include <optional>
 #include <spdlog/spdlog.h>
+#include <cpr/cpr.h>
+#include <nlohmann/json.hpp>
+#include <semver.hpp>
 
 struct GlobalArgs {
 	std::string configFile;
@@ -161,6 +164,58 @@ int main(int argc, char** argv) {
 					 xxlib::platform::os_to_string(xxlib::platform::get_current_os()),
 					 xxlib::platform::architecture_to_string(xxlib::platform::get_current_architecture()));
 		spdlog::info("lua version {}", xxlib::luavm::version());
+	});
+
+	app.add_subcommand("check-updates", "Check for updates")->callback([&]() {
+		semver::version current;
+		if (!semver::parse(xxlib::version(), current)) {
+			spdlog::error("Failed to parse current version: {}", xxlib::version());
+			return;
+		}
+
+		const auto latestUrlApi = "https://api.github.com/repos/gallardo994/xx-cli/releases/latest";
+		const auto latestUrlPage = "https://github.com/gallardo994/xx-cli/releases/latest";
+
+		try {
+			auto response = cpr::Get(cpr::Url{latestUrlApi});
+			if (response.status_code != 200) {
+				spdlog::error("Failed to check for updates. HTTP status code: {}", response.status_code);
+				return;
+			}
+
+			auto jsonResponse = nlohmann::json::parse(response.text);
+			auto latestVersion = jsonResponse["tag_name"].get<std::string>();
+
+			semver::version latest;
+			if (!semver::parse(latestVersion, latest)) {
+				spdlog::error("Failed to parse latest version from response: {}", latestVersion);
+				return;
+			}
+
+			if (latest > current) {
+				spdlog::info("A new version of xx is available: {} (current: {})", latestVersion, xxlib::version());
+				spdlog::info("Visit {} to download the latest version.", latestUrlPage);
+
+				if (xxlib::helpers::ask_for_confirmation("Do you want to open the releases page in your default browser?")) {
+#if defined(_WIN32)
+					std::string command = "start " + std::string(latestUrlPage);
+					std::system(command.c_str());
+#elif defined(__APPLE__)
+					std::string command = "open " + std::string(latestUrlPage);
+					std::system(command.c_str());
+#elif defined(__linux__)
+					std::string command = "xdg-open " + std::string(latestUrlPage);
+					std::system(command.c_str());
+#else
+					spdlog::error("Opening the browser is not supported on this platform.");
+#endif
+				}
+			} else {
+				spdlog::info("You are using the latest version of xx: {}", xxlib::version());
+			}
+		} catch (const std::exception& ex) {
+			spdlog::error("Error while checking for updates: {}", ex.what());
+		}
 	});
 
 	auto* list = app.add_subcommand("list", "List all available commands");

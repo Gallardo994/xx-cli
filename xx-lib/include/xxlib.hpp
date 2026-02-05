@@ -4,9 +4,9 @@
 #include <string>
 
 namespace xxlib {
-    [[nodiscard]] inline std::string version() {
-        return "0.9.3";
-    }
+	[[nodiscard]] inline std::string version() {
+		return "1.0.0";
+	}
 } // namespace xxlib
 
 #include "detail/parser.hpp"
@@ -15,5 +15,6 @@ namespace xxlib {
 #include "detail/luavm.hpp"
 #include "detail/platform.hpp"
 #include "detail/command.hpp"
+#include "detail/helpers.hpp"
 
 #endif // XXLIB_HPP
