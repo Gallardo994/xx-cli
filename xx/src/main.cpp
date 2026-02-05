@@ -183,6 +183,11 @@ int main(int argc, char** argv) {
 			}
 
 			auto jsonResponse = nlohmann::json::parse(response.text);
+			if (!jsonResponse.contains("tag_name") || !jsonResponse["tag_name"].is_string()) {
+				spdlog::error("Invalid GitHub API response: {}", response.text);
+				return;
+			}
+
 			auto latestVersion = jsonResponse["tag_name"].get<std::string>();
 
 			semver::version latest;
@@ -192,7 +197,7 @@ int main(int argc, char** argv) {
 			}
 
 			if (latest > current) {
-			    auto releasePage = jsonResponse["html_url"].get<std::string>();
+				auto releasePage = jsonResponse["html_url"].get<std::string>();
 
 				spdlog::info("A new version of xx is available: {} (current: {})", latestVersion, xxlib::version());
 				spdlog::info("Visit {} to download the latest version.", releasePage);
