@@ -174,7 +174,6 @@ int main(int argc, char** argv) {
 		}
 
 		const auto latestUrlApi = "https://api.github.com/repos/gallardo994/xx-cli/releases/latest";
-		const auto latestUrlPage = "https://github.com/gallardo994/xx-cli/releases/latest";
 
 		try {
 			auto response = cpr::Get(cpr::Url{latestUrlApi});
@@ -193,18 +192,20 @@ int main(int argc, char** argv) {
 			}
 
 			if (latest > current) {
+			    auto releasePage = jsonResponse["html_url"].get<std::string>();
+
 				spdlog::info("A new version of xx is available: {} (current: {})", latestVersion, xxlib::version());
-				spdlog::info("Visit {} to download the latest version.", latestUrlPage);
+				spdlog::info("Visit {} to download the latest version.", releasePage);
 
 				if (xxlib::helpers::ask_for_confirmation("Do you want to open the releases page in your default browser?")) {
 #if defined(_WIN32)
-					std::string command = "start " + std::string(latestUrlPage);
+					std::string command = "start " + std::string(releasePage);
 					std::system(command.c_str());
 #elif defined(__APPLE__)
-					std::string command = "open " + std::string(latestUrlPage);
+					std::string command = "open " + std::string(releasePage);
 					std::system(command.c_str());
 #elif defined(__linux__)
-					std::string command = "xdg-open " + std::string(latestUrlPage);
+					std::string command = "xdg-open " + std::string(releasePage);
 					std::system(command.c_str());
 #else
 					spdlog::error("Opening the browser is not supported on this platform.");
