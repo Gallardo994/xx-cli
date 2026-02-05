@@ -14,7 +14,6 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - windows-latest
           - ubuntu-latest
           - ubuntu-24.04-arm
         compiler:
@@ -23,15 +22,19 @@ jobs:
         include:
           - os: "windows-latest"
             compiler: "msvc"
+          - os: "windows-latest"
+            compiler: "llvm"
+
           - os: "windows-11-arm"
             compiler: "msvc"
+
           - os: "macos-latest"
             compiler: "llvm-20" # llvm-21 is currently broken on macos: https://github.com/llvm/llvm-project/issues/155531
           - os: "macos-latest"
             compiler: "gcc"
     steps:
       - uses: actions/checkout@v3
-        
+
       - name: Display cache key info
         run: |
           echo "Cache Key: v2-${{ matrix.os }}-${{ matrix.compiler }}-${{ env.BUILD_PRESET }}-${{ hashFiles('**/CMakeLists.txt', './vcpkg.json') }}"
