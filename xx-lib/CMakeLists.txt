@@ -3,6 +3,12 @@ cmake_minimum_required(VERSION 3.22)
 project(xx-lib LANGUAGES CXX)
 include(FetchContent)
 
+find_package(spdlog CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
+find_package(yaml-cpp CONFIG REQUIRED)
+find_package(inja CONFIG REQUIRED)
+find_package(Lua REQUIRED)
+
 set(SOURCES
     src/detail/command.cpp
     src/detail/parser.cpp
@@ -20,7 +26,6 @@ set(SOURCES
     src/third_party/nlohmann_lua.cpp
 
     src/detail/helpers.cpp
-
 )
 
 if (WIN32)
@@ -33,21 +38,13 @@ else()
     message(FATAL_ERROR "Unsupported platform: ${CMAKE_SYSTEM_NAME}")
 endif()
 
-FetchContent_Declare(
-    lua
-    GIT_REPOSITORY https://github.com/walterschell/Lua.git
-    GIT_TAG v5.4.7
-)
-FetchContent_MakeAvailable(lua)
-
-FetchContent_Declare(
-  yaml-cpp
-  GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
-  GIT_TAG f0329d0efd2e62ceda5ee899c343ee445f6f7bd2
-)
-FetchContent_MakeAvailable(yaml-cpp)
-
 add_library(xx-lib ${SOURCES})
 target_compile_features(xx-lib PUBLIC cxx_std_23)
-target_include_directories(xx-lib PRIVATE include)
-target_link_libraries(xx-lib PRIVATE spdlog::spdlog lua_static yaml-cpp)
+target_include_directories(xx-lib PRIVATE include ${LUA_INCLUDE_DIR})
+target_link_libraries(xx-lib PRIVATE
+    spdlog::spdlog
+    yaml-cpp::yaml-cpp
+    nlohmann_json::nlohmann_json
+    pantor::inja
+    ${LUA_LIBRARIES}
+)

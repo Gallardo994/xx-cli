@@ -1,5 +1,6 @@
 #include "detail/renderers/inja_renderer.hpp"
-#include "third_party/inja.hpp"
+
+#include <inja/inja.hpp>
 #include <string>
 
 namespace xxlib::inja_renderer {

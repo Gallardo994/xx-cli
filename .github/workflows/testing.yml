@@ -37,13 +37,18 @@ jobs:
         with:
           path: |
             ./build/
+            ~/vcpkg
+            ~/.cache/vcpkg/archives
+            ${{ env.LOCALAPPDATA }}/vcpkg/archives
+            ${{ env.APPDATA }}/vcpkg/archives
+            ${{ env.XDG_CACHE_HOME }}/vcpkg/archives
             ~/.cache/ccache
             ~/.ccache
             ~/.config/ccache
             ~/Library/Caches/ccache
             ${{ env.LOCALAPPDATA }}/ccache
             ${{ env.XDG_CACHE_HOME }}/ccache
-          key: ${{ runner.os }}-${{ matrix.compiler }}-${{ env.BUILD_PRESET }}-${{ hashFiles('**/CMakeLists.txt') }}
+          key: ${{ runner.os }}-${{ matrix.compiler }}-${{ env.BUILD_PRESET }}-${{ hashFiles('**/CMakeLists.txt', './vcpkg.json') }}
           restore-keys: |
             ${{ runner.os }}-${{ env.BUILD_PRESET }}-
 
@@ -54,6 +59,7 @@ jobs:
           vcvarsall: true
           cmake: true
           ninja: true
+          vcpkg: true
 
       - name: Configure CMake
         run: |

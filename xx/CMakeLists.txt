@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.22)
 
 project(xx LANGUAGES CXX)
 
+find_package(spdlog CONFIG REQUIRED)
+
 set(SOURCES
     src/main.cpp
 )

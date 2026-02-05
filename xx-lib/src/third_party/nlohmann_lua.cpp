@@ -1,6 +1,6 @@
 #include "third_party/nlohmann_lua.hpp"
-#include "third_party/json.hpp"
 
+#include <nlohmann/json.hpp>
 #include <lua.h>
 
 namespace nlohmann::lua {

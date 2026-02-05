@@ -1,0 +1,9 @@
+{
+  "dependencies": [
+    "inja",
+    "nlohmann-json",
+    "spdlog",
+    "yaml-cpp",
+    "lua"
+  ]
+}
