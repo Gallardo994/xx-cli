@@ -1,10 +1,10 @@
 #include "detail/parser.hpp"
 #include "detail/renderer.hpp"
-#include <yaml-cpp/yaml.h>
 
 #include <fstream>
 #include <iostream>
 #include <spdlog/spdlog.h>
+#include <yaml-cpp/yaml.h>
 
 namespace xxlib::parser {
 	std::expected<std::string, std::string> read_file(const std::string& path) {
