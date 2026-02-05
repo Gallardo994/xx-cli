@@ -7,7 +7,6 @@ on:
       - experimental
 env:
   BUILD_PRESET: "testing"
-  VCPKG_ROOT: "/Users/runner/vcpkg"
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -62,17 +61,19 @@ jobs:
           ninja: true
           vcpkg: true
 
-      - name: Print vcpkg debug info
-        if: ${{ always() }}
+      - name: Setup VCPKG_ROOT (Windows)
+        if: ${{ contains(matrix.os, 'windows') }}
+        run: |
+          echo "VCPKG_ROOT=C:\Users\runneradmin\vcpkg" >> $GITHUB_ENV
+
+      - name: Setup VCPKG_ROOT (Linux/macOS)
+        if: ${{ !contains(matrix.os, 'windows') }}
+        run: |
+          echo "VCPKG_ROOT=$HOME/vcpkg" >> $GITHUB_ENV
+
+      - name: Install vcpkg dependencies
         run: |
           vcpkg install
-          vcpkg list
-          vcpkg version
-
-          ls ${VCPKG_ROOT}
-          ls ${VCPKG_ROOT}/scripts
-          ls ${VCPKG_ROOT}/scripts/buildsystems
-          cat ${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake
 
       - name: Configure CMake
         run: |

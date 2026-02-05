@@ -3,7 +3,7 @@
 
 TEST(LuaVM_Version, ReturnsVersionString) {
 	auto version = xxlib::luavm::version();
-	EXPECT_EQ(version, "Lua 5.4.7");
+	EXPECT_EQ(version, "Lua 5.5.0");
 }
 
 TEST(LuaVM_CreateDestroy, CreatesAndDestroysLuaState) {
