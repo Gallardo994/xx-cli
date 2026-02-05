@@ -34,7 +34,7 @@ jobs:
         
       - name: Display cache key info
         run: |
-          echo "Cache Key: v2-${{ runner.os }}-${{ matrix.compiler }}-${{ env.BUILD_PRESET }}-${{ hashFiles('**/CMakeLists.txt', './vcpkg.json') }}"
+          echo "Cache Key: v2-${{ matrix.os }}-${{ matrix.compiler }}-${{ env.BUILD_PRESET }}-${{ hashFiles('**/CMakeLists.txt', './vcpkg.json') }}"
 
       - name: Cache
         uses: actions/cache@v3
@@ -52,9 +52,9 @@ jobs:
             ~/Library/Caches/ccache
             ${{ env.LOCALAPPDATA }}/ccache
             ${{ env.XDG_CACHE_HOME }}/ccache
-          key: v2-${{ runner.os }}-${{ matrix.compiler }}-${{ env.BUILD_PRESET }}-${{ hashFiles('**/CMakeLists.txt', './vcpkg.json') }}
+          key: v2-${{ matrix.os }}-${{ matrix.compiler }}-${{ env.BUILD_PRESET }}-${{ hashFiles('**/CMakeLists.txt', './vcpkg.json') }}
           restore-keys: |
-            ${{ runner.os }}-${{ env.BUILD_PRESET }}-${{ hashFiles('./vcpkg.json') }}
+            ${{ matrix.os }}-${{ env.BUILD_PRESET }}-${{ hashFiles('./vcpkg.json') }}
 
       - name: Setup Cpp
         uses: aminya/setup-cpp@v1
