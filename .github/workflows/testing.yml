@@ -65,7 +65,6 @@ jobs:
         if: ${{ always() }}
         run: |
           vcpkg list
-          vcpkg env
           vcpkg integrate project
           vcpkg version
 
