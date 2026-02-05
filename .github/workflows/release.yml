@@ -58,7 +58,7 @@ jobs:
             ${{ env.XDG_CACHE_HOME }}/ccache
           key: ${{ runner.os }}-${{ matrix.compiler }}-${{ env.BUILD_PRESET }}-${{ hashFiles('**/CMakeLists.txt', './vcpkg.json') }}
           restore-keys: |
-            ${{ runner.os }}-${{ env.BUILD_PRESET }}-
+            ${{ runner.os }}-${{ env.BUILD_PRESET }}-${{ hashFiles('./vcpkg.json') }}
 
       - name: Setup Cpp
         uses: aminya/setup-cpp@v1
