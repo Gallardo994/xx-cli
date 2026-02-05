@@ -12,7 +12,7 @@ TEST(Renderer_StringToRenderEngine, None) {
 }
 
 TEST(Renderer_StringToRenderEngine, Unknown) {
-	EXPECT_THROW(xxlib::renderer::string_to_render_engine("unknown"), std::invalid_argument);
+	EXPECT_THROW(auto _ = xxlib::renderer::string_to_render_engine("unknown"), std::invalid_argument);
 }
 
 TEST(Renderer_Render, InjaEngine) {

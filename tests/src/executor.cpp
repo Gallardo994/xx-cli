@@ -15,7 +15,7 @@ TEST(Executor_StringToExecutionEngine, DotnetRun) {
 }
 
 TEST(Executor_StringToExecutionEngine, Invalid) {
-	EXPECT_THROW(xxlib::executor::string_to_execution_engine("invalid"), std::invalid_argument);
+	EXPECT_THROW(auto _ = xxlib::executor::string_to_execution_engine("invalid"), std::invalid_argument);
 }
 
 TEST(Executor_ExecuteCommand, SystemEngine) {
