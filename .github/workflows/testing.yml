@@ -7,7 +7,6 @@ on:
       - experimental
 env:
   BUILD_PRESET: "testing"
-  VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -61,6 +60,10 @@ jobs:
           cmake: true
           ninja: true
           vcpkg: true
+
+      - name: Install vcpkg dependencies
+        run: |
+          vcpkg install
 
       - name: Configure CMake
         run: |
