@@ -61,9 +61,22 @@ jobs:
           ninja: true
           vcpkg: true
 
+      - name: Print vcpkg debug info
+        if: ${{ always() }}
+        run: |
+          vcpkg list
+          vcpkg env
+          vcpkg integrate project
+          vcpkg version
+
+          ls ./vcpkg
+          ls ./vcpkg/scripts/
+          ls ./vcpkg/scripts/buildsystems/
+          cat ./vcpkg/scripts/buildsystems/vcpkg.cmake
+
       - name: Configure CMake
         run: |
-          cmake --preset ${{ env.BUILD_PRESET }} -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake
+          cmake --preset ${{ env.BUILD_PRESET }}
 
       - name: "Build"
         run: |
