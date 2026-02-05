@@ -48,7 +48,7 @@ jobs:
             ~/Library/Caches/ccache
             ${{ env.LOCALAPPDATA }}/ccache
             ${{ env.XDG_CACHE_HOME }}/ccache
-          key: ${{ runner.os }}-${{ matrix.compiler }}-${{ env.BUILD_PRESET }}-${{ hashFiles('**/CMakeLists.txt', './vcpkg.json') }}
+          key: v2-${{ runner.os }}-${{ matrix.compiler }}-${{ env.BUILD_PRESET }}-${{ hashFiles('**/CMakeLists.txt', './vcpkg.json') }}
           restore-keys: |
             ${{ runner.os }}-${{ env.BUILD_PRESET }}-${{ hashFiles('./vcpkg.json') }}
 
@@ -70,11 +70,6 @@ jobs:
         if: ${{ !contains(matrix.os, 'windows') }}
         run: |
           echo "VCPKG_ROOT=$HOME/vcpkg" >> $GITHUB_ENV
-
-      - name: Setup VCPKG_TARGET_TRIPLET (Linux arm64)
-        if: ${{ matrix.os == 'ubuntu-24.04-arm' }}
-        run: |
-          echo "VCPKG_TARGET_TRIPLET=arm64-linux" >> $GITHUB_ENV
 
       - name: Configure CMake
         run: |
