@@ -4,7 +4,7 @@
 #include <string>
 
 namespace xxlib {
-    inline std::string version() {
+    [[nodiscard]] inline std::string version() {
         return "0.9.3";
     }
 } // namespace xxlib

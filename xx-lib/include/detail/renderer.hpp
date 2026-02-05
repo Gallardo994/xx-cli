@@ -10,9 +10,9 @@ namespace xxlib::renderer {
 		Inja,
 	};
 
-	xxlib::renderer::Engine string_to_render_engine(const std::string& rendererStr);
+	[[nodiscard]] xxlib::renderer::Engine string_to_render_engine(const std::string& rendererStr);
 
-	std::string render(const std::string& templateStr, const std::unordered_map<std::string, std::string>& templateVars, Engine renderEngine);
+	[[nodiscard]] std::string render(const std::string& templateStr, const std::unordered_map<std::string, std::string>& templateVars, Engine renderEngine);
 } // namespace xxlib::renderer
 
 #endif // XX_RENDERER_HPP

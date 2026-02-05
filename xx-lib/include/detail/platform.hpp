@@ -5,7 +5,7 @@
 
 namespace xxlib::platform {
 	enum class OSFamily { Windows, Unix, Unknown };
-	inline OSFamily string_to_os_family(const std::string& osFamily) {
+	[[nodiscard]] inline OSFamily string_to_os_family(const std::string& osFamily) {
 		if (osFamily == "windows") {
 			return OSFamily::Windows;
 		} else if (osFamily == "unix") {
@@ -14,7 +14,7 @@ namespace xxlib::platform {
 			return OSFamily::Unknown;
 		}
 	}
-	inline std::string os_family_to_string(OSFamily osFamily) {
+	[[nodiscard]] inline std::string os_family_to_string(OSFamily osFamily) {
 		switch (osFamily) {
 		case OSFamily::Windows:
 			return "windows";
@@ -26,7 +26,7 @@ namespace xxlib::platform {
 	}
 
 	enum class OS { Windows, MacOS, Linux, Unknown };
-	inline OS string_to_os(const std::string& os) {
+	[[nodiscard]] inline OS string_to_os(const std::string& os) {
 		if (os == "windows") {
 			return OS::Windows;
 		} else if (os == "macos") {
@@ -37,7 +37,7 @@ namespace xxlib::platform {
 			return OS::Unknown;
 		}
 	}
-	inline std::string os_to_string(OS os) {
+	[[nodiscard]] inline std::string os_to_string(OS os) {
 		switch (os) {
 		case OS::Windows:
 			return "windows";
@@ -51,7 +51,7 @@ namespace xxlib::platform {
 	}
 
 	enum class Architecture { x86_64, arm64, unknown };
-	inline Architecture string_to_architecture(const std::string& arch) {
+	[[nodiscard]] inline Architecture string_to_architecture(const std::string& arch) {
 		if (arch == "x86_64") {
 			return Architecture::x86_64;
 		} else if (arch == "arm64") {
@@ -60,7 +60,7 @@ namespace xxlib::platform {
 			return Architecture::unknown;
 		}
 	}
-	inline std::string architecture_to_string(Architecture arch) {
+	[[nodiscard]] inline std::string architecture_to_string(Architecture arch) {
 		switch (arch) {
 		case Architecture::x86_64:
 			return "x86_64";
@@ -71,9 +71,9 @@ namespace xxlib::platform {
 		}
 	}
 
-	OSFamily get_current_os_family();
-	OS get_current_os();
-	Architecture get_current_architecture();
+	[[nodiscard]] OSFamily get_current_os_family();
+	[[nodiscard]] OS get_current_os();
+	[[nodiscard]] Architecture get_current_architecture();
 } // namespace xxlib::platform
 
 #endif // XX_PLATFORM_HPP

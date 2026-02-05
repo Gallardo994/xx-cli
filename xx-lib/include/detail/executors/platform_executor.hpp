@@ -6,10 +6,8 @@
 #include <cstdint>
 #include <expected>
 
-namespace xxlib {
-	namespace platform_executor {
-		std::expected<int32_t, std::string> execute_command(Command& command, CommandContext& context);
-	} // namespace platform_executor
-} // namespace xxlib
+namespace xxlib::platform_executor {
+	[[nodiscard]] std::expected<int32_t, std::string> execute_command(Command& command, CommandContext& context);
+} // namespace xxlib::platform_executor
 
 #endif // XX_PLATFORM_EXECUTOR_HPP

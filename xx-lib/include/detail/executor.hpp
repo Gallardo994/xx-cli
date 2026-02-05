@@ -15,9 +15,9 @@ namespace xxlib::executor {
 		DotnetRun,
 	};
 
-	Engine string_to_execution_engine(const std::string& executorStr);
+	[[nodiscard]] Engine string_to_execution_engine(const std::string& executorStr);
 
-	std::expected<int32_t, std::string> execute_command(Command& command, CommandContext& context);
+	[[nodiscard]] std::expected<int32_t, std::string> execute_command(Command& command, CommandContext& context);
 } // namespace xxlib::executor
 
 #endif // XX_EXECUTOR_HPP

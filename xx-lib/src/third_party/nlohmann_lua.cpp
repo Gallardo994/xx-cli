@@ -1,40 +1,16 @@
 #include "third_party/nlohmann_lua.hpp"
+#include "third_party/json.hpp"
 
 #include <lua.h>
 
-namespace nlohmann {
-	const std::vector<struct luaL_Reg> lua::jsonLib_f = {
+namespace nlohmann::lua {
+	const std::vector<struct luaL_Reg> functions = {
 		{"parse", lua::json_parse},
 		{"dump", lua::json_dump},
 		{nullptr, nullptr},
 	};
 
-	int lua::luaopen_array(lua_State* L) {
-		lua_newtable(L);
-		luaL_setfuncs(L, jsonLib_f.data(), 0);
-		lua_setglobal(L, "json");
-		return 1;
-	}
-
-	int lua::json_parse(lua_State* L) {
-		auto* jsonData = luaL_checkstring(L, 1);
-		if (!jsonData) {
-			luaL_argerror(L, 1, "`json_data` must be a string");
-			return 0;
-		}
-
-		try {
-			auto json = nlohmann::json::parse(jsonData);
-			json_to_lua(L, json);
-			return 1;
-		} catch (std::exception& ex) {
-			luaL_argerror(L, 1, "Failed to parse JSON from `json_data`");
-		}
-
-		return 0;
-	}
-
-	int lua::json_to_lua(lua_State* L, json& j) {
+	int json_to_lua(lua_State* L, json& j) {
 		using vt = nlohmann::json::value_t;
 
 		switch (j.type()) {
@@ -85,26 +61,7 @@ namespace nlohmann {
 		}
 	}
 
-	int lua::json_dump(lua_State* L) {
-		try {
-			auto j = lua_to_json(L, 1);
-			auto minify = lua_toboolean(L, 2) != 0;
-
-			std::string dumped;
-			if (minify) {
-				dumped = j.dump();
-			} else {
-				dumped = j.dump(4);
-			}
-			lua_pushstring(L, dumped.c_str());
-			return 1;
-		} catch (const std::exception& ex) {
-			luaL_error(L, "Failed to dump JSON: %s", ex.what());
-			return 0;
-		}
-	}
-
-	nlohmann::json lua::lua_to_json(lua_State* L, int idx) {
+	nlohmann::json lua_to_json(lua_State* L, int idx) {
 		const auto type = lua_type(L, idx);
 
 		switch (type) {
@@ -171,4 +128,47 @@ namespace nlohmann {
 		}
 	}
 
-} // namespace nlohmann
+	int luaopen_array(lua_State* L) {
+		lua_newtable(L);
+		luaL_setfuncs(L, functions.data(), 0);
+		lua_setglobal(L, "json");
+		return 1;
+	}
+
+	int json_parse(lua_State* L) {
+		auto* jsonData = luaL_checkstring(L, 1);
+		if (!jsonData) {
+			luaL_argerror(L, 1, "`json_data` must be a string");
+			return 0;
+		}
+
+		try {
+			auto json = nlohmann::json::parse(jsonData);
+			json_to_lua(L, json);
+			return 1;
+		} catch (std::exception& ex) {
+			luaL_argerror(L, 1, "Failed to parse JSON from `json_data`");
+		}
+
+		return 0;
+	}
+
+	int json_dump(lua_State* L) {
+		try {
+			auto j = lua_to_json(L, 1);
+			auto minify = lua_toboolean(L, 2) != 0;
+
+			std::string dumped;
+			if (minify) {
+				dumped = j.dump();
+			} else {
+				dumped = j.dump(4);
+			}
+			lua_pushstring(L, dumped.c_str());
+			return 1;
+		} catch (const std::exception& ex) {
+			luaL_error(L, "Failed to dump JSON: %s", ex.what());
+			return 0;
+		}
+	}
+} // namespace nlohmann::lua

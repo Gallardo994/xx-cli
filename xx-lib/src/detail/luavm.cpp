@@ -22,7 +22,7 @@ namespace xxlib::luavm {
 	}
 
 	void add_json_library(LuaStatePtr& luaState) {
-		nlohmann::lua::luaopen_array(luaState.get());
+		auto _ = nlohmann::lua::luaopen_array(luaState.get());
 	}
 
 	std::string version() {

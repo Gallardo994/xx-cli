@@ -11,9 +11,9 @@ namespace xxlib::helpers {
 		std::vector<std::string> positional;
 	};
 
-	bool ask_for_confirmation(const std::string& text);
-	ExtrasResult split_extras(const std::vector<std::string>& extras);
-	std::vector<std::string> get_uset_vars(const std::unordered_map<std::string, std::string>& templateVars);
+	[[nodiscard]] bool ask_for_confirmation(const std::string& text);
+	[[nodiscard]] ExtrasResult split_extras(const std::vector<std::string>& extras);
+	[[nodiscard]] std::vector<std::string> get_uset_vars(const std::unordered_map<std::string, std::string>& templateVars);
 } // namespace xxlib::helpers
 
 #endif // XX_HELPERS_HPP

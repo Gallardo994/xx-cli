@@ -9,7 +9,7 @@ class Command;
 class CommandContext;
 
 namespace xxlib::dotnet_run_executor {
-	std::expected<int32_t, std::string> execute_command(Command& command, CommandContext& context);
+	[[nodiscard]] std::expected<int32_t, std::string> execute_command(Command& command, CommandContext& context);
 } // namespace xxlib::dotnet_run_executor
 
 #endif // XX_DOTNET_RUN_EXECUTOR_HPP

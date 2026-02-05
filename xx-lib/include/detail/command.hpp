@@ -28,9 +28,9 @@ struct CommandContext {
 };
 
 namespace xxlib::command {
-	std::string render(const std::string& templateStr, const std::unordered_map<std::string, std::string>& templateVars, xxlib::renderer::Engine renderEngine);
-	std::string join_cmd(const Command& command);
-	std::string join_constraints(const Command& command);
+	[[nodiscard]] std::string render(const std::string& templateStr, const std::unordered_map<std::string, std::string>& templateVars, xxlib::renderer::Engine renderEngine);
+	[[nodiscard]] std::string join_cmd(const Command& command);
+	[[nodiscard]] std::string join_constraints(const Command& command);
 } // namespace xxlib::command
 
 #endif // XX_COMMAND_HPP

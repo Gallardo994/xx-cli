@@ -9,7 +9,7 @@ class Command;
 class CommandContext;
 
 namespace xxlib::lua_executor {
-	std::expected<int32_t, std::string> execute_command(Command& command, CommandContext& context);
+	[[nodiscard]] std::expected<int32_t, std::string> execute_command(Command& command, CommandContext& context);
 } // namespace xxlib::lua_executor
 
 #endif // XX_LUA_EXECUTOR_HPP
