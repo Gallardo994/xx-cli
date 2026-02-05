@@ -19,7 +19,7 @@ target_include_directories(xx PRIVATE
 )
 target_link_libraries(xx PRIVATE
     xx-lib
-    spdlog::spdlog
+    spdlog::spdlog_header_only
     cpr::cpr
     nlohmann_json::nlohmann_json
     semver::semver
@@ -27,4 +27,3 @@ target_link_libraries(xx PRIVATE
 if (WIN32)
     target_link_libraries(xx PRIVATE -static)
 endif()
-
