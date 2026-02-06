@@ -11,7 +11,7 @@ It is both suitable for running locally, as well as in CI/CD pipelines by wget'i
 
 ### Homebrew (MacOS/Linux) (recommended)
 
-On MacOS you can install xx-cli via Homebrew:
+On MacOS/Linux you can install xx-cli via Homebrew:
 
 ```bash
 brew install gallardo994/tap/xx
