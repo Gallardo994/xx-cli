@@ -166,6 +166,8 @@ Special thanks to the following open-source projects:
 - [inja](https://github.com/pantor/inja)
 - [Lua](https://www.lua.org/)
 - [nlohmann_json_lua](https://github.com/graymadness/nlohmann_json_lua)
+- [neargye-semver](https://github.com/Neargye/semver)
+- [cpr](https://github.com/libcpr/cpr)
 
 ## Building and Testing
 
