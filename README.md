@@ -1,4 +1,4 @@
-# xx-cli [WIP]
+# xx-cli
 
 [![release](https://github.com/Gallardo994/xx-cli/actions/workflows/release.yml/badge.svg)](https://github.com/Gallardo994/xx-cli/actions/workflows/release.yml)
 [![testing](https://github.com/Gallardo994/xx-cli/actions/workflows/testing.yml/badge.svg)](https://github.com/Gallardo994/xx-cli/actions/workflows/testing.yml)
@@ -6,10 +6,6 @@
 xx-cli is a CLI tool for executing pre-made command aliases on per-project basis, meaning the commands can be shared across team members working on the same project. Alongside aliases, xx-cli includes self-contained Lua VM that can make abstracting OS differences easier.
 
 It is both suitable for running locally, as well as in CI/CD pipelines by wget'ing or curl'ing a pre-compiled binary from the releases page. No extra dependencies are required to run the binaries, however, some execution engines might require external dependencies (e.g. Dotnet Run engine requires .NET SDK to be installed).
-
-## Work in Progress
-
-This project is a work in progress. The features and syntax are subject to change.
 
 ## Install
 
@@ -168,7 +164,7 @@ Special thanks to the following open-source projects:
 - [yaml-cpp](https://github.com/jbeder/yaml-cpp)
 - [spdlog](https://github.com/gabime/spdlog)
 - [inja](https://github.com/pantor/inja)
-- [Lua for CMake](https://github.com/walterschell/Lua) & [Lua](https://www.lua.org/)
+- [Lua](https://www.lua.org/)
 - [nlohmann_json_lua](https://github.com/graymadness/nlohmann_json_lua)
 
 ## Building and Testing
