@@ -4,9 +4,8 @@
 #include <string>
 
 namespace xxlib {
-	[[nodiscard]] inline std::string version() {
-		return "1.1.0";
-	}
+	[[nodiscard]] std::string version();
+	[[nodiscard]] std::string detailed_version_text();
 } // namespace xxlib
 
 #include "detail/parser.hpp"

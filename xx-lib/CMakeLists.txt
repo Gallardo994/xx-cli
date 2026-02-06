@@ -4,6 +4,7 @@ project(xx-lib LANGUAGES CXX)
 include(FetchContent)
 
 find_package(spdlog CONFIG REQUIRED)
+find_package(fmt CONFIG REQUIRED)
 find_package(cpr CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(yaml-cpp CONFIG REQUIRED)
@@ -11,6 +12,8 @@ find_package(inja CONFIG REQUIRED)
 find_package(Lua REQUIRED)
 
 set(SOURCES
+    src/xxlib.cpp
+
     src/detail/command.cpp
     src/detail/parser.cpp
     src/detail/planner.cpp
@@ -46,6 +49,7 @@ target_compile_features(xx-lib PUBLIC cxx_std_23)
 target_include_directories(xx-lib PRIVATE include ${LUA_INCLUDE_DIR})
 target_link_libraries(xx-lib PRIVATE
     spdlog::spdlog
+    fmt::fmt
     cpr::cpr
     nlohmann_json::nlohmann_json
     yaml-cpp::yaml-cpp

@@ -1,5 +1,6 @@
 {
   "dependencies": [
+    "cli11",
     "cpr",
     "inja",
     "lua",
@@ -7,6 +8,6 @@
     "nlohmann-json",
     "spdlog",
     "yaml-cpp",
-    "cli11"
+    "fmt"
   ]
 }
