@@ -2,7 +2,10 @@ cmake_minimum_required(VERSION 3.22)
 
 project(xx LANGUAGES CXX)
 
+set(SPDLOG_FMT_EXTERNAL ON)
+
 find_package(CLI11 CONFIG REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
 find_package(semver CONFIG REQUIRED)
 
 set(SOURCES
@@ -18,5 +21,6 @@ target_include_directories(xx PRIVATE
 target_link_libraries(xx PRIVATE
     xx-lib
     CLI11::CLI11
+    spdlog::spdlog
     semver::semver
 )

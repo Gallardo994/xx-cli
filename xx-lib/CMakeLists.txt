@@ -45,12 +45,10 @@ add_library(xx-lib ${SOURCES})
 target_compile_features(xx-lib PUBLIC cxx_std_23)
 target_include_directories(xx-lib PRIVATE include ${LUA_INCLUDE_DIR})
 target_link_libraries(xx-lib PRIVATE
+    spdlog::spdlog
     cpr::cpr
     nlohmann_json::nlohmann_json
     yaml-cpp::yaml-cpp
     pantor::inja
     ${LUA_LIBRARIES}
-)
-target_link_libraries(xx-lib PUBLIC
-    spdlog::spdlog
 )
