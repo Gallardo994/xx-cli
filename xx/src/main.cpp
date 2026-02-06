@@ -8,7 +8,6 @@
 #include <CLI/CLI.hpp>
 #include <spdlog/spdlog.h>
 #include <cpr/cpr.h>
-#include <nlohmann/json.hpp>
 #include <semver.hpp>
 
 struct GlobalArgs {
@@ -173,54 +172,41 @@ int main(int argc, char** argv) {
 			return;
 		}
 
-		const auto latestUrlApi = "https://api.github.com/repos/gallardo994/xx-cli/releases/latest";
+		const auto latestReleaseOpt = xxlib::updates::get_latest_release();
 
-		try {
-			auto response = cpr::Get(cpr::Url{latestUrlApi});
-			if (response.status_code != 200) {
-				spdlog::error("Failed to check for updates. HTTP status code: {}", response.status_code);
-				return;
-			}
+		if (!latestReleaseOpt) {
+			spdlog::error("Failed to check for updates: {}", latestReleaseOpt.error());
+			return;
+		}
 
-			auto jsonResponse = nlohmann::json::parse(response.text);
-			if (!jsonResponse.contains("tag_name") || !jsonResponse["tag_name"].is_string()) {
-				spdlog::error("Invalid GitHub API response: {}", response.text);
-				return;
-			}
+		const auto& latestRelease = latestReleaseOpt.value();
 
-			auto latestVersion = jsonResponse["tag_name"].get<std::string>();
+		semver::version latest;
+		if (!semver::parse(latestRelease->version, latest)) {
+			spdlog::error("Failed to parse latest version from response: {}", latestRelease->version);
+			return;
+		}
 
-			semver::version latest;
-			if (!semver::parse(latestVersion, latest)) {
-				spdlog::error("Failed to parse latest version from response: {}", latestVersion);
-				return;
-			}
+		if (latest > current) {
+			spdlog::info("A new version of xx is available: {} (current: {})", latestRelease->version, xxlib::version());
+			spdlog::info("Visit {} to download the latest version.", latestRelease->url);
 
-			if (latest > current) {
-				auto releasePage = jsonResponse["html_url"].get<std::string>();
-
-				spdlog::info("A new version of xx is available: {} (current: {})", latestVersion, xxlib::version());
-				spdlog::info("Visit {} to download the latest version.", releasePage);
-
-				if (xxlib::helpers::ask_for_confirmation("Do you want to open the releases page in your default browser?")) {
+			if (xxlib::helpers::ask_for_confirmation("Do you want to open the releases page in your default browser?")) {
 #if defined(_WIN32)
-					std::string command = "start " + std::string(releasePage);
-					std::system(command.c_str());
+				std::string command = "start " + std::string(latestRelease->url);
+				std::system(command.c_str());
 #elif defined(__APPLE__)
-					std::string command = "open " + std::string(releasePage);
-					std::system(command.c_str());
+				std::string command = "open " + std::string(latestRelease->url);
+				std::system(command.c_str());
 #elif defined(__linux__)
-					std::string command = "xdg-open " + std::string(releasePage);
-					std::system(command.c_str());
+				std::string command = "xdg-open " + std::string(latestRelease->url);
+				std::system(command.c_str());
 #else
-					spdlog::error("Opening the browser is not supported on this platform.");
+				spdlog::error("Opening the browser is not supported on this platform.");
 #endif
-				}
-			} else {
-				spdlog::info("You are using the latest version of xx: {}", xxlib::version());
 			}
-		} catch (const std::exception& ex) {
-			spdlog::error("Error while checking for updates: {}", ex.what());
+		} else {
+			spdlog::info("You are using the latest version of xx: {}", xxlib::version());
 		}
 	});
 

@@ -28,6 +28,7 @@ set(SOURCES
     src/detail/luavm_modules/luavm_cpr.cpp
 
     src/detail/helpers.cpp
+    src/detail/updates.cpp
 )
 
 if (WIN32)

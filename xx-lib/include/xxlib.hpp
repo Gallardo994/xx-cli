@@ -16,5 +16,6 @@ namespace xxlib {
 #include "detail/platform.hpp"
 #include "detail/command.hpp"
 #include "detail/helpers.hpp"
+#include "detail/updates.hpp"
 
 #endif // XXLIB_HPP
