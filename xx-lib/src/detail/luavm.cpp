@@ -1,6 +1,7 @@
 #include "detail/luavm.hpp"
 #include "detail/luavm_modules/luavm_json.hpp"
 #include "detail/luavm_modules/luavm_cpr.hpp"
+#include "detail/luavm_modules/luavm_fs.hpp"
 
 #include <lua.hpp>
 
@@ -27,8 +28,12 @@ namespace xxlib::luavm {
 	}
 
 	void add_cpr_library(LuaStatePtr& luaState) {
-        auto _ = mod_cpr::luaopen_cpr(luaState.get());
-    }
+		auto _ = mod_cpr::luaopen_cpr(luaState.get());
+	}
+
+	void add_fs_library(LuaStatePtr& luaState) {
+		auto _ = mod_fs::luaopen_fs(luaState.get());
+	}
 
 	std::string version() {
 		return LUA_RELEASE;

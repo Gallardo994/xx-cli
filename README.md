@@ -158,6 +158,7 @@ Available plugins/modules:
 - `pcr`: For making HTTP requests using cpr bindings. Each function returns a table `status_code`, `body`, `headers`, `url` and `error` fields.
   - `pcr.get(url, [ queryParametersTable, headersTable ])` - Makes a GET request to the specified URL with optional parameters.
   - `pcr.post(url, [ postBodyString, queryParametersTable, headersTable ])` - Makes a POST request to the specified URL with optional parameters.
+- `fs` for filesystem operations using `std::filesystem`-compatible API.
 
 ## Dotnet Run execution engine
 
@@ -177,6 +178,7 @@ Special thanks to the following open-source projects:
 - [nlohmann_json_lua](https://github.com/graymadness/nlohmann_json_lua)
 - [neargye-semver](https://github.com/Neargye/semver)
 - [cpr](https://github.com/libcpr/cpr)
+- [filesystem](https://github.com/PG1003/filesystem)
 
 ## Building and Testing
 

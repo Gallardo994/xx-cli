@@ -29,6 +29,7 @@ set(SOURCES
     src/detail/luavm.cpp
     src/detail/luavm_modules/luavm_json.cpp
     src/detail/luavm_modules/luavm_cpr.cpp
+    src/detail/luavm_modules/luavm_fs.cpp
 
     src/detail/helpers.cpp
     src/detail/updates.cpp

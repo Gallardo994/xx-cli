@@ -24,6 +24,9 @@ alias:
 
   luacode:
     - cmd: |
+        local current_dir = fs.current_path()
+        print(current_dir)
+
         local t = {}
         for str in string.gmatch(TEMPLATE_VARS.values, '([^,]+)') do
             table.insert(t, tonumber(str))
