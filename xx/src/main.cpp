@@ -1,5 +1,6 @@
 #include "xxlib.hpp"
 
+#include <cstdio>
 #include <filesystem>
 #include <sstream>
 #include <string>
