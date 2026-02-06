@@ -1,11 +1,11 @@
 #include "xxlib.hpp"
-#include "third_party/CLI11.hpp"
 
 #include <cstdio>
 #include <filesystem>
 #include <sstream>
 #include <string>
 #include <optional>
+#include <CLI/CLI.hpp>
 #include <spdlog/spdlog.h>
 #include <cpr/cpr.h>
 #include <nlohmann/json.hpp>

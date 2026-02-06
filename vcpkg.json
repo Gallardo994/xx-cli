@@ -3,9 +3,10 @@
     "cpr",
     "inja",
     "lua",
+    "neargye-semver",
     "nlohmann-json",
     "spdlog",
     "yaml-cpp",
-    "neargye-semver"
+    "cli11"
   ]
 }

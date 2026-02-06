@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 
 project(xx LANGUAGES CXX)
 
+find_package(CLI11 CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(cpr CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
@@ -19,6 +20,7 @@ target_include_directories(xx PRIVATE
 )
 target_link_libraries(xx PRIVATE
     xx-lib
+    CLI11::CLI11
     spdlog::spdlog_header_only
     cpr::cpr
     nlohmann_json::nlohmann_json
