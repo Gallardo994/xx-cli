@@ -1,16 +1,12 @@
-#ifndef XX_LUAVM__JSON_HPP
-#define XX_LUAVM__JSON_HPP
+#ifndef XX_LUAVM_MODULES_JSON_HPP
+#define XX_LUAVM_MODULES_JSON_HPP
 
-extern "C" {
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
-}
+#include <lua.hpp>
 
-namespace xxlib::luavm::json {
+namespace xxlib::luavm::mod_json {
 	[[nodiscard]] int json_parse(lua_State* L);
 	[[nodiscard]] int json_dump(lua_State* L);
 	[[nodiscard]] int luaopen_array(lua_State* L);
-} // namespace xxlib::luavm::json
+} // namespace xxlib::luavm::mod_json
 
-#endif // XX_LUAVM__JSON_HPP
+#endif // XX_LUAVM_MODULES_JSON_HPP

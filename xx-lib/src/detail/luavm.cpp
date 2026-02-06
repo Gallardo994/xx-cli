@@ -1,5 +1,6 @@
 #include "detail/luavm.hpp"
 #include "detail/luavm_modules/luavm_json.hpp"
+#include "detail/luavm_modules/luavm_cpr.hpp"
 
 #include <lua.hpp>
 
@@ -22,8 +23,12 @@ namespace xxlib::luavm {
 	}
 
 	void add_json_library(LuaStatePtr& luaState) {
-		auto _ = json::luaopen_array(luaState.get());
+		auto _ = mod_json::luaopen_array(luaState.get());
 	}
+
+	void add_cpr_library(LuaStatePtr& luaState) {
+        auto _ = mod_cpr::luaopen_cpr(luaState.get());
+    }
 
 	std::string version() {
 		return LUA_RELEASE;

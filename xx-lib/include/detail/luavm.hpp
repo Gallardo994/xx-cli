@@ -19,6 +19,7 @@ namespace xxlib::luavm {
 	void destroy(LuaStatePtr& luaState);
 
 	void add_json_library(LuaStatePtr& luaState);
+	void add_cpr_library(LuaStatePtr& luaState);
 
 	int32_t loadstring(LuaStatePtr& luaState, const std::string& code);
 	int32_t pcall(LuaStatePtr& luaState, int32_t nargs, int32_t nresults, int32_t errfunc);

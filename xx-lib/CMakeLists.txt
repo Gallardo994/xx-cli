@@ -4,6 +4,7 @@ project(xx-lib LANGUAGES CXX)
 include(FetchContent)
 
 find_package(spdlog CONFIG REQUIRED)
+find_package(cpr CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(yaml-cpp CONFIG REQUIRED)
 find_package(inja CONFIG REQUIRED)
@@ -24,6 +25,7 @@ set(SOURCES
 
     src/detail/luavm.cpp
     src/detail/luavm_modules/luavm_json.cpp
+    src/detail/luavm_modules/luavm_cpr.cpp
 
     src/detail/helpers.cpp
 )
@@ -43,8 +45,9 @@ target_compile_features(xx-lib PUBLIC cxx_std_23)
 target_include_directories(xx-lib PRIVATE include ${LUA_INCLUDE_DIR})
 target_link_libraries(xx-lib PRIVATE
     spdlog::spdlog_header_only
-    yaml-cpp::yaml-cpp
+    cpr::cpr
     nlohmann_json::nlohmann_json
+    yaml-cpp::yaml-cpp
     pantor::inja
     ${LUA_LIBRARIES}
 )

@@ -3,10 +3,10 @@
 #include <nlohmann/json.hpp>
 #include <lua.h>
 
-namespace xxlib::luavm::json {
+namespace xxlib::luavm::mod_json {
 	const std::vector<struct luaL_Reg> functions = {
-		{"parse", xxlib::luavm::json::json_parse},
-		{"dump", xxlib::luavm::json::json_dump},
+		{"parse", xxlib::luavm::mod_json::json_parse},
+		{"dump", xxlib::luavm::mod_json::json_dump},
 		{nullptr, nullptr},
 	};
 
@@ -171,4 +171,4 @@ namespace xxlib::luavm::json {
 			return 0;
 		}
 	}
-} // namespace xxlib::luavm::json
+} // namespace xxlib::luavm::mod_json

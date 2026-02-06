@@ -41,6 +41,17 @@ alias:
       template_vars:
         values: "0"
 
+  luacpr:
+    - cmd: |
+        local get = cpr.get("https://httpbin.org/get", { [ "a" ] = "b" }, { [ "Content-Type" ] = "application/json" })
+        print("HTTP GET Response: " .. get.body)
+
+        local post = cpr.post("https://httpbin.org/post", json.dump({ "a", "b" }), { [ "x" ] = "y" }, { [ "Content-Type" ] = "application/json" })
+        print("HTTP POST Response: " .. post.body)
+      execution_engine: lua
+      template_vars:
+        values: "0"
+
   luadump:
     - cmd: |
         function dump(o)
