@@ -126,7 +126,7 @@ namespace xxlib::parser {
 		} catch (const YAML::Exception& e) {
 			return std::unexpected(std::string("YAML parsing error: ") + e.what());
 		} catch (const std::exception& e) {
-			return std::unexpected(std::string("Error parsing command: ") + e.what());
+			return std::unexpected(e.what());
 		}
 
 		if (command.cmd.empty()) {
@@ -166,7 +166,8 @@ namespace xxlib::parser {
 
 					auto opt = parse_command(entry);
 					if (!opt) {
-						return std::unexpected(opt.error());
+						spdlog::error("Error parsing command for alias '{}': {}", aliasName, opt.error());
+						continue;
 					}
 
 					auto cmd = *opt;
@@ -185,7 +186,8 @@ namespace xxlib::parser {
 				if (aliasVal.IsMap()) {
 					auto opt = parse_command(aliasVal);
 					if (!opt) {
-						return std::unexpected(opt.error());
+						spdlog::error("Error parsing command for alias '{}': {}", aliasName, opt.error());
+                        continue;
 					}
 
 					auto cmd = *opt;
@@ -199,7 +201,8 @@ namespace xxlib::parser {
 
 						auto opt = parse_command(item);
 						if (!opt) {
-							return std::unexpected(opt.error());
+							spdlog::error("Error parsing command for alias '{}': {}", aliasName, opt.error());
+                            continue;
 						}
 
 						auto cmd = *opt;

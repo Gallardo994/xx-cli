@@ -156,8 +156,8 @@ alias:
 )";
 
 	auto result = xxlib::parser::parse_buffer(yaml);
-	ASSERT_FALSE(result.has_value());
-	EXPECT_EQ(result.error(), "Missing 'cmd' field");
+	ASSERT_TRUE(result.has_value());
+	EXPECT_EQ(result->size(), 0u);
 }
 
 TEST(Parser_ParseBuffer, InvalidConstraintType) {
@@ -170,8 +170,8 @@ alias:
 )";
 
 	auto result = xxlib::parser::parse_buffer(yaml);
-	ASSERT_FALSE(result.has_value());
-	EXPECT_EQ(result.error(), "Each constraint must be a map with a single key/value pair");
+	ASSERT_TRUE(result.has_value());
+    EXPECT_EQ(result->size(), 0u);
 }
 
 TEST(Parser_ParseBuffer, InvalidRequiresConfirmationType) {
@@ -183,8 +183,8 @@ alias:
 )";
 
 	auto result = xxlib::parser::parse_buffer(yaml);
-	ASSERT_FALSE(result.has_value());
-	EXPECT_EQ(result.error(), "'requires_confirmation' must be a boolean (true/false)");
+	ASSERT_TRUE(result.has_value());
+    EXPECT_EQ(result->size(), 0u);
 }
 
 TEST(Parser_ParseBuffer, TemplateVarsAndRenderEngine) {
