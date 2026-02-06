@@ -152,7 +152,12 @@ The Lua script can return:
 - A nil value (or no return): Treated as a successful execution (exit code 0).
 
 Available plugins/modules:
-- `json`: For JSON serialization and deserialization using nlohmann_json_lua, e.g. `local t = json.parse(s)`
+- `json`: For JSON serialization and deserialization using nlohmann::json bindings.
+  - `json.dump(lua_table)` - Serializes a Lua table to a JSON string.
+  - `json.load(json_string)` - Deserializes a JSON string into a Lua table.
+- `pcr`: For making HTTP requests using cpr bindings. Each function returns a table `status_code`, `body`, `headers`, `url` and `error` fields.
+  - `pcr.get(url, [ queryParametersTable, headersTable ])` - Makes a GET request to the specified URL with optional parameters.
+  - `pcr.post(url, [ postBodyString, queryParametersTable, headersTable ])` - Makes a POST request to the specified URL with optional parameters.
 
 ## Dotnet Run execution engine
 
