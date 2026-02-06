@@ -27,6 +27,8 @@ MacOS/Linux:
 curl -sSL https://raw.githubusercontent.com/Gallardo994/xx-cli/refs/heads/main/install.sh | bash
 ```
 
+You can re-run the script to update xx-cli to the latest version, if you have it already installed.
+
 ### Manual installation (Windows)
 
 Windows:
@@ -35,6 +37,8 @@ Windows:
 3. Rename the downloaded file to `xx.exe` and place it somewhere in your PATH.
 
 If you're unsure which architecture you have, you most likely have x86_64.
+
+Updating is done by repeating the same steps, however, you can check for updates using `xx check-updates` command.
 
 ## Example YAML Configuration
 
