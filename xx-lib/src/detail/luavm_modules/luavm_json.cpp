@@ -1,16 +1,16 @@
-#include "third_party/nlohmann_lua.hpp"
+#include "detail/luavm_modules/luavm_json.hpp"
 
 #include <nlohmann/json.hpp>
 #include <lua.h>
 
-namespace nlohmann::lua {
+namespace xxlib::luavm::json {
 	const std::vector<struct luaL_Reg> functions = {
-		{"parse", lua::json_parse},
-		{"dump", lua::json_dump},
+		{"parse", xxlib::luavm::json::json_parse},
+		{"dump", xxlib::luavm::json::json_dump},
 		{nullptr, nullptr},
 	};
 
-	int json_to_lua(lua_State* L, json& j) {
+	int json_to_lua(lua_State* L, nlohmann::json& j) {
 		using vt = nlohmann::json::value_t;
 
 		switch (j.type()) {
@@ -171,4 +171,4 @@ namespace nlohmann::lua {
 			return 0;
 		}
 	}
-} // namespace nlohmann::lua
+} // namespace xxlib::luavm::json

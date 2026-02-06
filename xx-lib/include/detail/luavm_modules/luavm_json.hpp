@@ -1,5 +1,5 @@
-#ifndef NLOHMANN_LUA_HPP
-#define NLOHMANN_LUA_HPP
+#ifndef XX_LUAVM__JSON_HPP
+#define XX_LUAVM__JSON_HPP
 
 extern "C" {
 #include <lua.h>
@@ -7,10 +7,10 @@ extern "C" {
 #include <lauxlib.h>
 }
 
-namespace nlohmann::lua {
+namespace xxlib::luavm::json {
 	[[nodiscard]] int json_parse(lua_State* L);
 	[[nodiscard]] int json_dump(lua_State* L);
 	[[nodiscard]] int luaopen_array(lua_State* L);
-} // namespace nlohmann::lua
+} // namespace xxlib::luavm::json
 
-#endif // NLOHMANN_LUA_HPP
+#endif // XX_LUAVM__JSON_HPP

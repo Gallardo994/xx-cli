@@ -23,7 +23,7 @@ set(SOURCES
     src/detail/renderers/inja_renderer.cpp
 
     src/detail/luavm.cpp
-    src/third_party/nlohmann_lua.cpp
+    src/detail/luavm_modules/luavm_json.cpp
 
     src/detail/helpers.cpp
 )
