@@ -27,6 +27,14 @@ MacOS/Linux:
 curl -sSL https://raw.githubusercontent.com/Gallardo994/xx-cli/refs/heads/main/install.sh | bash
 ```
 
+If your system doesn't have `curl` installed, you can use `wget` instead:
+
+```bash
+wget -qO- https://raw.githubusercontent.com/Gallardo994/xx-cli/refs/heads/main/install.sh | bash
+```
+
+The script internally supports both `curl` and `wget` and will choose `curl` if it exists, falling back to `wget` if it doesn't.
+
 You can re-run the script to update xx-cli to the latest version, if you have it already installed.
 
 ### Manual installation (Windows)
