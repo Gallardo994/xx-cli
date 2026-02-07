@@ -48,6 +48,12 @@ If you're unsure which architecture you have, you most likely have x86_64.
 
 Updating is done by repeating the same steps, however, you can check for updates using `xx check-updates` command.
 
+### Linux caveats
+
+The binaries provided on Releases page are built on Ubuntu and linked against `glibc`, so they might not work on Linux distributions using `musl` as their standard library (e.g. Alpine Linux). 
+
+Install scripts also depend on `curl` or `wget` and require `sudo` to be present on the system. The binaries themselves do not require those dependencies.
+
 ## Example YAML Configuration
 
 `.xx.yaml` file in current working directory:
