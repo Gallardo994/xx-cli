@@ -1,0 +1,18 @@
+alias:
+  test-docker:
+    - cmd: |
+        docker build -t xx-ubuntu-clean-install:latest .
+        docker run --rm xx-ubuntu-clean-install:latest
+
+  clean-docker:
+    - cmd: |
+        docker rmi -f xx-ubuntu-clean-install:latest || true
+
+  test-podman:
+    - cmd: |
+        podman build -t xx-ubuntu-clean-install:latest .
+        podman run --rm xx-ubuntu-clean-install:latest
+
+  clean-podman:
+    - cmd: |
+        podman rmi -f xx-ubuntu-clean-install:latest || true
