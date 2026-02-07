@@ -17,11 +17,11 @@ download_file() {
     local output="$2"
 
     if has_command curl; then
-        printf "Using curl"
+        printf "Using curl\n"
         curl -sSL "${url}" -o "${output}"
         return $?
     elif has_command wget; then
-        printf "Using wget"
+        printf "Using wget\n"
         wget -q -O "${output}" "${url}"
         return $?
     else
@@ -99,7 +99,12 @@ install_xx_cli() {
     printf "File downloaded to %s\n" "${DOWNLOAD_TEMP_FILE}"
 
     printf "Installing xx-cli to %s\n" "${INSTALL_DIRECTORY}/${BINARY_NAME}"
-    sudo mv "${DOWNLOAD_TEMP_FILE}" "${INSTALL_DIRECTORY}/${BINARY_NAME}"
+
+    if [ "$(id -u)" -ne 0 ]; then
+        sudo mv "${DOWNLOAD_TEMP_FILE}" "${INSTALL_DIRECTORY}/${BINARY_NAME}"
+    else
+        mv "${DOWNLOAD_TEMP_FILE}" "${INSTALL_DIRECTORY}/${BINARY_NAME}"
+    fi
 
     if command -v xx >/dev/null 2>&1; then
         xx version
