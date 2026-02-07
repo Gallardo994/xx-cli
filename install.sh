@@ -8,8 +8,38 @@ readonly DOWNLOAD_URL_TEMPLATE="https://github.com/Gallardo994/xx-cli/releases/d
 readonly SUPPORTED_MACOS_ARCHS=("arm64")
 readonly SUPPORTED_LINUX_ARCHS=("x86_64" "arm64")
 
+has_command() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+download_file() {
+    local url="$1"
+    local output="$2"
+
+    if has_command curl; then
+        printf "Using curl"
+        curl -sSL "${url}" -o "${output}"
+        return $?
+    elif has_command wget; then
+        printf "Using wget"
+        wget -q -O "${output}" "${url}"
+        return $?
+    else
+        echo "Error: Neither curl nor wget is installed. Please install one of them and try again." >&2
+        return 1
+    fi
+}
+
 get_latest_release() {
-    curl -sSL "${RELEASES_URL}/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'
+    local curl_or_wget_args
+
+    if has_command curl; then
+        curl -sSL "${RELEASES_URL}/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'
+    elif has_command wget; then
+        wget -qO- "${RELEASES_URL}/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'
+    else
+        echo ""
+    fi
 }
 
 install_xx_cli() {
@@ -17,7 +47,6 @@ install_xx_cli() {
     LATEST_RELEASE=$(get_latest_release)
 
     if [ -z "${LATEST_RELEASE}" ]; then
-        echo "Failed to fetch the latest release version. Cancelling." >&2
         exit 1
     fi
 
@@ -54,11 +83,18 @@ install_xx_cli() {
         fi
     fi
 
+    local DOWNLOAD_URL
     DOWNLOAD_URL=$(printf "${DOWNLOAD_URL_TEMPLATE}" "${LATEST_RELEASE}" "${PLATFORM}" "${ARCH}")
+    local DOWNLOAD_TEMP_FILE
     DOWNLOAD_TEMP_FILE="$(mktemp)"
 
     printf "Downloading ${PLATFORM}-${ARCH} from %s\n" "${DOWNLOAD_URL}"
-    curl -L -o "${DOWNLOAD_TEMP_FILE}" "${DOWNLOAD_URL}"
+
+    if ! download_file "${DOWNLOAD_URL}" "${DOWNLOAD_TEMP_FILE}"; then
+        rm -f "${DOWNLOAD_TEMP_FILE}"
+        exit 1
+    fi
+
     chmod +x "${DOWNLOAD_TEMP_FILE}"
     printf "File downloaded to %s\n" "${DOWNLOAD_TEMP_FILE}"
 
@@ -68,7 +104,6 @@ install_xx_cli() {
     if command -v xx >/dev/null 2>&1; then
         xx version
     else
-        echo "Installation failed. xx not found. Is ${INSTALL_DIRECTORY} in your PATH?" >&2
         exit 1
     fi
 }
