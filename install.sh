@@ -99,7 +99,7 @@ install_xx_cli() {
     printf "File downloaded to %s\n" "${DOWNLOAD_TEMP_FILE}"
 
     printf "Installing xx-cli to %s\n" "${INSTALL_DIRECTORY}/${BINARY_NAME}"
-    su root -c "mv \"${DOWNLOAD_TEMP_FILE}\" \"${INSTALL_DIRECTORY}/${BINARY_NAME}\""
+    sudo mv "${DOWNLOAD_TEMP_FILE}" "${INSTALL_DIRECTORY}/${BINARY_NAME}"
 
     if command -v xx >/dev/null 2>&1; then
         xx version
