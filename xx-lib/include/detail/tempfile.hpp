@@ -28,7 +28,7 @@ namespace xxlib {
 
 #ifdef _WIN32
 			std::array<char, MAX_PATH> tmpName{};
-			if (GetTempFileNameA(tempDir.c_str(), "/xxcli", 0, tmpName.data()) == 0) {
+			if (GetTempFileNameA(tempDir.c_str(), "xxcli", 0, tmpName.data()) == 0) {
 				throw std::runtime_error("Failed to create temporary file (WinAPI)");
 			}
 

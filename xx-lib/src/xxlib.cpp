@@ -5,7 +5,7 @@
 
 namespace xxlib {
 	std::string version() {
-		return "1.2.1";
+		return "1.2.2";
 	}
 
 	std::string detailed_version_text() {
