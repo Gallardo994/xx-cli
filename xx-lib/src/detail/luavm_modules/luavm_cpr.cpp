@@ -5,7 +5,7 @@
 #include <lauxlib.h>
 
 namespace xxlib::luavm::mod_cpr {
-	const std::vector<struct luaL_Reg> functions = {
+	const std::vector<luaL_Reg> functions = {
 		{"get", cpr_get},
 		{"post", cpr_post},
 		{nullptr, nullptr},

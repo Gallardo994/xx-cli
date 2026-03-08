@@ -4,7 +4,7 @@
 #include <lua.h>
 
 namespace xxlib::luavm::mod_json {
-	const std::vector<struct luaL_Reg> functions = {
+	const std::vector<luaL_Reg> functions = {
 		{"parse", xxlib::luavm::mod_json::json_parse},
 		{"dump", xxlib::luavm::mod_json::json_dump},
 		{nullptr, nullptr},
